@@ -15,5 +15,7 @@
         "noUnusedLocals": true,
         "outDir": "./compiled"
     },
-    "include": ["./src"]
+    "include": [
+        "./src"
+    ]
 }
