@@ -1,4 +1,4 @@
-import { ChainInfo, ChainURLs } from "./types/globals"
+import { ChainInfo, ChainURLs } from './types/globals'
 
 export class BaseChain {
     constructor(info: ChainInfo) {
@@ -11,8 +11,5 @@ export class BaseChain {
 
     readonly urls: ChainURLs
 
-
-    readonly request = {
-
-    }
+    readonly request = {}
 }

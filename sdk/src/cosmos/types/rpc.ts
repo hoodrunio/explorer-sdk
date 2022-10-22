@@ -2,7 +2,7 @@ type RPCSuccessResponse<T> = {
     id: number
     jsonrpc: string
     result: T
-    error: undefined | ""
+    error: undefined | ''
 }
 
 type RPCErrorResponse = {
@@ -12,22 +12,25 @@ type RPCErrorResponse = {
     error: string
 }
 
-
 export type RPCMethod = keyof RPCDatas
 
 export type RPCEndpoint<T extends RPCMethod> = RPCDatas[T] extends {
     endpoint: infer E
-} ? E : never
+}
+    ? E
+    : never
 
 export type RPCParams<T extends RPCMethod> = RPCDatas[T] extends {
     params: infer E
-} ? E : never
+}
+    ? E
+    : never
 
 export type RPCResult<T extends RPCMethod> = RPCDatas[T] extends {
     result: infer E
-} ? RPCSuccessResponse<E> | RPCErrorResponse : never
-
-
+}
+    ? RPCSuccessResponse<E> | RPCErrorResponse
+    : never
 
 interface RPCDatas {
     /** Node heartbeat */
@@ -188,7 +191,6 @@ interface RPCDatas {
                 num_txs: string
             }>
         }
-
     }
 
     /** Get block at a specified height */
@@ -280,12 +282,10 @@ interface RPCDatas {
                 }
             }
         }
-
     }
 
     /** Get commit results at a specified height */
-    commit:
-    {
+    commit: {
         endpoint: '/commit'
         params: {
             /** Height to return. If no height is provided, it will fetch commit informations regarding the latest block. Default value: 0. */
@@ -341,8 +341,7 @@ interface RPCDatas {
     }
 
     /** Get validator set at a specified height */
-    validators:
-    {
+    validators: {
         endpoint: '/validators'
         params: {
             /** Height to return. If no height is provided, it will fetch validator set which corresponds to the latest block. Default value: 0. */
@@ -366,16 +365,12 @@ interface RPCDatas {
             count: string
             total: string
         }
-
     }
 
     /** Get Genesis */
-    genesis:
-    {
+    genesis: {
         endpoint: '/genesis'
-        params: {
-
-        }
+        params: {}
         result: {
             genesis: {
                 genesis_time: string
@@ -407,16 +402,12 @@ interface RPCDatas {
                 app_state: {}
             }
         }
-
     }
 
     /** Get consensus state */
-    dumpConsensusState:
-    {
+    dumpConsensusState: {
         endpoint: '/dump_consensus_state'
-        params: {
-
-        }
+        params: {}
         result: {
             round_state: {
                 height: string
@@ -510,19 +501,15 @@ interface RPCDatas {
                 }
             }>
         }
-
     }
 
     /** Get consensus state */
-    consensusState:
-    {
+    consensusState: {
         endpoint: '/consensus_state'
-        params: {
-
-        }
+        params: {}
         result: {
             round_state: {
-                "height/round/step": string
+                'height/round/step': string
                 start_time: string
                 proposal_block_hash: string
                 locked_block_hash: string
@@ -540,12 +527,10 @@ interface RPCDatas {
                 }
             }
         }
-
     }
 
     /** Get consensus parameters */
-    consensusParams:
-    {
+    consensusParams: {
         endpoint: '/consensus_params'
         params: {
             /** Height to return. If no height is provided, it will fetch commit informations regarding the latest block. Default value: 0. */
@@ -567,12 +552,10 @@ interface RPCDatas {
                 }
             }
         }
-
     }
 
     /** Get the list of unconfirmed transactions */
-    unconfirmedTXs:
-    {
+    unconfirmedTXs: {
         endpoint: '/unconfirmed_txs'
         params: {
             /** Maximum number of unconfirmed transactions to return (max 100). Default value: 30. */
@@ -584,27 +567,21 @@ interface RPCDatas {
             total_bytes: string
             txs: Array<string>
         }
-
     }
 
     /** Get data about unconfirmed transactions */
-    numUnconfirmedTXs:
-    {
+    numUnconfirmedTXs: {
         endpoint: '/num_unconfirmed_txs'
-        params: {
-
-        }
+        params: {}
         result: {
             n_txs: string
             total: string
             total_bytes: string
         }
-
     }
 
     /** Search for transactions */
-    txSearch:
-    {
+    txSearch: {
         endpoint: '/tx_search'
         params: {
             /** Query. For example: `tx.height=1000`. */
@@ -647,12 +624,10 @@ interface RPCDatas {
             }>
             total_count: string
         }
-
     }
 
     /** Search for blocks by BeginBlock and EndBlock events. `TODO!` */
-    blockSearch:
-    {
+    blockSearch: {
         endpoint: '/block_searchs'
         params: {
             /** Query. For example: `block.height > 1000 AND valset.changed > 0`. */
@@ -671,8 +646,7 @@ interface RPCDatas {
     }
 
     /** Get transactions by hash */
-    tx:
-    {
+    tx: {
         endpoint: '/tx'
         params: {
             /** Transaction hash to retrive. */
@@ -699,8 +673,7 @@ interface RPCDatas {
     }
 
     /** Broadcast evidence of the misbehavior. */
-    broadcastEvidence:
-    {
+    broadcastEvidence: {
         endpoint: '/broadcast_evidence'
         params: {
             /** JSON evidence. For example: `JSON_EVIDENCE_encoded`. */
@@ -762,7 +735,6 @@ interface RPCDatas {
                 code: string
             }
         }
-
     }
 
     /** Checks the transaction without executing it. */
@@ -789,7 +761,6 @@ interface RPCDatas {
             }>
             codespace: string
         }
-
     }
 
     /** Get some info about the application. */
@@ -803,7 +774,6 @@ interface RPCDatas {
                 app_version: string
             }
         }
-
     }
 
     /** Query the application for some information. */
@@ -828,11 +798,8 @@ interface RPCDatas {
             index: string
             code: string
         }
-
-
     }
 }
-
 
 interface BlockID {
     hash: string
@@ -841,8 +808,6 @@ interface BlockID {
         hash: string
     }
 }
-
-
 
 interface Block {
     header: {
