@@ -1,13 +1,13 @@
 
 
-export type RPCResponseSuccess<T> = {
+export type RPCSuccessResponse<T> = {
     id: number
     jsonrpc: string
     result: T
     error: undefined | ""
 }
 
-export type RPCResponseError = {
+export type RPCErrorResponse = {
     id: number
     jsonrpc: string
     result: undefined
@@ -27,7 +27,7 @@ export type RPCParams<T extends RPCName> = RPCDatas[T] extends {
 
 export type RPCResult<T extends RPCName> = RPCDatas[T] extends {
     result: infer E
-} ? RPCResponseSuccess<E> | RPCResponseError : never
+} ? RPCSuccessResponse<E> | RPCErrorResponse : never
 
 
 
