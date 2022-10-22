@@ -13,17 +13,17 @@ type RPCErrorResponse = {
 }
 
 
-export type RPCName = keyof RPCDatas
+export type RPCMethod = keyof RPCDatas
 
-export type RPCEndpoint<T extends RPCName> = RPCDatas[T] extends {
+export type RPCEndpoint<T extends RPCMethod> = RPCDatas[T] extends {
     endpoint: infer E
 } ? E : never
 
-export type RPCParams<T extends RPCName> = RPCDatas[T] extends {
+export type RPCParams<T extends RPCMethod> = RPCDatas[T] extends {
     params: infer E
 } ? E : never
 
-export type RPCResult<T extends RPCName> = RPCDatas[T] extends {
+export type RPCResult<T extends RPCMethod> = RPCDatas[T] extends {
     result: infer E
 } ? RPCSuccessResponse<E> | RPCErrorResponse : never
 
