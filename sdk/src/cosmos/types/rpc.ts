@@ -4,7 +4,7 @@ export type RPCResponseSuccess<T> = {
     id: number
     jsonrpc: string
     result: T
-    error: undefined
+    error: undefined | ""
 }
 
 export type RPCResponseError = {
