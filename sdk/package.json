@@ -1,0 +1,11 @@
+{
+  "name": "sdk",
+  "version": "0.1.0",
+  "description": "SDK for Cosmos ecosystem Explorer.",
+  "main": "dist/index.cjs.js",
+  "module": "dist/index.mjs.js",
+  "types": "dist/index.d.ts",
+  "author": "TestnetRun Contributors",
+  "license": "MIT",
+  "private": true
+}
