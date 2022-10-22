@@ -1,13 +1,11 @@
-
-
-export type RPCSuccessResponse<T> = {
+type RPCSuccessResponse<T> = {
     id: number
     jsonrpc: string
     result: T
     error: undefined | ""
 }
 
-export type RPCErrorResponse = {
+type RPCErrorResponse = {
     id: number
     jsonrpc: string
     result: undefined
@@ -31,7 +29,7 @@ export type RPCResult<T extends RPCName> = RPCDatas[T] extends {
 
 
 
-export interface RPCDatas {
+interface RPCDatas {
     /** Node heartbeat */
     health: {
         endpoint: '​/health'
