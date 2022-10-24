@@ -1,14 +1,15 @@
 # SDK
+
 This SDK is for the upcoming Explorer.
 
-- It will support all the RPC methods.
+-   It will support all the RPC methods.
 
-- It will support all the REST API methods.
+-   It will support all the REST API methods.
 
-- It will support all the Web Socket methods.
-
+-   It will support all the Web Socket methods.
 
 ## Roadmap
+
 ✅ Make a prototype for all RPC methods.
 
 ❌ Make an exact list for all REST API methods including uncommon ones.
@@ -22,9 +23,11 @@ This SDK is for the upcoming Explorer.
 ❌ Make a prototype for Web Socket methods.
 
 ## To Know
-- Create a new YAML file in `sdk/cosmos_chains` folder, according to `example.yaml` to add a new chain support.
+
+-   Create a new YAML file in `sdk/cosmos_chains` folder, according to `example.yaml` to add a new chain support.
 
 The content of `example.yaml`:
+
 ```yaml
 # Name of the chain.
 name: Example
@@ -39,14 +42,16 @@ rest: https://rest.example.com
 socket: wss://ws.example.com/
 ```
 
-- Type below, to generate TypeScript objects for the new chain.
-Make sure the current directory is in `sdk/` folder.
+-   Type below, to generate TypeScript objects for the new chain.
+    Make sure the current directory is in `sdk/` folder.
+
 ```
 yarn generate-chains
 ```
 
-- Type below to create a bundle for the SDK.
-Make sure the current directory is in `sdk/` folder.
+-   Type below to create a bundle for the SDK.
+    Make sure the current directory is in `sdk/` folder.
+
 ```
 yarn run build
 ```
