@@ -1,0 +1,14 @@
+{
+  "name": "tests",
+  "version": "0.1.0",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "clean-old-sdk": "rm -rf node_modules",
+    "preinstall": "yarn clean-old-sdk && cd ../sdk && yarn build",
+    "test-rpc": "node src/rpc.js"
+  },
+  "dependencies": {
+    "sdk": "file:../sdk"
+  }
+}
