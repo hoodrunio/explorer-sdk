@@ -1,5 +1,5 @@
 import { ChainInfo, ChainURLs } from '../types/globals'
-import { RPCEndpoint, RPCMethod, RPCParams, RPCResult, RPCResponse } from '../types/rpc/rpc'
+import { RPCEndpoint, RPCMethod, RPCParams, RPCResponseResult, RPCSuccessResponse } from '../types/rpc/rpc'
 import fetch from 'node-fetch'
 
 export class BaseChain {
@@ -29,7 +29,7 @@ export class BaseChain {
     protected async rpcRequest<T extends RPCMethod>(
         path: RPCEndpoint<T>,
         params: RPCParams<T>
-    ): Promise<RPCResponse<T>> {
+    ): Promise<RPCSuccessResponse<T>> {
         try {
             // Create a variable to hold queryParams.
             let queryParams = ''
@@ -60,13 +60,13 @@ export class BaseChain {
                 throw new Error(`RPC Error. Status: ${response.status}`)
             }
 
-            const json = (await response.json()) as RPCResult<T>
+            const json = (await response.json()) as RPCResponseResult<T>
             // Return an error, if response has an error.
             if (json.error) {
                 throw new Error(`RPC Error. Message: ${json.error}`)
             }
 
-            return json as RPCResponse<T>
+            return json as RPCSuccessResponse<T>
         } catch (error) {
             throw new Error(`RPC Error.`)
         }
