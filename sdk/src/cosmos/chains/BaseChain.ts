@@ -5,7 +5,6 @@ import {
     RPCParams,
     RPCResponseResult,
     RPCResult,
-    RPCSuccessResponse,
 } from '../types/rpc/rpc'
 import fetch from 'node-fetch'
 
