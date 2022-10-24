@@ -4,7 +4,7 @@
     "description": "SDK for Cosmos ecosystem Explorer.",
     "main": "bundle/index.cjs.js",
     "module": "bundle/index.esm.js",
-    "types": "bundle/types/index.d.ts",
+    "types": "bundle/index.d.ts",
     "author": "TestnetRun Contributors",
     "license": "MIT",
     "private": true,
