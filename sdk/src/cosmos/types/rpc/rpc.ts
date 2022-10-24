@@ -1,4 +1,4 @@
-export type RPCResponse<T> = {
+export type RPCSuccessResponse<T> = {
     id: number
     jsonrpc: string
     result: T
@@ -30,11 +30,13 @@ export type RPCParams<T extends RPCMethod> = RPCDatas[T] extends {
     : never
 
 /** RPC response result type based on `RPCMethod`. */
-export type RPCResult<T extends RPCMethod> = RPCDatas[T] extends {
+export type RPCResponseResult<T extends RPCMethod> = RPCDatas[T] extends {
     result: infer E
 }
-    ? RPCResponse<E> | RPCErrorResponse
+    ? RPCSuccessResponse<E> | RPCErrorResponse
     : never
+
+
 
 export interface RPCDatas {
     /** Node heartbeat */
