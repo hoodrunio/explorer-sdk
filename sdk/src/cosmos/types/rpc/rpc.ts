@@ -1,48 +1,52 @@
-type RPCSuccessResponse<T> = {
+export type RPCResponse<T> = {
     id: number
     jsonrpc: string
     result: T
-    error: undefined | ''
+    error: undefined | ""
 }
 
-type RPCErrorResponse = {
+export type RPCErrorResponse = {
     id: number
     jsonrpc: string
     result: undefined
     error: string
 }
 
+/** Available RPC Methods. */
 export type RPCMethod = keyof RPCDatas
 
+/** RPC endpoint paths based on `RPCMethod`. */
 export type RPCEndpoint<T extends RPCMethod> = RPCDatas[T] extends {
     endpoint: infer E
 }
     ? E
     : never
 
+/** RPC parameters based on `RPCMethod`. */
 export type RPCParams<T extends RPCMethod> = RPCDatas[T] extends {
     params: infer E
 }
     ? E
     : never
 
+/** RPC response result type based on `RPCMethod`. */
 export type RPCResult<T extends RPCMethod> = RPCDatas[T] extends {
     result: infer E
 }
-    ? RPCSuccessResponse<E> | RPCErrorResponse
+    ? RPCResponse<E> | RPCErrorResponse
     : never
 
-interface RPCDatas {
+export interface RPCDatas {
     /** Node heartbeat */
     health: {
         endpoint: '​/health'
-        params: {}
+        params: undefined
         result: {}
     }
     /** Node Status */
     status: {
         endpoint: '/status'
-        params: {}
+        params: undefined
         result: {
             node_info: {
                 protocol_version: {
@@ -86,7 +90,7 @@ interface RPCDatas {
     /** Network informations */
     netInfo: {
         endpoint: '/net_info'
-        params: {}
+        params: undefined
         result: {
             listening: boolean
             listeners: Array<string>
@@ -370,7 +374,7 @@ interface RPCDatas {
     /** Get Genesis */
     genesis: {
         endpoint: '/genesis'
-        params: {}
+        params: undefined
         result: {
             genesis: {
                 genesis_time: string
@@ -407,7 +411,7 @@ interface RPCDatas {
     /** Get consensus state */
     dumpConsensusState: {
         endpoint: '/dump_consensus_state'
-        params: {}
+        params: undefined
         result: {
             round_state: {
                 height: string
@@ -506,7 +510,7 @@ interface RPCDatas {
     /** Get consensus state */
     consensusState: {
         endpoint: '/consensus_state'
-        params: {}
+        params: undefined
         result: {
             round_state: {
                 'height/round/step': string
@@ -572,7 +576,7 @@ interface RPCDatas {
     /** Get data about unconfirmed transactions */
     numUnconfirmedTXs: {
         endpoint: '/num_unconfirmed_txs'
-        params: {}
+        params: undefined
         result: {
             n_txs: string
             total: string
@@ -739,7 +743,7 @@ interface RPCDatas {
 
     /** Checks the transaction without executing it. */
     checkTX: {
-        endpoint: '/broadcast_tx_commit'
+        endpoint: '/check_tx'
         params: {
             /** The transaction. */
             tx: string
@@ -766,7 +770,7 @@ interface RPCDatas {
     /** Get some info about the application. */
     abciInfo: {
         endpoint: '/abci_info'
-        params: {}
+        params: undefined
         result: {
             response: {
                 data: string
@@ -778,7 +782,7 @@ interface RPCDatas {
 
     /** Query the application for some information. */
     abciQuery: {
-        endpoint: '/abci_info'
+        endpoint: '/abci_query'
         params: {
             /** Path to the data ("/a/b/c"). For example: `/a/b/c`. */
             path: string
