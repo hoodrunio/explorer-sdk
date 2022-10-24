@@ -1,5 +1,12 @@
 import { ChainInfo, ChainURLs } from '../types/globals'
-import { RPCEndpoint, RPCMethod, RPCParams, RPCResponseResult, RPCSuccessResponse } from '../types/rpc/rpc'
+import {
+    RPCEndpoint,
+    RPCMethod,
+    RPCParams,
+    RPCResponseResult,
+    RPCResult,
+    RPCSuccessResponse,
+} from '../types/rpc/rpc'
 import fetch from 'node-fetch'
 
 export class BaseChain {
@@ -16,7 +23,8 @@ export class BaseChain {
     readonly urls: ChainURLs
 
     /**
-     * Makes an RPC request to the RPC server at `path`, with `params`.
+     * Makes an RPC request to the RPC server at `path`, with `params`. \
+     * Returns the result of the server response.
      *
      * ## Usage
      * ```ts
@@ -29,7 +37,7 @@ export class BaseChain {
     protected async rpcRequest<T extends RPCMethod>(
         path: RPCEndpoint<T>,
         params: RPCParams<T>
-    ): Promise<RPCSuccessResponse<T>> {
+    ): Promise<RPCResult<T>> {
         try {
             // Create a variable to hold queryParams.
             let queryParams = ''
@@ -60,14 +68,18 @@ export class BaseChain {
                 throw new Error(`RPC Error. Status: ${response.status}`)
             }
 
+            // Parse response as a JSON object.
             const json = (await response.json()) as RPCResponseResult<T>
+
             // Return an error, if response has an error.
             if (json.error) {
                 throw new Error(`RPC Error. Message: ${json.error}`)
             }
 
-            return json as RPCSuccessResponse<T>
+            // Successfully return the result of the response JSON object.
+            return json.result as RPCResult<T>
         } catch (error) {
+            console.error(`LOOK AT THE ERROR BELOW:\n${error}`)
             throw new Error(`RPC Error.`)
         }
     }
