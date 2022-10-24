@@ -5,7 +5,7 @@ export type Endpoint = `/${string}`
 export interface ChainURLs {
     rpc: HTTPS_URL
     rest: HTTPS_URL
-    ws: WSS_URL
+    socket: WSS_URL
 }
 
 export interface ChainInfo {
