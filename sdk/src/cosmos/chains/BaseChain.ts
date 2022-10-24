@@ -31,13 +31,20 @@ export class BaseChain {
         params: RPCParams<T>
     ): Promise<RPCResponse<T>> {
         try {
+            // Create a variable to hold queryParams.
             let queryParams = ''
+
+            // Do below, if typeof `params` isn't `'undefined`.
             if (typeof params !== 'undefined') {
-                const keyAndValues = Object.entries(params as { [key in string]: unknown })
-                if (keyAndValues.length > 0) {
+                // Get all the parameter keys and values.
+                const keysAndValues = Object.entries(params as { [key in string]: unknown })
+
+                // Do below, if there are keys & values.
+                if (keysAndValues.length > 0) {
+                    // Set query parameters.
                     queryParams =
                         '?' +
-                        keyAndValues
+                        keysAndValues
                             .map(([key, value]) =>
                                 typeof value === 'undefined' ? '' : `${key}=${value}`
                             )
