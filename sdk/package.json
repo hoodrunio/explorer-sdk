@@ -16,7 +16,8 @@
         "bundle": "rollup -c",
         "clean": "rm -rf compiled",
         "build": "yarn compile && yarn bundle && yarn clean",
-        "prettify": "yarn prettier -w ."
+        "prettify": "yarn prettier -w .",
+        "generate-chains": "node ../scripts/generate-chains.js"
     },
     "devDependencies": {
         "@types/node": "^18.11.3",
