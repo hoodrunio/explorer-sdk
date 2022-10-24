@@ -7,4 +7,4 @@ export const EvmosInfo: ChainInfo = {
         rest: 'https://evmos-api.polkachu.com',
         socket: 'wss://rpc.evmos.bh.rocks/websocket',
     },
-}    
+}
