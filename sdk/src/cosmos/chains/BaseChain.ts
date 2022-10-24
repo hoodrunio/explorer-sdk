@@ -74,7 +74,7 @@ export class BaseChain {
 
     /** Returns node heartbeat. */
     async getHealth() {
-        return this.rpcRequest<'health'>('​/health', undefined)
+        return this.rpcRequest<'health'>('/health', undefined)
     }
 
     /** Returns node status. */

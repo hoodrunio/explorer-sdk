@@ -39,7 +39,7 @@ export type RPCResult<T extends RPCMethod> = RPCDatas[T] extends {
 export interface RPCDatas {
     /** Node heartbeat */
     health: {
-        endpoint: '​/health'
+        endpoint: '/health'
         params: undefined
         result: {}
     }
