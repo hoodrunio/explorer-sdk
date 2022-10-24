@@ -30,13 +30,15 @@ export type RPCParams<T extends RPCMethod> = RPCDatas[T] extends {
     : never
 
 /** RPC response result type based on `RPCMethod`. */
-export type RPCResponseResult<T extends RPCMethod> = RPCDatas[T] extends {
+export type RPCResponseResult<T extends RPCMethod> =
+    | RPCSuccessResponse<RPCResult<T>>
+    | RPCErrorResponse
+
+export type RPCResult<T extends RPCMethod> = RPCDatas[T] extends {
     result: infer E
 }
-    ? RPCSuccessResponse<E> | RPCErrorResponse
+    ? E
     : never
-
-
 
 export interface RPCDatas {
     /** Node heartbeat */
@@ -307,13 +309,7 @@ export interface RPCDatas {
                     chain_id: string
                     height: string
                     time: string
-                    last_block_id: {
-                        hash: string
-                        parts: {
-                            total: number
-                            hash: string
-                        }
-                    }
+                    last_block_id: BlockID
                     last_commit_hash: string
                     data_hash: string
                     validators_hash: string
@@ -327,13 +323,7 @@ export interface RPCDatas {
                 commit: {
                     height: string
                     round: number
-                    block_id: {
-                        hash: string
-                        parts: {
-                            total: number
-                            hash: string
-                        }
-                    }
+                    block_id: BlockID
                     signatures: Array<{
                         block_id_flag: number
                         validator_address: string
@@ -807,7 +797,7 @@ export interface RPCDatas {
     }
 }
 
-interface BlockID {
+export interface BlockID {
     hash: string
     parts: {
         total: number
@@ -815,7 +805,7 @@ interface BlockID {
     }
 }
 
-interface Block {
+export interface Block {
     header: {
         version: {
             block: string
@@ -824,13 +814,7 @@ interface Block {
         chain_id: string
         height: string
         time: string
-        last_block_id: {
-            hash: string
-            parts: {
-                total: number
-                hash: string
-            }
-        }
+        last_block_id: BlockID
         last_commit_hash: string
         data_hash: string
         validators_hash: string
@@ -859,24 +843,12 @@ interface Block {
     last_commit: {
         height: number
         round: number
-        block_id: {
-            hash: string
-            parts: {
-                total: number
-                hash: string
-            }
-        }
+        block_id: BlockID
         signatures: Array<{
             type: number
             height: string
             round: number
-            block_id: {
-                hash: string
-                parts: {
-                    total: number
-                    hash: string
-                }
-            }
+            block_id: BlockID
             timestamp: string
             validator_address: string
             validator_index: number
