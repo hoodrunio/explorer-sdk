@@ -1,8 +1,8 @@
 import { BaseChain } from './BaseChain'
-import { EVMOS } from '../info'
+import { EvmosInfo } from '../chain-infos'
 
 class Evmos extends BaseChain {
     constructor() {
-        super(EVMOS)
+        super(EvmosInfo)
     }
 }
