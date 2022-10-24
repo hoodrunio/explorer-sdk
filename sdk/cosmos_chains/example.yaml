@@ -1,0 +1,11 @@
+# Name of the chain.
+name: Example
+
+# URL for the RPC.
+rpc: https://rpc.example.com
+
+# URL for the REST API.
+rest: https://rest.example.com
+
+# URL for the web socket.
+socket: wss://ws.example.com/
