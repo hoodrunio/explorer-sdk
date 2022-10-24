@@ -1,7 +1,6 @@
-# Scripts
 This folder includes scripts which we need to develop the SDK.
 
-## generate-chains.js
+# generate-chains.js
 The script reads all the files inside `sdk/cosmos_chains/` folder.
 
 Then it parses them, and generates TypeScript objects.
