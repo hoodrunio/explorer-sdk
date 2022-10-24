@@ -14,7 +14,7 @@ Create a new YAML file (for example: `example.yaml`) inside `sdk/cosmos_chains/`
 Lines start with `#` are comments, you DO NOT need them.
 
 Example file content:
-```
+```yaml
 # Name of the chain.
 name: Example
 
