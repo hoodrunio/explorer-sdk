@@ -15,25 +15,33 @@ export class BaseChain {
     /** URLs for the chain. */
     readonly urls: ChainURLs
 
-
     /**
      * Makes an RPC request to the RPC server at `path`, with `params`.
-     * 
+     *
      * ## Usage
      * ```ts
-     * // Returns node heartbeat. 
+     * // Returns node heartbeat.
      * async getRpcHealth() {
      *     return this.rpcRequest<'health'>('​/health', undefined)
      * }
      * ```
      */
-    protected async rpcRequest<T extends RPCMethod>(path: RPCEndpoint<T>, params: RPCParams<T>): Promise<RPCResponse<T>> {
+    protected async rpcRequest<T extends RPCMethod>(
+        path: RPCEndpoint<T>,
+        params: RPCParams<T>
+    ): Promise<RPCResponse<T>> {
         try {
             let queryParams = ''
             if (typeof params !== 'undefined') {
                 const keyAndValues = Object.entries(params as { [key in string]: unknown })
                 if (keyAndValues.length > 0) {
-                    queryParams = '?' + keyAndValues.map(([key, value]) => typeof value === 'undefined' ? '' : `${key}=${value}`).join('&')
+                    queryParams =
+                        '?' +
+                        keyAndValues
+                            .map(([key, value]) =>
+                                typeof value === 'undefined' ? '' : `${key}=${value}`
+                            )
+                            .join('&')
                 }
             }
 
@@ -42,21 +50,20 @@ export class BaseChain {
 
             // Return an error, if the response is not OK.
             if (!response.ok) {
-                throw (new Error(`RPC Error. Status: ${response.status}`))
+                throw new Error(`RPC Error. Status: ${response.status}`)
             }
 
-            const json = await response.json() as RPCResult<T>
+            const json = (await response.json()) as RPCResult<T>
             // Return an error, if response has an error.
             if (json.error) {
-                throw (new Error(`RPC Error. Message: ${json.error}`))
+                throw new Error(`RPC Error. Message: ${json.error}`)
             }
 
             return json as RPCResponse<T>
         } catch (error) {
-            throw (new Error(`RPC Error.`))
+            throw new Error(`RPC Error.`)
         }
     }
-
 
     /** Returns node heartbeat. */
     async getHealth() {
@@ -78,8 +85,7 @@ export class BaseChain {
         return this.rpcRequest<'blockchain'>('/blockchain', params)
     }
 
-
-    /** 
+    /**
      * Returns the block at `height`, if `height` is given. \
      * Returns the latest block, if `height` is not given.
      */
@@ -87,14 +93,12 @@ export class BaseChain {
         return this.rpcRequest<'block'>('/block', params)
     }
 
-
     /** Returns the block associated with `hash`. */
     async getBlockByHash(params: RPCParams<'blockByHash'>) {
         return this.rpcRequest<'blockByHash'>('/block_by_hash', params)
     }
 
-
-    /** 
+    /**
      * Returns the results of the block at `height`, if `height` is given. \
      * Returns the results of the latest block, if `height` is not given.
      */
@@ -102,7 +106,7 @@ export class BaseChain {
         return this.rpcRequest<'blockResults'>('/block_results', params)
     }
 
-    /** 
+    /**
      * Returns the commit results of the block at `height`, if `height` is given. \
      * Returns the commit results of the latest block, if `height` is not given.
      */
@@ -110,8 +114,7 @@ export class BaseChain {
         return this.rpcRequest<'commit'>('/commit', params)
     }
 
-
-    /** 
+    /**
      * Returns the validator set of the block at `height`, if `height` is given. \
      * Returns the validator set of the latest block, if `height` is not given.
      */
@@ -134,7 +137,7 @@ export class BaseChain {
         return this.rpcRequest<'consensusState'>('/consensus_state', undefined)
     }
 
-    /** 
+    /**
      * Returns the consensus parameters of the block at `height`, if `height` is given. \
      * Returns the consensus parameters of the latest block, if `height` is not given.
      */
@@ -152,7 +155,7 @@ export class BaseChain {
         return this.rpcRequest<'numUnconfirmedTXs'>('/num_unconfirmed_txs', undefined)
     }
 
-    /** 
+    /**
      * Returns the transaction search result. \
      * Read the comments of parameters, to learn how it works.
      */
@@ -160,8 +163,7 @@ export class BaseChain {
         return this.rpcRequest<'txSearch'>('/tx_search', params)
     }
 
-
-    /** 
+    /**
      * Returns the block search result. \
      * There is no example in the docs right now. \
      * So, this one will be rechecked in the future.
@@ -170,7 +172,7 @@ export class BaseChain {
         return this.rpcRequest<'blockSearch'>('/block_searchs', params)
     }
 
-    /** 
+    /**
      * Returns the transaction associated with `hash`. \
      * Return value includes prove, if `prove` is true. \
      * Return value doesn't include prove, if `prove` is false. \
@@ -218,7 +220,6 @@ export class BaseChain {
     async getABCIInfo() {
         return this.rpcRequest<'abciInfo'>('/abci_info', undefined)
     }
-
 
     /**
      * Query the application for some information. \
