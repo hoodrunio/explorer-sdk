@@ -4,15 +4,13 @@
     // Import dependencies.
     const path = require('path')
     const fs = require('fs')
-
-    // Get and split all the parent folders.
-    const parent_folders = __dirname.split('/');
+    
 
     // Create a path representing `cosmos_chains` folder's.
-    const cosmos_chains_folder_path = '/' + path.join(...parent_folders.slice(0, parent_folders.length - 2), 'sdk', 'cosmos_chains')
+    const cosmos_chains_folder_path = 'cosmos_chains'
 
     // Create a path representing `cosmos_chains` folder's.
-    const chain_infos_ts_file_path = '/' + path.join(...parent_folders.slice(0, parent_folders.length - 2), 'sdk', 'src', 'cosmos', 'chain-infos.ts')
+    const chain_infos_ts_file_path = 'src/cosmos/chain-infos.ts'
 
     // Define the new content which will be written to "chain-infos.ts" file.
     let new_chain_infos_ts_content = `import { ChainInfo } from './types/globals'`
