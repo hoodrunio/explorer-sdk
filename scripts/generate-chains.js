@@ -99,7 +99,7 @@ const parse_yaml = (content) => {
         rest: '',
         socket: '',
         decimals: undefined,
-        prefix: '',
+        prefix: undefined,
         valoperPrefix: undefined,
         consPrefix: undefined,
     }
@@ -131,7 +131,10 @@ const parse_yaml = (content) => {
     chain.objectName = chain.name.split(' ').map(part => capitalize(part)).join('') + 'Info'
 
     // Check the necessary properties.
-    if (chain.name && chain.rpc && chain.rest && chain.socket && chain.objectName && chain.prefix) {
+    if (chain.name && chain.rpc && chain.rest && chain.socket && chain.objectName) {
+        // Set prefix if it is not specified yet.
+        !chain.prefix && (chain.prefix = chain.name.toLowerCase())
+
         return {
             objectName: chain.objectName,
             name: chain.name,
