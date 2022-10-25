@@ -41,7 +41,7 @@ type PathParam<
 
 export interface RESTDatas {
     /** Queries all proposals based on given status. */
-    proposal: {
+    proposals: {
         endpoint: `/cosmos/gov/v1beta1/proposals`
         pathParams: undefined
         queryParams: {
