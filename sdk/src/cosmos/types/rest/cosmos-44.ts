@@ -277,7 +277,7 @@ export interface RESTDatas {
         }
     }
 
-    /** Queries the parameters of slashing module */
+    /** Queries the parameters of slashing module. */
     slashingParams: {
         endpoint: `/cosmos/slashing/v1beta1/params`
         pathParams: undefined
@@ -295,7 +295,7 @@ export interface RESTDatas {
     }
 
     /** Queries signing info of all validators. */
-    slashingSigningInfo: {
+    slashingSigningInfos: {
         endpoint: `/cosmos/slashing/v1beta1/signing_infos`
         pathParams: undefined
         queryParams: {
