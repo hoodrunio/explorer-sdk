@@ -8,7 +8,15 @@ export interface ChainURLs {
     socket: WSS_URL
 }
 
+export interface ChainPrefixes {
+    prefix: string
+    valoperPrefix: string
+    consPrefix: string
+}
+
 export interface ChainInfo {
     name: string
     urls: ChainURLs
+    prefixes: ChainPrefixes
+    decimals: number
 }
