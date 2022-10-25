@@ -4,8 +4,8 @@ rpc: https://rpc.celestia.testnet.run
 
 rest: https://api.celestia.testnet.run
 
-ws: wss://rpc.celestia.testnet.run/websocket
-
-decimals: 6
+socket: wss://rpc.celestia.testnet.run/websocket
 
 prefix: celestia
+
+# If `decimals` is not specified, suppose it is `6`.

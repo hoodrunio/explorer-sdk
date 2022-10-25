@@ -4,14 +4,14 @@ rpc: https://rpc.cosmos.directory/osmosis
 
 rest: https://rest.cosmos.directory/osmosis
 
-ws: wss://rpc.osmosis.interbloc.org/websocket
-
-decimals: 6
+socket: wss://rpc.osmosis.interbloc.org/websocket
 
 prefix: osmosis
 
-# You can also specify other prefixes if they don't follow the same rule
+# You can also specify other prefixes if they don't follow the same rule.
 
 valoperPrefix: osmovaloper
 
 consPrefix: osmovalcons
+
+# If `decimals` is not specified, suppose it is `6`.

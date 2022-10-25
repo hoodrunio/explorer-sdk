@@ -4,7 +4,7 @@ rpc: https://rpc.beta.kyve.network
 
 rest: https://api.beta.kyve.network
 
-ws: wss://rpc.beta.kyve.network/websocket
+socket: wss://rpc.beta.kyve.network/websocket
 
 prefix: kyve
 
