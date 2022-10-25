@@ -11,7 +11,7 @@ export const AxelarInfo: ChainInfo = {
     prefixes: {
         prefix: 'axelar',
         valoperPrefix: 'axelarvaloper',
-        consPrefix: 'axelarvalcon',
+        consPrefix: 'axelarvalcons',
     },
     decimals: 6,
 }    
@@ -27,7 +27,7 @@ export const EvmosInfo: ChainInfo = {
     prefixes: {
         prefix: 'evmos',
         valoperPrefix: 'evmosvaloper',
-        consPrefix: 'evmosvalcon',
+        consPrefix: 'evmosvalcons',
     },
     decimals: 18,
 }    
@@ -43,7 +43,7 @@ export const CelestiaInfo: ChainInfo = {
     prefixes: {
         prefix: 'celestia',
         valoperPrefix: 'celestiavaloper',
-        consPrefix: 'celestiavalcon',
+        consPrefix: 'celestiavalcons',
     },
     decimals: 6,
 }    
@@ -59,7 +59,7 @@ export const KyveInfo: ChainInfo = {
     prefixes: {
         prefix: 'kyve',
         valoperPrefix: 'kyvevaloper',
-        consPrefix: 'kyvevalcon',
+        consPrefix: 'kyvevalcons',
     },
     decimals: 6,
 }    
@@ -75,7 +75,7 @@ export const OsmosisInfo: ChainInfo = {
     prefixes: {
         prefix: 'osmo',
         valoperPrefix: 'osmovaloper',
-        consPrefix: 'osmovalcon',
+        consPrefix: 'osmovalcons',
     },
     decimals: 6,
 }    
@@ -91,7 +91,7 @@ export const SecretInfo: ChainInfo = {
     prefixes: {
         prefix: 'secret',
         valoperPrefix: 'secretvaloper',
-        consPrefix: 'secretvalcon',
+        consPrefix: 'secretvalcons',
     },
     decimals: 6,
 }    

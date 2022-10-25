@@ -145,7 +145,7 @@ const parse_yaml = (content) => {
             prefix: chain.prefix,
             // If prefixes below are not given, create them using the prefix above.
             valoperPrefix: chain.valoperPrefix ?? chain.prefix + 'valoper',
-            consPrefix: chain.consPrefix ?? chain.prefix + 'valcon',
+            consPrefix: chain.consPrefix ?? chain.prefix + 'valcons',
         }
     }
 }
