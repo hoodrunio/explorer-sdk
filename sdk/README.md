@@ -44,14 +44,10 @@ socket: wss://ws.example.com/
 # You can provide `decimals` if it is not `6`, otherwise it's generated automatically.
 #decimals: 18
 
-# The prefix for the chain
-prefix: example
+# If `prefix` is not specified, suppose it to be lowercase version of `name`.
 
-# You can also specify other prefixes if they don't follow the same rule.
-
-#valoperPrefix: examvaloper
-
-#consPrefix: examvalcons
+# You can also provide `prefix`, if it isn't lowercase version of `name`.
+#prefix: exam
 ```
 
 -   Type below, to generate TypeScript objects for the new chain.
