@@ -6,7 +6,8 @@
   "scripts": {
     "clean-old-sdk": "rm -rf node_modules",
     "preinstall": "yarn clean-old-sdk && cd ../sdk && yarn build",
-    "test-rpc": "node src/rpc.js"
+    "test-rpc": "node src/rpc.js",
+    "test-rest": "node src/rest.js"
   },
   "dependencies": {
     "sdk": "file:../sdk"
