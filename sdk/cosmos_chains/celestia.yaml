@@ -6,6 +6,6 @@ rest: https://api.celestia.testnet.run
 
 socket: wss://rpc.celestia.testnet.run/websocket
 
-prefix: celestia
+# If `prefix` is not specified, suppose it to be lowercase version of `name`.
 
 # If `decimals` is not specified, suppose it is `6`.

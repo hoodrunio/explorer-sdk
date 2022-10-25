@@ -6,6 +6,6 @@ rest: https://axelar-api.polkachu.com
 
 socket: wss://axelar-rpc.chainode.tech/websocket
 
-prefix: axelar
+# If `prefix` is not specified, suppose it to be lowercase version of `name`.
 
 # If `decimals` is not specified, suppose it is `6`.

@@ -6,6 +6,6 @@ rest: https://evmos-api.polkachu.com
 
 socket: wss://rpc.evmos.bh.rocks/websocket
 
-prefix: evmos
+# If `prefix` is not specified, suppose it to be lowercase version of `name`.
 
 decimals: 18
