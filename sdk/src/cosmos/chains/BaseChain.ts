@@ -1,6 +1,14 @@
 import { ChainInfo, ChainURLs } from '../types/globals'
 import { RPCEndpoint, RPCMethod, RPCParams, RPCResponseResult, RPCResult } from '../types/rpc/rpc'
 import fetch from 'node-fetch'
+import {
+    RESTEndpoint,
+    RESTMethod,
+    RESTPathParams,
+    RESTQueryParams,
+    RESTResponse,
+    RESTSuccessResponse,
+} from '../types/rest/cosmos-44'
 
 export class BaseChain {
     constructor(info: ChainInfo) {
@@ -16,8 +24,9 @@ export class BaseChain {
     readonly urls: ChainURLs
 
     /**
-     * Makes an RPC request to the RPC server at `path`, with `params`. \
-     * Returns the result of the server response.
+     * Makes an RPC request to the RPC server at `endpoint`, with `queryParams`. \
+     * Returns the result of the server response. \
+     * Use it to create RPC methods.
      *
      * ## Usage
      * ```ts
@@ -28,22 +37,22 @@ export class BaseChain {
      * ```
      */
     protected async rpcRequest<T extends RPCMethod>(
-        path: RPCEndpoint<T>,
-        params: RPCParams<T>
+        endpoint: RPCEndpoint<T>,
+        queryParams: RPCParams<T>
     ): Promise<RPCResult<T>> {
         try {
             // Create a variable to hold queryParams.
-            let queryParams = ''
+            let query = ''
 
             // Do below, if typeof `params` isn't `'undefined`.
-            if (typeof params !== 'undefined') {
+            if (typeof queryParams !== 'undefined') {
                 // Get all the parameter keys and values.
-                const keysAndValues = Object.entries(params as { [key in string]: unknown })
+                const keysAndValues = Object.entries(queryParams as { [key in string]: unknown })
 
                 // Do below, if there are keys & values.
                 if (keysAndValues.length > 0) {
                     // Set query parameters.
-                    queryParams =
+                    query =
                         '?' +
                         keysAndValues
                             .map(([key, value]) =>
@@ -54,7 +63,7 @@ export class BaseChain {
             }
 
             // Make a request to the RPC server.
-            const response = await fetch(`${this.urls.rpc}${path}${queryParams}`)
+            const response = await fetch(`${this.urls.rpc}${endpoint}${query}`)
 
             // Return an error, if the response is not OK.
             if (!response.ok) {
@@ -71,6 +80,69 @@ export class BaseChain {
 
             // Successfully return the result of the response JSON object.
             return json.result as RPCResult<T>
+        } catch (error) {
+            console.error(`LOOK AT THE ERROR BELOW:\n${error}`)
+            throw new Error(`RPC Error.`)
+        }
+    }
+
+    /**
+     * Makes an GET request to the REST API server at `endpoint`, with `queryParams`. \
+     * Returns the result of the server response. \
+     * Use it to create REST API methods.
+     *
+     * ## Usage
+     * ```ts
+     * // Returns proposal details based on `proposalId`.
+     * async getProposal({ proposalId }: RESTPathParams<'proposalById'>) {
+     *     return this.restGetRequest(`/cosmos/gov/v1beta1/proposals/${proposalId}`, undefined)
+     * }
+     * ```
+     */
+    protected async restGetRequest<T extends RESTMethod>(
+        endpoint: RESTEndpoint<T>,
+        queryParams: RESTQueryParams<T>
+    ): Promise<RESTSuccessResponse<T>> {
+        try {
+            // Create a variable to hold queryParams.
+            let query = ''
+
+            // Do below, if typeof `params` isn't `'undefined`.
+            if (typeof queryParams !== 'undefined') {
+                // Get all the parameter keys and values.
+                const keysAndValues = Object.entries(queryParams as { [key in string]: unknown })
+
+                // Do below, if there are keys & values.
+                if (keysAndValues.length > 0) {
+                    // Set query parameters.
+                    query =
+                        '?' +
+                        keysAndValues
+                            .map(([key, value]) =>
+                                typeof value === 'undefined' ? '' : `${key}=${value}`
+                            )
+                            .join('&')
+                }
+            }
+
+            // Make a request to the RPC server.
+            const response = await fetch(`${this.urls.rest}${endpoint}${query}`)
+
+            // Return an error, if the response is not OK.
+            if (!response.ok) {
+                throw new Error(`RPC Error. Status: ${response.status}`)
+            }
+
+            // Parse response as a JSON object.
+            const json = (await response.json()) as RESTResponse<T>
+
+            // Return an error, if response has an error.
+            if (json.message) {
+                throw new Error(`RPC Error. Message: ${json.message}`)
+            }
+
+            // Successfully return the result of the response JSON object.
+            return json as RESTSuccessResponse<T>
         } catch (error) {
             console.error(`LOOK AT THE ERROR BELOW:\n${error}`)
             throw new Error(`RPC Error.`)
@@ -239,5 +311,59 @@ export class BaseChain {
      */
     async queryABCI(params: RPCParams<'abciQuery'>) {
         return this.rpcRequest<'abciQuery'>('/abci_query', params)
+    }
+
+    /** Returns proposal details based on `proposalId`. */
+    async getProposal({ proposalId }: RESTPathParams<'proposalById'>) {
+        return this.restGetRequest<'proposalById'>(
+            `/cosmos/gov/v1beta1/proposals/${proposalId}`,
+            undefined
+        )
+    }
+
+    /** Returns proposal deposits based on `proposalId`. */
+    async getProposalDeposits({
+        proposalId,
+        ...query
+    }: RESTPathParams<'proposalDepositsById'> & RESTQueryParams<'proposalDepositsById'>) {
+        return this.restGetRequest<'proposalDepositsById'>(
+            `/cosmos/gov/v1beta1/proposals/${proposalId}/deposits`,
+            query
+        )
+    }
+
+    /** Returns proposal depositor based on `proposalId` & `depositor`. */
+    async getProposalDepositor({ proposalId, depositor }: RESTPathParams<'proposalDepositorById'>) {
+        return this.restGetRequest<'proposalDepositorById'>(
+            `/cosmos/gov/v1beta1/proposals/${proposalId}/deposits/${depositor}`,
+            undefined
+        )
+    }
+
+    /** Returns proposal tally based on `proposalId`. */
+    async getProposalTally({ proposalId }: RESTPathParams<'proposalTallyById'>) {
+        return this.restGetRequest<'proposalTallyById'>(
+            `/cosmos/gov/v1beta1/proposals/${proposalId}/tally`,
+            undefined
+        )
+    }
+
+    /** Returns proposal votes based on `proposalId`. */
+    async getProposalVotes({
+        proposalId,
+        ...query
+    }: RESTPathParams<'proposalVotesById'> & RESTQueryParams<'proposalVotesById'>) {
+        return this.restGetRequest<'proposalVotesById'>(
+            `/cosmos/gov/v1beta1/proposals/${proposalId}/votes`,
+            query
+        )
+    }
+
+    /** Returns proposal voter based on `proposalId` & `voter`. */
+    async getProposalVoter({ proposalId, voter }: RESTPathParams<'proposalVoterById'>) {
+        return this.restGetRequest<'proposalVoterById'>(
+            `/cosmos/gov/v1beta1/proposals/${proposalId}/votes/${voter}`,
+            undefined
+        )
     }
 }
