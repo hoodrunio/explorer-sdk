@@ -1,0 +1,11 @@
+name: Celestia
+
+rpc: https://rpc.celestia.testnet.run
+
+rest: https://api.celestia.testnet.run
+
+ws: wss://rpc.celestia.testnet.run/websocket
+
+decimals: 6
+
+prefix: celestia

@@ -5,3 +5,7 @@ rpc: https://rpc.cosmos.directory/evmos
 rest: https://evmos-api.polkachu.com
 
 socket: wss://rpc.evmos.bh.rocks/websocket
+
+decimals: 6
+
+prefix: evmos

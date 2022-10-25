@@ -1,0 +1,11 @@
+name: Axelar
+
+rpc: https://rpc.cosmos.directory/axelar
+
+rest: https://axelar-api.polkachu.com
+
+ws: wss://axelar-rpc.chainode.tech/websocket
+
+prefix: axelar
+
+# If `decimals` is not specified, suppose it is `6`.

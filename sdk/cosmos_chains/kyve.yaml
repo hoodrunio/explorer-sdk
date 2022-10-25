@@ -1,0 +1,11 @@
+name: kyve
+
+rpc: https://rpc.beta.kyve.network
+
+rest: https://api.beta.kyve.network
+
+ws: wss://rpc.beta.kyve.network/websocket
+
+prefix: kyve
+
+# If `decimals` is not specified, suppose it is `6`.
