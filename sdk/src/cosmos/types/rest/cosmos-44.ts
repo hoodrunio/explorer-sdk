@@ -278,7 +278,7 @@ export interface RESTDatas {
     }
 
     /** Queries the parameters of slashing module */
-    slashing: {
+    slashingParams: {
         endpoint: `/cosmos/slashing/v1beta1/params`
         pathParams: undefined
         queryParams: undefined
