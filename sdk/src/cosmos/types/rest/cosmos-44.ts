@@ -277,6 +277,79 @@ export interface RESTDatas {
         }
     }
 
+    /** Queries the parameters of slashing module */
+    slashing: {
+        endpoint: `/cosmos/slashing/v1beta1/params`
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+            params: {
+                signed_blocks_window: string
+                min_signed_per_window: string
+                downtime_jail_duration: string
+                slash_fraction_double_sign: string
+                slash_fraction_downtime: string
+            }
+        }
+
+    }
+
+    /** Queries signing info of all validators. */
+    slashingSigningInfo: {
+        endpoint: `/cosmos/slashing/v1beta1/signing_infos`
+        pathParams: undefined
+        queryParams: {
+            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
+            'pagination.key': unknown
+            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
+            'pagination.offset': number
+            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
+            'pagination.limit': number
+            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
+            'pagination.count_total': boolean
+            /** `reverse` is set to true if results are to be returned in the descending order. */
+            'pagination.reverse': boolean
+        }
+        response: {
+            info: Array<{
+                address: string
+                start_height: string
+                index_offset: string
+                jailed_until: string
+                tombstoned: boolean
+                missed_blocks_counter: string
+            }>
+            pagination: {
+                next_key: string
+                total: string
+            }
+        }
+
+    }
+
+
+    /** Queries the signing info of given cons address. */
+    slashingSigningInfoByConsAddress: {
+        endpoint: `/cosmos/slashing/v1beta1/signing_infos/${PathParam<'slashingSigningInfoByConsAddress', 'consAddress'>}`
+        pathParams: {
+            /** The address to query signing info of. */
+            consAddress: string
+        }
+        queryParams: undefined
+        response: {
+            val_signing_info: {
+                address: string
+                start_height: string
+                index_offset: string
+                jailed_until: string
+                tombstoned: boolean
+                missed_blocks_counter: string
+            }
+        }
+
+
+    }
+
     do_not_use: {
         endpoint: `DO_NOT_USE_THIS`
         pathParams: {}
