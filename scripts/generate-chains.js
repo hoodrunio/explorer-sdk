@@ -4,7 +4,7 @@
     // Import dependencies.
     const path = require('path')
     const fs = require('fs')
-    
+
 
     // Create a path representing `cosmos_chains` folder's.
     const cosmos_chains_folder_path = 'cosmos_chains'
@@ -98,6 +98,10 @@ const parse_yaml = (content) => {
         rpc: '',
         rest: '',
         socket: '',
+        decimals: undefined,
+        prefix: '',
+        valoperPrefix: undefined,
+        consPrefix: undefined,
     }
 
     // Split lines.
@@ -112,8 +116,13 @@ const parse_yaml = (content) => {
         if (!line.startsWith('#')) {
             let [key, value] = line.split(': ')
 
-            // Check if both `key` and `value` exists
+            // Check if both `key` and `value` exists.
             if (key && value) {
+                if (key === 'decimals') {
+                    // Parse `decimals` as a number.
+                    value = parseInt(value)
+                }
+
                 chain[key] = value
             }
         }
@@ -121,14 +130,19 @@ const parse_yaml = (content) => {
 
     chain.objectName = chain.name.split(' ').map(part => capitalize(part)).join('') + 'Info'
 
-    // Check all the properties.
-    if (chain.name && chain.rpc && chain.rest && chain.socket && chain.objectName) {
+    // Check the necessary properties.
+    if (chain.name && chain.rpc && chain.rest && chain.socket && chain.objectName && chain.prefix) {
         return {
             objectName: chain.objectName,
             name: chain.name,
             rpc: chain.rpc,
             rest: chain.rest,
             socket: chain.socket,
+            decimals: chain.decimals ?? 6, // If `decimals` is not given, suppose it is 6.
+            prefix: chain.prefix,
+            // If prefixes below are not given, create them using the prefix above.
+            valoperPrefix: chain.valoperPrefix ?? chain.prefix + 'valoper',
+            consPrefix: chain.consPrefix ?? chain.prefix + 'valcon',
         }
     }
 }
@@ -153,6 +167,12 @@ export const ${chain.objectName}: ChainInfo = {
         rest: '${chain.rest}',
         socket: '${chain.socket}',
     },
+    prefixes: {
+        prefix: '${chain.prefix}',
+        valoperPrefix: '${chain.valoperPrefix}',
+        consPrefix: '${chain.consPrefix}',
+    },
+    decimals: ${chain.decimals},
 }    
 `
 }
