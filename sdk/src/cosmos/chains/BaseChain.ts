@@ -381,4 +381,30 @@ export class BaseChain {
             undefined
         )
     }
+
+    /** Returns the parameters of slashing module. */
+    async getSlashingParams() {
+        return this.restGetRequest<'slashingParams'>(
+            `/cosmos/slashing/v1beta1/params`,
+            undefined
+        )
+    }
+
+    /** Returns signing info of all validators. */
+    async getSlashingSigningInfos({ ...query }: RESTQueryParams<'slashingSigningInfos'>) {
+        return this.restGetRequest<'slashingSigningInfos'>(
+            `/cosmos/slashing/v1beta1/signing_infos`,
+            query
+        )
+    }
+
+    /** Returns the signing info of given cons address. */
+    async getSlashingSigningInfoByConsAddress({ consAddress }: RESTPathParams<'slashingSigningInfoByConsAddress'>) {
+        return this.restGetRequest<'slashingSigningInfoByConsAddress'>(
+            `/cosmos/slashing/v1beta1/signing_infos/${consAddress}`,
+            undefined
+        )
+    }
+
+
 }
