@@ -40,6 +40,59 @@ type PathParam<
 > = RESTDatas[T]['pathParams'][E]
 
 export interface RESTDatas {
+    /** Queries all proposals based on given status. */
+    proposal: {
+        endpoint: `/cosmos/gov/v1beta1/proposals`
+        pathParams: undefined
+        queryParams: {
+            /** The status of the proposals */
+            proposal_status: 'PROPOSAL_STATUS_UNSPECIFIED' | 'PROPOSAL_STATUS_DEPOSIT_PERIOD' | 'PROPOSAL_STATUS_PASSED' | 'PROPOSAL_STATUS_REJECTED' | 'PROPOSAL_STATUS_FAILED'
+            /** The voter address for the proposals. */
+            voter: string
+            /** The deposit addresses from the proposals. */
+            depositor: string
+            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
+            'pagination.key': unknown
+            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
+            'pagination.offset': number
+            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
+            'pagination.limit': number
+            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
+            'pagination.count_total': boolean
+            /** `reverse` is set to true if results are to be returned in the descending order. */
+            'pagination.reverse': boolean
+        }
+        response: {
+            proposals: Array<{
+                proposal_id: string
+                content: {
+                    type_url: string
+                    value: string
+                }
+                status: string
+                final_tally_result: {
+                    yes: string
+                    abstain: string
+                    no: string
+                    no_with_veto: string
+                }
+                submit_time: string
+                deposit_end_time: string
+                total_deposit: Array<{
+                    denom: string
+                    amount: string
+                }>
+                voting_start_time: string
+                voting_end_time: string
+            }>
+            pagination: {
+                next_key: string
+                total: string
+            }
+        }
+
+    }
+
     /** Queries proposal details based on ProposalID. */
     proposalById: {
         endpoint: `/cosmos/gov/v1beta1/proposals/${PathParam<'proposalById', 'proposalId'>}`
@@ -224,8 +277,8 @@ export interface RESTDatas {
         }
     }
 
-    any: {
-        endpoint: '////////////////'
+    do_not_use: {
+        endpoint: `DO_NOT_USE_THIS`
         pathParams: {}
         queryParams: {}
         response: {}
