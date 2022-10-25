@@ -1,4 +1,4 @@
-import { ChainInfo, ChainURLs } from '../types/globals'
+import { ChainInfo, ChainPrefixes, ChainURLs } from '../types/globals'
 import { RPCEndpoint, RPCMethod, RPCParams, RPCResponseResult, RPCResult } from '../types/rpc/rpc'
 import fetch from 'node-fetch'
 import {
@@ -13,8 +13,9 @@ import {
 export class BaseChain {
     constructor(info: ChainInfo) {
         this.name = info.name
-
         this.urls = info.urls
+        this.prefixes = info.prefixes
+        this.decimals = info.decimals
     }
 
     /** The name of the chain. */
@@ -22,6 +23,12 @@ export class BaseChain {
 
     /** URLs for the chain. */
     readonly urls: ChainURLs
+
+    /** The prefixes for the chain. */
+    readonly prefixes: ChainPrefixes
+
+    /** Decimals of the native token of the chain. */
+    readonly decimals: number
 
     /**
      * Makes an RPC request to the RPC server at `endpoint`, with `queryParams`. \
