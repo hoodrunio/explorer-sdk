@@ -320,6 +320,14 @@ export class BaseChain {
         return this.rpcRequest<'abciQuery'>('/abci_query', params)
     }
 
+    /** Returns all proposals based on given status. */
+    async getProposals({ ...query }: RESTQueryParams<'proposals'>) {
+        return this.restGetRequest<'proposals'>(
+            `/cosmos/gov/v1beta1/proposals`,
+            query
+        )
+    }
+
     /** Returns proposal details based on `proposalId`. */
     async getProposal({ proposalId }: RESTPathParams<'proposalById'>) {
         return this.restGetRequest<'proposalById'>(
