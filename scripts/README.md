@@ -25,6 +25,18 @@ rest: https://rest.example.com
 
 # URL for the web socket.
 socket: wss://ws.example.com/
+
+# You can provide `decimals` if it is not `6`, otherwise it's generated automatically.
+#decimals: 18
+
+# The prefix for the chain
+prefix: example
+
+# You can also specify other prefixes if they don't follow the same rule.
+
+#valoperPrefix: examvaloper
+
+#consPrefix: examvalcons
 ```
 
 Set current directory to `sdk/`.
