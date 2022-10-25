@@ -1,11 +1,5 @@
 import { ChainInfo, ChainURLs } from '../types/globals'
-import {
-    RPCEndpoint,
-    RPCMethod,
-    RPCParams,
-    RPCResponseResult,
-    RPCResult,
-} from '../types/rpc/rpc'
+import { RPCEndpoint, RPCMethod, RPCParams, RPCResponseResult, RPCResult } from '../types/rpc/rpc'
 import fetch from 'node-fetch'
 
 export class BaseChain {
