@@ -11,8 +11,8 @@ export type RESTSuccessResponse<T extends RESTMethod> = RESTDatas[T] extends {
     response: infer R
 }
     ? Q extends PaginationQueryParams
-        ? R & PaginationResponse
-        : R
+    ? R & PaginationResponse
+    : R
     : never
 
 export type RESTResponse<T extends RESTMethod> =
@@ -50,11 +50,11 @@ export interface RESTDatas {
         queryParams: PaginationQueryParams & {
             /** The status of the proposals */
             proposal_status:
-                | 'PROPOSAL_STATUS_UNSPECIFIED'
-                | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
-                | 'PROPOSAL_STATUS_PASSED'
-                | 'PROPOSAL_STATUS_REJECTED'
-                | 'PROPOSAL_STATUS_FAILED'
+            | 'PROPOSAL_STATUS_UNSPECIFIED'
+            | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
+            | 'PROPOSAL_STATUS_PASSED'
+            | 'PROPOSAL_STATUS_REJECTED'
+            | 'PROPOSAL_STATUS_FAILED'
             /** The voter address for the proposals. */
             voter: string
             /** The deposit addresses from the proposals. */
@@ -919,6 +919,38 @@ export interface RESTDatas {
             }
         }
     }
+
+
+
+    /** Queries all the grants for given grantee address. */
+    grantsByGrantee: {
+        endpoint: `/cosmos/feegrant/v1beta1/allowances/${PathParam<'grantsByGrantee','granteeAddress'>}`
+        pathParams: {
+            /** The grantee address to query for. */
+            granteeAddress: string
+        }
+        queryParams: PaginationQueryParams
+        // Let's find a grantee address and test, to find the type of the server response.
+        response: unknown // TODO!
+    }
+
+
+
+    /** Queries fee granted to the grantee by the granter. */
+    grantsByGranteeGranterPair: {
+        endpoint: `/cosmos/feegrant/v1beta1/allowances/${PathParam<'grantsByGranteeGranterPair','granterAddress'>}/${PathParam<'grantsByGranteeGranterPair','granteeAddress'>}`
+        pathParams: {
+            /** The address of the user granting an allowance of their funds. */
+            granterAddress: string
+            /** The address of the user being granted an allowance of another user's funds. */
+            granteeAddress: string
+        }
+        queryParams: undefined
+        // Let's find a grantee address and test, to find the type of the server response.
+        response: unknown // TODO!
+    }
+
+
 }
 
 /**
