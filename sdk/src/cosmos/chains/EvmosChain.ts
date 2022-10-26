@@ -8,6 +8,10 @@ import {
     EvmosRESTSuccessResponse,
 } from '../types/rest/chains/evmos'
 
+/**
+ * # Evmos
+ * The class that has methods to intereact with Evmos blockchain.
+ */
 export class EvmosChain extends Cosmos44Chain {
     constructor() {
         super(EvmosInfo)
