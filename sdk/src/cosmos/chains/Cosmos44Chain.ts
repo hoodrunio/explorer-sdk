@@ -616,4 +616,16 @@ export class Cosmos44Chain {
             undefined
         )
     }
+
+
+    /** Returns all the existing accounts. */
+    async getAllAccounts({ ...query }: RESTQueryParams<'allAccounts'>) {
+        return this.restGetRequest<'allAccounts'>(`/cosmos/auth/v1beta1/accounts`, query)
+    }
+
+
+    /** Returns account details based on address. */
+    async getAccountDetails({ address }: RESTPathParams<'accountDetails'>) {
+        return this.restGetRequest<'accountDetails'>(`/cosmos/auth/v1beta1/accounts/${address}`, undefined)
+    }
 }
