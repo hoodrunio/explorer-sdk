@@ -11,8 +11,8 @@ export type RESTSuccessResponse<T extends RESTMethod> = RESTDatas[T] extends {
     response: infer R
 }
     ? Q extends PaginationQueryParams
-    ? R & PaginationResponse
-    : R
+        ? R & PaginationResponse
+        : R
     : never
 
 export type RESTResponse<T extends RESTMethod> =
@@ -50,11 +50,11 @@ export interface RESTDatas {
         queryParams: PaginationQueryParams & {
             /** The status of the proposals */
             proposal_status:
-            | 'PROPOSAL_STATUS_UNSPECIFIED'
-            | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
-            | 'PROPOSAL_STATUS_PASSED'
-            | 'PROPOSAL_STATUS_REJECTED'
-            | 'PROPOSAL_STATUS_FAILED'
+                | 'PROPOSAL_STATUS_UNSPECIFIED'
+                | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
+                | 'PROPOSAL_STATUS_PASSED'
+                | 'PROPOSAL_STATUS_REJECTED'
+                | 'PROPOSAL_STATUS_FAILED'
             /** The voter address for the proposals. */
             voter: string
             /** The deposit addresses from the proposals. */
@@ -952,7 +952,6 @@ export interface RESTDatas {
         response: unknown // TODO!
     }
 
-
     /** Queries all the existing accounts. */
     allAccounts: {
         endpoint: `/cosmos/auth/v1beta1/accounts`
@@ -960,11 +959,11 @@ export interface RESTDatas {
         queryParams: PaginationQueryParams
         response: {
             accounts: Array<{
-                "@type": string
+                '@type': string
                 base_account: {
                     address: string
                     pub_key?: {
-                        "@type": string
+                        '@type': string
                         key: string
                     }
                     account_number: string
@@ -974,7 +973,6 @@ export interface RESTDatas {
             }>
         }
     }
-
 
     /** Queries account details based on address. */
     accountDetails: {
@@ -986,17 +984,16 @@ export interface RESTDatas {
         queryParams: undefined
         response: {
             account: {
-                "@type": string
+                '@type': string
                 address: string
                 pub_key: {
-                    "@type": string
+                    '@type': string
                     key: string
                 }
                 account_number: string
                 sequence: string
             }
         }
-
     }
 }
 
