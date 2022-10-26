@@ -11,8 +11,8 @@ export type RESTSuccessResponse<T extends RESTMethod> = RESTDatas[T] extends {
     response: infer R
 }
     ? Q extends PaginationQueryParams
-        ? R & PaginationResponse
-        : R
+    ? R & PaginationResponse
+    : R
     : never
 
 export type RESTResponse<T extends RESTMethod> =
@@ -50,11 +50,11 @@ export interface RESTDatas {
         queryParams: PaginationQueryParams & {
             /** The status of the proposals */
             proposal_status:
-                | 'PROPOSAL_STATUS_UNSPECIFIED'
-                | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
-                | 'PROPOSAL_STATUS_PASSED'
-                | 'PROPOSAL_STATUS_REJECTED'
-                | 'PROPOSAL_STATUS_FAILED'
+            | 'PROPOSAL_STATUS_UNSPECIFIED'
+            | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
+            | 'PROPOSAL_STATUS_PASSED'
+            | 'PROPOSAL_STATUS_REJECTED'
+            | 'PROPOSAL_STATUS_FAILED'
             /** The voter address for the proposals. */
             voter: string
             /** The deposit addresses from the proposals. */
@@ -532,9 +532,9 @@ export interface RESTDatas {
     }
 
     /** Queries all unbonding delegations of a given delegator address. */
-    unboundingDelegations: {
+    unbondingDelegations: {
         endpoint: `/cosmos/staking/v1beta1/delegations/${PathParam<
-            'unboundingDelegations',
+            'unbondingDelegations',
             'delegatorAddress'
         >}/unbonding_delegations`
         pathParams: {
@@ -645,6 +645,266 @@ export interface RESTDatas {
             }
         }
     }
+
+
+    /** Queries the historical info for given height. */
+    historicalStakingInfo: {
+        endpoint: `/cosmos/staking/v1beta1/historical_info/${PathParam<'historicalStakingInfo', 'height'>}`
+        pathParams: {
+            height: number
+        }
+        queryParams: undefined
+        response: {
+            hist: {
+                header: {
+                    version: {
+                        block: string
+                        app: string
+                    }
+                    chain_id: string
+                    height: string
+                    time: string
+                    last_block_id: {
+                        hash: string
+                        part_set_header: {
+                            total: number
+                            hash: string
+                        }
+                    }
+                    last_commit_hash: string
+                    data_hash: string
+                    validators_hash: string
+                    next_validators_hash: string
+                    consensus_hash: string
+                    app_hash: string
+                    last_results_hash: string
+                    evidence_hash: string
+                    proposer_address: string
+                }
+                valset: Array<{
+                    operator_address: string
+                    consensus_pubkey: {
+                        type_url: string
+                        value: string
+                    }
+                    jailed: boolean
+                    status: unknown
+                    tokens: string
+                    delegator_shares: string
+                    description: {
+                        moniker: string
+                        identity: string
+                        website: string
+                        security_contact: string
+                        details: string
+                    }
+                    unbonding_height: string
+                    unbonding_time: string
+                    commission: {
+                        commission_rates: {
+                            rate: string
+                            max_rate: string
+                            max_change_rate: string
+                        }
+                        update_time: string
+                    }
+                    min_self_delegation: string
+                }>
+            }
+        }
+    }
+
+    /** Queries the pool info. */
+    stakingPoolInfo: {
+        endpoint: `/cosmos/staking/v1beta1/pool`
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+            pool: {
+                not_bonded_tokens: string
+                bonded_tokens: string
+            }
+        }
+    }
+
+    /** Queries all validators that match the given status. */
+    allValidators: {
+        endpoint: `/cosmos/staking/v1beta1/validators`
+        pathParams: undefined
+        queryParams: PaginationQueryParams & {
+            /** Enables to query for validators matching a given statu */
+            status: string
+        }
+        response: {
+            validators: Array<{
+                operator_address: string
+                consensus_pubkey: {
+                    "@type": string
+                    key: string
+                }
+                jailed: boolean
+                status: string
+                tokens: string
+                delegator_shares: string
+                description: {
+                    moniker: string
+                    identity: string
+                    website: string
+                    security_contact: string
+                    details: string
+                }
+                unbonding_height: string
+                unbonding_time: string
+                commission: {
+                    commission_rates: {
+                        rate: string
+                        max_rate: string
+                        max_change_rate: string
+                    }
+                    update_time: string
+                }
+                min_self_delegation: string
+            }>
+        }
+    }
+
+    /** Queries validator info for given validator address. */
+    validator: {
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'validator', 'validatorAddress'>}`
+        pathParams: {
+            /** The validator address to query for. */
+            validatorAddress: string
+        }
+        queryParams: undefined
+        response: {
+            validator: {
+                operator_address: string
+                consensus_pubkey: {
+                    type_url: string
+                    value: string
+                }
+                jailed: boolean
+                status: string
+                tokens: string
+                delegator_shares: string
+                description: {
+                    moniker: string
+                    identity: string
+                    website: string
+                    security_contact: string
+                    details: string
+                }
+                unbonding_height: string
+                unbonding_time: string
+                commission: {
+                    commission_rates: {
+                        rate: string
+                        max_rate: string
+                        max_change_rate: string
+                    }
+                    update_time: string
+                }
+                min_self_delegation: string
+            }
+        }
+    }
+
+    /** Queries delegation info for given validator. */
+    validatorDelegations: {
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'validatorDelegations', 'validatorAddress'>}/delegations`
+        pathParams: {
+            /** The validator address to query for. */
+            validatorAddress: string
+        }
+        queryParams: PaginationQueryParams
+        response: {
+            delegation_responses: Array<{
+                delegation: {
+                    delegator_address: string
+                    validator_address: string
+                    shares: string
+                }
+                balance: {
+                    denom: string
+                    amount: string
+                }
+            }>
+        }
+
+    }
+
+    /** Queries unbonding delegation info for given validator. */
+    validatorUnbondingDelegations: {
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'validatorUnbondingDelegations', 'validatorAddress'>}/unbonding_delegations`
+        pathParams: {
+            /** The validator address to query for. */
+            validatorAddress: string
+        }
+        queryParams: undefined
+        response: {
+            unbond: {
+                delegator_address: string
+                validator_address: string
+                entries: Array<{
+                    creation_height: string
+                    completion_time: string
+                    initial_balance: string
+                    balance: string
+                }>
+            }
+        }
+    }
+
+    /** Queries delegation info for given validator delegator pair. */
+    validatorDelegationsByDelegator: {
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'validatorDelegationsByDelegator', 'validatorAddress'>}/delegations/${PathParam<'validatorDelegationsByDelegator', 'delegatorAddress'>}`
+        pathParams: {
+            /** The validator address to query for. */
+            validatorAddress: string
+            /** The delegator address to query for. */
+            delegatorAddress: string
+        }
+        queryParams: undefined
+        response: {
+            delegation_response: {
+                delegation: {
+                    delegator_address: string
+                    validator_address: string
+                    shares: string
+                }
+                balance: {
+                    denom: string
+                    amount: string
+                }
+            }
+        }
+    }
+
+    /** Queries unbonding delegation info for given validator delegator pair. */
+    validatorUnbondingDelegationsByDelegator: {
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'validatorUnbondingDelegationsByDelegator', 'validatorAddress'>}/delegations/${PathParam<'validatorUnbondingDelegationsByDelegator', 'delegatorAddress'>}`
+        pathParams: {
+            /** The validator address to query for. */
+            validatorAddress: string
+            /** The delegator address to query for. */
+            delegatorAddress: string
+        }
+        queryParams: undefined
+        response: {
+            unbond: {
+                delegator_address: string
+                validator_address: string
+                entries: Array<{
+                    creation_height: string
+                    completion_time: string
+                    initial_balance: string
+                    balance: string
+                }>
+            }
+        }
+
+    }
+
 }
 
 /**
