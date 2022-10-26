@@ -106,10 +106,12 @@ export class Cosmos44Chain {
      * }
      * ```
      */
-    protected async restGetRequest<T extends RESTMethod>(
-        endpoint: RESTEndpoint<T>,
-        queryParams: RESTQueryParams<T>
-    ): Promise<RESTSuccessResponse<T>> {
+    protected async restGetRequest<
+        T extends RESTMethod,
+        E = RESTEndpoint<T>,
+        Q = RESTQueryParams<T>,
+        R = RESTSuccessResponse<T>
+    >(endpoint: E, queryParams: Q): Promise<R> {
         try {
             // Create a variable to hold queryParams.
             let query = ''
@@ -149,7 +151,7 @@ export class Cosmos44Chain {
             }
 
             // Successfully return the result of the response JSON object.
-            return json as RESTSuccessResponse<T>
+            return json as R
         } catch (error) {
             console.error(`LOOK AT THE ERROR BELOW:\n${error}`)
             throw new Error(`RPC Error.`)
