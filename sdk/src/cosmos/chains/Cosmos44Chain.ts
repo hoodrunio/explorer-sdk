@@ -497,8 +497,8 @@ export class Cosmos44Chain {
     async getUnboundingDelegations({
         delegatorAddress,
         ...query
-    }: RESTPathParams<'unboundingDelegations'> & RESTQueryParams<'unboundingDelegations'>) {
-        return this.restGetRequest<'unboundingDelegations'>(
+    }: RESTPathParams<'unbondingDelegations'> & RESTQueryParams<'unbondingDelegations'>) {
+        return this.restGetRequest<'unbondingDelegations'>(
             `/cosmos/staking/v1beta1/delegations/${delegatorAddress}/unbonding_delegations`,
             query
         )
@@ -525,4 +525,46 @@ export class Cosmos44Chain {
             undefined
         )
     }
+
+    /** Returns the historical staking info for given height. */
+    async getHistoricalStakingInfo({ height }: RESTPathParams<'historicalStakingInfo'>) {
+        return this.restGetRequest<'historicalStakingInfo'>(`/cosmos/staking/v1beta1/historical_info/${height}`, undefined)
+    }
+
+    /** Returns the historical staking info for given height. */
+    async getStakingPoolInfo() {
+        return this.restGetRequest<'stakingPoolInfo'>(`/cosmos/staking/v1beta1/pool`, undefined)
+    }
+
+    /** Returns all validators that match the given status. */
+    async getAllValidators({ ...query }: RESTQueryParams<'allValidators'>) {
+        return this.restGetRequest<'allValidators'>(`/cosmos/staking/v1beta1/validators`, query)
+    }
+
+    /** Returns validator info for given validator address. */
+    async getValidator({ validatorAddress }: RESTPathParams<'validator'>) {
+        return this.restGetRequest<'validator'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}`, undefined)
+    }
+
+
+    /** Returns delegation info for given validator. */
+    async getDelegationsByValidator({ validatorAddress, ...query }: RESTPathParams<'delegationsByValidator'> & RESTQueryParams<'delegationsByValidator'>) {
+        return this.restGetRequest<'delegationsByValidator'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations`, query)
+    }
+
+    /** Returns unbonding delegation info for given validator. */
+    async getUnbondingDelegationsByValidator({ validatorAddress }: RESTPathParams<'unbondingDelegationsByValidator'>) {
+        return this.restGetRequest<'unbondingDelegationsByValidator'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/unbonding_delegations`, undefined)
+    }
+
+    /** Returns delegation info for given validator delegator pair. */
+    async getDelegationsByValidatorDelegatorPair({ validatorAddress, delegatorAddress }: RESTPathParams<'delegationsByValidatorDelegatorPair'>) {
+        return this.restGetRequest<'delegationsByValidatorDelegatorPair'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations/${delegatorAddress}`, undefined)
+    }
+
+    /** Returns delegation info for given validator delegator pair. */
+    async getUnbondingDelegationsByValidatorDelegatorPair({ validatorAddress, delegatorAddress }: RESTPathParams<'unbondingDelegationsByValidatorDelegatorPair'>) {
+        return this.restGetRequest<'unbondingDelegationsByValidatorDelegatorPair'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations/${delegatorAddress}/unbonding_delegations`, undefined)
+    }
+
 }
