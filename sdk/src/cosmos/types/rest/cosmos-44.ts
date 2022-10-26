@@ -382,7 +382,8 @@ export interface RESTDatas {
 
     }
 
-    /** Queries evidence based on evidence hash. 
+    /** 
+     * Queries evidence based on evidence hash. \
      * FIND AN EVIDENCE HASH, then test this to find response type. 
     */
     evidenceByHash: {
@@ -395,6 +396,56 @@ export interface RESTDatas {
         response: unknown
     }
 
+
+    /** Queries the balance of all coins for a single account. */
+    balances: {
+        endpoint: `/cosmos/bank/v1beta1/balances/${PathParam<'balances', 'address'>}`
+        pathParams: {
+            /** The address to query balances for. */
+            address: string
+        }
+        queryParams: {
+            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
+            'pagination.key': unknown
+            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
+            'pagination.offset': number
+            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
+            'pagination.limit': number
+            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
+            'pagination.count_total': boolean
+            /** `reverse` is set to true if results are to be returned in the descending order. */
+            'pagination.reverse': boolean
+        }
+        response: {
+            balances: Array<{
+                denom: string
+                amount: string
+            }>
+            pagination: {
+                next_key: any
+                total: string
+            }
+        }
+
+    }
+
+    /** Queries the balance of a single coin for a single account. */
+    balance: {
+        endpoint: `/cosmos/bank/v1beta1/balances/${PathParam<'balance', 'address'>}/${PathParam<'balance', 'denom'>}`
+        pathParams: {
+            /** The address to query balances for. */
+            address: string
+            /** The coin denom to query balances for. */
+            denom: string
+        }
+        queryParams: undefined
+        response: {
+            balance: {
+                denom: string
+                amount: string
+            }
+        }
+    }
 
 }
 
