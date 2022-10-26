@@ -451,6 +451,17 @@ export interface RESTDatas {
             }
         }
     }
+
+    /** Returns the current minting inflation value. */
+    inflation: {
+        endpoint: `/cosmos/mint/v1beta1/inflation`
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+            /** String representing float. ParseFloat it. */
+            inflation: string
+        }
+    }
 }
 
 /**

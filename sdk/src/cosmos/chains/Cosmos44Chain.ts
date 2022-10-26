@@ -465,4 +465,9 @@ export class Cosmos44Chain {
     async getSupply({ denom }: RESTPathParams<'supply'>) {
         return this.restGetRequest<'supply'>(`/cosmos/bank/v1beta1/supply/${denom}`, undefined)
     }
+
+    /** Returns the current minting inflation value. */
+    async getInflation() {
+        return this.restGetRequest<'inflation'>(`/cosmos/mint/v1beta1/inflation`, undefined)
+    }
 }

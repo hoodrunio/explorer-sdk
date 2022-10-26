@@ -31,4 +31,8 @@ export class EvmosChain extends Cosmos44Chain {
             query
         )
     }
+
+    async getInflation() {
+        return this.restGetRequest<'inflation'>(`/evmos/inflation/v1/inflation_rate`, undefined)
+    }
 }

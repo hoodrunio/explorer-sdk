@@ -41,7 +41,9 @@ type PathParam<
     E extends keyof EvmosRESTDatas[T]['pathParams']
 > = RESTDatas[T]['pathParams'][E]
 
-export type EvmosRESTDatas = Omit<RESTDatas, 'balance'> & {
+type MethodsThatHasToBeRedefined = 'balance' | 'inflation'
+
+export type EvmosRESTDatas = Omit<RESTDatas, MethodsThatHasToBeRedefined> & {
     /** Queries the balance of a single coin for a single account. */
     balance: {
         endpoint: `/cosmos/bank/v1beta1/balances/${PathParam<'balance', 'address'>}/by_denom`
@@ -54,5 +56,13 @@ export type EvmosRESTDatas = Omit<RESTDatas, 'balance'> & {
             denom: string
         }
         response: RESTDatas['balance']
+    }
+
+    /** Returns the current minting inflation value. */
+    inflation: {
+        endpoint: `/evmos/inflation/v1/inflation_rate`
+        pathParams: undefined
+        queryParams: undefined
+        response: RESTDatas['inflation']
     }
 }
