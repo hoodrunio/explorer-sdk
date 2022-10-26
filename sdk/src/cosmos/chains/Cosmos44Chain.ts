@@ -440,4 +440,36 @@ export class Cosmos44Chain {
             undefined
         )
     }
+
+    /** Returns the staking parameters. */
+    async getStakingParams() {
+        return this.restGetRequest<'stakingParams'>(
+            `/cosmos/staking/v1beta1/params`,
+            undefined
+        )
+    }
+
+    /** Returns the parameters of x/bank module. */
+    async getBankParams() {
+        return this.restGetRequest<'bankParams'>(
+            `/cosmos/bank/v1beta1/params`,
+            undefined
+        )
+    }
+
+    /** Returns the parameters of distribution module. */
+    async getDistributionParams() {
+        return this.restGetRequest<'distributionParams'>(
+            `/cosmos/distribution/v1beta1/params`,
+            undefined
+        )
+    }
+
+    /** Returns the parameters of auth module. */
+    async getAuthParams() {
+        return this.restGetRequest<'authParams'>(
+            `/cosmos/auth/v1beta1/params`,
+            undefined
+        )
+    }
 }
