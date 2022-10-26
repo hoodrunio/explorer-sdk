@@ -12,11 +12,11 @@ This SDK is for the upcoming Explorer.
 
 ✅ Make a prototype for all RPC methods.
 
-❌ Make an exact list for all REST API methods including uncommon ones.
+🏗️ Make a prototype for REST API methods of Cosmos SDK v0.44.
 
-❌ Make 3 lists according to Cosmos SDK versions, using the old list.
+🏗️ Make prototypes for REST API methods of chains using Cosmos SDK.
 
-❌ Make a prototype for REST API methods.
+❌ Make a prototype for REST API methods of Cosmos SDK v0.45.
 
 ❌ Make an exact list for all Web Socket methods including uncommon ones.
 
