@@ -25,11 +25,8 @@ export class EvmosChain extends Cosmos44Chain {
         E = EvmosRESTEndpoint<T>,
         Q = EvmosRESTQueryParams<T>,
         R = EvmosRESTSuccessResponse<T>
-    >(endpoint: E, queryParams: Q): R {
-        return super.restGetRequest(
-            endpoint as unknown as RESTEndpoint<T>,
-            queryParams as unknown as RESTQueryParams<T>
-        ) as R
+    >(endpoint: E, queryParams: Q) {
+        return super.restGetRequest<T, E, Q, R>(endpoint, queryParams)
     }
 
     async getBalance({
