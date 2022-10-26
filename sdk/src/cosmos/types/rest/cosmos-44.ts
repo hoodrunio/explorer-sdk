@@ -462,6 +462,189 @@ export interface RESTDatas {
             inflation: string
         }
     }
+
+    /** Queries all delegations of a given delegator address. */
+    delegations: {
+        endpoint: `/cosmos/staking/v1beta1/delegations/${PathParam<
+            'delegations',
+            'delegatorAddress'
+        >}`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegatorAddress: string
+        }
+        queryParams: PaginationQueryParams
+        response: {
+            delegation_responses: Array<{
+                delegation: {
+                    delegator_address: string
+                    validator_address: string
+                    shares: string
+                }
+                balance: {
+                    denom: string
+                    amount: string
+                }
+            }>
+        }
+    }
+
+    /** Queries all redelegations of a given delegator address. */
+    redelegations: {
+        endpoint: `/cosmos/staking/v1beta1/delegations/${PathParam<
+            'redelegations',
+            'delegatorAddress'
+        >}/redelegations`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegatorAddress: string
+        }
+        queryParams: PaginationQueryParams & {
+            /** The validator address to redelegate from. */
+            src_validator_addr: string
+            /** The validator address to redelegate to. */
+            dst_validator_addr: string
+        }
+        response: {
+            redelegation_responses: Array<{
+                redelegation: {
+                    delegator_address: string
+                    validator_src_address: string
+                    validator_dst_address: string
+                    entries: Array<{
+                        creation_height: string
+                        completion_time: string
+                        initial_balance: string
+                        shares_dst: string
+                    }>
+                }
+                entries: Array<{
+                    redelegation_entry: {
+                        creation_height: string
+                        completion_time: string
+                        initial_balance: string
+                        shares_dst: string
+                    }
+                    balance: string
+                }>
+            }>
+        }
+    }
+
+    /** Queries all unbonding delegations of a given delegator address. */
+    unboundingDelegations: {
+        endpoint: `/cosmos/staking/v1beta1/delegations/${PathParam<
+            'unboundingDelegations',
+            'delegatorAddress'
+        >}/unbonding_delegations`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegatorAddress: string
+        }
+        queryParams: PaginationQueryParams
+        response: {
+            unbonding_responses: Array<{
+                delegator_address: string
+                validator_address: string
+                entries: Array<{
+                    creation_height: string
+                    completion_time: string
+                    initial_balance: string
+                    balance: string
+                }>
+            }>
+        }
+    }
+
+    /** Queries all validators info for given delegator address. */
+    allValidatorsByDelegator: {
+        endpoint: `/cosmos/staking/v1beta1/delegations/${PathParam<
+            'allValidatorsByDelegator',
+            'delegatorAddress'
+        >}/validators`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegatorAddress: string
+        }
+        queryParams: PaginationQueryParams
+        response: {
+            validators: Array<{
+                operator_address: string
+                consensus_pubkey: {
+                    type_url: string
+                    value: string
+                }
+                jailed: boolean
+                status: unknown
+                tokens: string
+                delegator_shares: string
+                description: {
+                    moniker: string
+                    identity: string
+                    website: string
+                    security_contact: string
+                    details: string
+                }
+                unbonding_height: string
+                unbonding_time: string
+                commission: {
+                    commission_rates: {
+                        rate: string
+                        max_rate: string
+                        max_change_rate: string
+                    }
+                    update_time: string
+                }
+                min_self_delegation: string
+            }>
+        }
+    }
+
+    /** Queries validator info for given delegator validator pair. */
+    validatorByDelegator: {
+        endpoint: `/cosmos/staking/v1beta1/delegations/${PathParam<
+            'validatorByDelegator',
+            'delegatorAddress'
+        >}/validators/${PathParam<'validatorByDelegator', 'validatorAddress'>}`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegatorAddress: string
+            /** The validator address to query for. */
+            validatorAddress: string
+        }
+        queryParams: undefined
+        response: {
+            validator: {
+                operator_address: string
+                consensus_pubkey: {
+                    type_url: string
+                    value: string
+                }
+                jailed: boolean
+                status: string
+                tokens: string
+                delegator_shares: string
+                description: {
+                    moniker: string
+                    identity: string
+                    website: string
+                    security_contact: string
+                    details: string
+                }
+                unbonding_height: string
+                unbonding_time: string
+                commission: {
+                    commission_rates: {
+                        rate: string
+                        max_rate: string
+                        max_change_rate: string
+                    }
+                    update_time: string
+                }
+                min_self_delegation: string
+            }
+        }
+    }
 }
 
 /**
