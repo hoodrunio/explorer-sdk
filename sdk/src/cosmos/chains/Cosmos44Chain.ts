@@ -470,4 +470,59 @@ export class Cosmos44Chain {
     async getInflation() {
         return this.restGetRequest<'inflation'>(`/cosmos/mint/v1beta1/inflation`, undefined)
     }
+
+    /** Returns all delegations of a given delegator address. */
+    async getDelegations({
+        delegatorAddress,
+        ...query
+    }: RESTPathParams<'delegations'> & RESTQueryParams<'delegations'>) {
+        return this.restGetRequest<'delegations'>(
+            `/cosmos/staking/v1beta1/delegations/${delegatorAddress}`,
+            query
+        )
+    }
+
+    /** Returns all redelegations of a given delegator address. */
+    async getRedelegations({
+        delegatorAddress,
+        ...query
+    }: RESTPathParams<'redelegations'> & RESTQueryParams<'redelegations'>) {
+        return this.restGetRequest<'redelegations'>(
+            `/cosmos/staking/v1beta1/delegations/${delegatorAddress}/redelegations`,
+            query
+        )
+    }
+
+    /** Returns all unbonding delegations of a given delegator address. */
+    async getUnboundingDelegations({
+        delegatorAddress,
+        ...query
+    }: RESTPathParams<'unboundingDelegations'> & RESTQueryParams<'unboundingDelegations'>) {
+        return this.restGetRequest<'unboundingDelegations'>(
+            `/cosmos/staking/v1beta1/delegations/${delegatorAddress}/unbonding_delegations`,
+            query
+        )
+    }
+
+    /** Returns all validators info for given delegator address. */
+    async getAllValidatorsByDelegator({
+        delegatorAddress,
+        ...query
+    }: RESTPathParams<'allValidatorsByDelegator'> & RESTQueryParams<'allValidatorsByDelegator'>) {
+        return this.restGetRequest<'allValidatorsByDelegator'>(
+            `/cosmos/staking/v1beta1/delegations/${delegatorAddress}/validators`,
+            query
+        )
+    }
+
+    /** Returns validator info for given delegator validator pair. */
+    async getValidatorByDelegator({
+        delegatorAddress,
+        validatorAddress,
+    }: RESTPathParams<'validatorByDelegator'>) {
+        return this.restGetRequest<'validatorByDelegator'>(
+            `/cosmos/staking/v1beta1/delegations/${delegatorAddress}/validators/${validatorAddress}`,
+            undefined
+        )
+    }
 }
