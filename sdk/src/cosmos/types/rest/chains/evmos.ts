@@ -66,3 +66,5 @@ export type EvmosRESTDatas = Omit<RESTDatas, MethodsThatHasToBeRedefined> & {
         response: RESTDatas['inflation']
     }
 }
+
+// Add 2 `.../authz/...` endpoints support for Evmes.
