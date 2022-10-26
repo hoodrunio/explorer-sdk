@@ -1,19 +1,12 @@
 import { Cosmos44Chain } from './Cosmos44Chain'
 import { EvmosInfo } from '../chain-infos'
 import {
-    EvmosRESTDatas,
     EvmosRESTEndpoint,
     EvmosRESTMethod,
     EvmosRESTPathParams,
     EvmosRESTQueryParams,
     EvmosRESTSuccessResponse,
 } from '../types/rest/chains/evmos'
-import {
-    RESTDatas,
-    RESTEndpoint,
-    RESTQueryParams,
-    RESTSuccessResponse,
-} from '../types/rest/cosmos-44'
 
 export class EvmosChain extends Cosmos44Chain {
     constructor() {
