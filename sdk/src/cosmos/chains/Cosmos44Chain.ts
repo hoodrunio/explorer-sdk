@@ -562,7 +562,7 @@ export class Cosmos44Chain {
         return this.restGetRequest<'delegationsByValidatorDelegatorPair'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations/${delegatorAddress}`, undefined)
     }
 
-    /** Returns delegation info for given validator delegator pair. */
+    /** Returns unbonding delegation info for given validator delegator pair. */
     async getUnbondingDelegationsByValidatorDelegatorPair({ validatorAddress, delegatorAddress }: RESTPathParams<'unbondingDelegationsByValidatorDelegatorPair'>) {
         return this.restGetRequest<'unbondingDelegationsByValidatorDelegatorPair'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations/${delegatorAddress}/unbonding_delegations`, undefined)
     }
