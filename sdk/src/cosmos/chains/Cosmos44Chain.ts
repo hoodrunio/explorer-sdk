@@ -10,7 +10,7 @@ import {
     RESTSuccessResponse,
 } from '../types/rest/cosmos-44'
 
-export class BaseChain {
+export class Cosmos44Chain {
     constructor(info: ChainInfo) {
         this.name = info.name
         this.urls = info.urls
