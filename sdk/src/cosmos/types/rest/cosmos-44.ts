@@ -447,6 +447,66 @@ export interface RESTDatas {
         }
     }
 
+    /** Queries the staking parameters. */
+    stakingParams: {
+        endpoint: `/cosmos/staking/v1beta1/params`
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+            params: {
+                unbonding_time: string
+                max_validators: number
+                max_entries: number
+                historical_entries: number
+                bond_denom: string
+            }
+        }
+    }
+
+    /** Queries the parameters of x/bank module. */
+    bankParams: {
+        endpoint: `/cosmos/bank/v1beta1/params`
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+            params: {
+                send_enabled: Array<any>
+                default_send_enabled: boolean
+            }
+        }
+    }
+
+    /** Queries params of the distribution module. */
+    distributionParams: {
+        endpoint: `/cosmos/distribution/v1beta1/params`
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+            params: {
+                community_tax: string
+                base_proposer_reward: string
+                bonus_proposer_reward: string
+                withdraw_addr_enabled: boolean
+            }
+        }
+    }
+
+    /** Queries params of the auth module. */
+    authParams: {
+        endpoint: `/cosmos/auth/v1beta1/params`
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+            params: {
+                max_memo_characters: string
+                tx_sig_limit: string
+                tx_size_cost_per_byte: string
+                sig_verify_cost_ed25519: string
+                sig_verify_cost_secp256k1: string
+            }
+        }
+
+    }
 }
 
 /**
