@@ -472,4 +472,20 @@ export class Cosmos44Chain {
             undefined
         )
     }
+
+    /** Returns the total supply of all coins. */
+    async getSupplies({ ...query }: RESTQueryParams<'supplies'>) {
+        return this.restGetRequest<'supplies'>(
+            `/cosmos/bank/v1beta1/supply`,
+            query
+        )
+    }
+
+    /** Returns the supply of a single coin. */
+    async getSupply({ denom }: RESTPathParams<'supply'>) {
+        return this.restGetRequest<'supply'>(
+            `/cosmos/bank/v1beta1/supply/${denom}`,
+            undefined
+        )
+    }
 }
