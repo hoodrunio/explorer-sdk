@@ -46,7 +46,12 @@ export interface RESTDatas {
         pathParams: undefined
         queryParams: {
             /** The status of the proposals */
-            proposal_status: 'PROPOSAL_STATUS_UNSPECIFIED' | 'PROPOSAL_STATUS_DEPOSIT_PERIOD' | 'PROPOSAL_STATUS_PASSED' | 'PROPOSAL_STATUS_REJECTED' | 'PROPOSAL_STATUS_FAILED'
+            proposal_status:
+                | 'PROPOSAL_STATUS_UNSPECIFIED'
+                | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
+                | 'PROPOSAL_STATUS_PASSED'
+                | 'PROPOSAL_STATUS_REJECTED'
+                | 'PROPOSAL_STATUS_FAILED'
             /** The voter address for the proposals. */
             voter: string
             /** The deposit addresses from the proposals. */
@@ -90,7 +95,6 @@ export interface RESTDatas {
                 total: string
             }
         }
-
     }
 
     /** Queries proposal details based on ProposalID. */
@@ -291,7 +295,6 @@ export interface RESTDatas {
                 slash_fraction_downtime: string
             }
         }
-
     }
 
     /** Queries signing info of all validators. */
@@ -324,13 +327,14 @@ export interface RESTDatas {
                 total: string
             }
         }
-
     }
-
 
     /** Queries the signing info of given cons address. */
     slashingSigningInfoByConsAddress: {
-        endpoint: `/cosmos/slashing/v1beta1/signing_infos/${PathParam<'slashingSigningInfoByConsAddress', 'consAddress'>}`
+        endpoint: `/cosmos/slashing/v1beta1/signing_infos/${PathParam<
+            'slashingSigningInfoByConsAddress',
+            'consAddress'
+        >}`
         pathParams: {
             /** The address to query signing info of. */
             consAddress: string
@@ -346,8 +350,6 @@ export interface RESTDatas {
                 missed_blocks_counter: string
             }
         }
-
-
     }
 
     /** Queries all evidence. */
@@ -368,7 +370,7 @@ export interface RESTDatas {
         }
         response: {
             evidence: Array<{
-                "@type": string
+                '@type': string
                 height: string
                 time: string
                 power: string
@@ -379,13 +381,12 @@ export interface RESTDatas {
                 total: string
             }
         }
-
     }
 
-    /** 
+    /**
      * Queries evidence based on evidence hash. \
-     * FIND AN EVIDENCE HASH, then test this to find response type. 
-    */
+     * FIND AN EVIDENCE HASH, then test this to find response type.
+     */
     evidenceByHash: {
         endpoint: `/cosmos/evidence/v1beta1/evidence/${PathParam<'evidenceByHash', 'evidenceHash'>}`
         pathParams: {
@@ -395,7 +396,6 @@ export interface RESTDatas {
         queryParams: undefined
         response: unknown
     }
-
 
     /** Queries the balance of all coins for a single account. */
     balances: {
@@ -426,12 +426,14 @@ export interface RESTDatas {
                 total: string
             }
         }
-
     }
 
     /** Queries the balance of a single coin for a single account. */
     balance: {
-        endpoint: `/cosmos/bank/v1beta1/balances/${PathParam<'balance', 'address'>}/${PathParam<'balance', 'denom'>}`
+        endpoint: `/cosmos/bank/v1beta1/balances/${PathParam<'balance', 'address'>}/${PathParam<
+            'balance',
+            'denom'
+        >}`
         pathParams: {
             /** The address to query balances for. */
             address: string
@@ -505,7 +507,6 @@ export interface RESTDatas {
                 sig_verify_cost_secp256k1: string
             }
         }
-
     }
 
     /** Queries the total supply of all coins. */
@@ -550,7 +551,6 @@ export interface RESTDatas {
                 amount: string
             }
         }
-
     }
 }
 

@@ -5,7 +5,6 @@ rpc: https://rpc.beta.kyve.network
 rest: https://api.beta.kyve.network
 
 socket: wss://rpc.beta.kyve.network/websocket
-
 # If `prefix` is not specified, suppose it to be lowercase version of `name`.
 
 # If `decimals` is not specified, suppose it is `6`.

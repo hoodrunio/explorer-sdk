@@ -7,5 +7,4 @@ rest: https://rest.cosmos.directory/osmosis
 socket: wss://rpc.osmosis.interbloc.org/websocket
 
 prefix: osmo
-
 # If `decimals` is not specified, suppose it is `6`.

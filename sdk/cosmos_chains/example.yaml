@@ -9,7 +9,6 @@ rest: https://rest.example.com
 
 # URL for the web socket.
 socket: wss://ws.example.com/
-
 # You can provide `decimals` if it is not `6`, otherwise it's generated automatically.
 #decimals: 18
 

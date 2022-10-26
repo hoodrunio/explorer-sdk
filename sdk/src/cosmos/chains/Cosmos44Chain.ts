@@ -322,10 +322,7 @@ export class Cosmos44Chain {
 
     /** Returns all proposals based on given status. */
     async getProposals({ ...query }: RESTQueryParams<'proposals'>) {
-        return this.restGetRequest<'proposals'>(
-            `/cosmos/gov/v1beta1/proposals`,
-            query
-        )
+        return this.restGetRequest<'proposals'>(`/cosmos/gov/v1beta1/proposals`, query)
     }
 
     /** Returns proposal details based on `proposalId`. */
@@ -384,10 +381,7 @@ export class Cosmos44Chain {
 
     /** Returns the parameters of slashing module. */
     async getSlashingParams() {
-        return this.restGetRequest<'slashingParams'>(
-            `/cosmos/slashing/v1beta1/params`,
-            undefined
-        )
+        return this.restGetRequest<'slashingParams'>(`/cosmos/slashing/v1beta1/params`, undefined)
     }
 
     /** Returns signing info of all validators. */
@@ -399,7 +393,9 @@ export class Cosmos44Chain {
     }
 
     /** Returns the signing info of given cons address. */
-    async getSlashingSigningInfoByConsAddress({ consAddress }: RESTPathParams<'slashingSigningInfoByConsAddress'>) {
+    async getSlashingSigningInfoByConsAddress({
+        consAddress,
+    }: RESTPathParams<'slashingSigningInfoByConsAddress'>) {
         return this.restGetRequest<'slashingSigningInfoByConsAddress'>(
             `/cosmos/slashing/v1beta1/signing_infos/${consAddress}`,
             undefined
@@ -408,10 +404,7 @@ export class Cosmos44Chain {
 
     /** Returns all evidence. */
     async getAllEvidence({ ...query }: RESTQueryParams<'allEvidence'>) {
-        return this.restGetRequest<'allEvidence'>(
-            `/cosmos/evidence/v1beta1/evidence`,
-            query
-        )
+        return this.restGetRequest<'allEvidence'>(`/cosmos/evidence/v1beta1/evidence`, query)
     }
 
     /** Returns evidence based on evidence hash. */
@@ -427,10 +420,7 @@ export class Cosmos44Chain {
         address,
         ...query
     }: RESTPathParams<'balances'> & RESTQueryParams<'balances'>) {
-        return this.restGetRequest<'balances'>(
-            `/cosmos/bank/v1beta1/balances/${address}`,
-            query
-        )
+        return this.restGetRequest<'balances'>(`/cosmos/bank/v1beta1/balances/${address}`, query)
     }
 
     /** Returns the balance of a single coin for a single account. */
@@ -443,18 +433,12 @@ export class Cosmos44Chain {
 
     /** Returns the staking parameters. */
     async getStakingParams() {
-        return this.restGetRequest<'stakingParams'>(
-            `/cosmos/staking/v1beta1/params`,
-            undefined
-        )
+        return this.restGetRequest<'stakingParams'>(`/cosmos/staking/v1beta1/params`, undefined)
     }
 
     /** Returns the parameters of x/bank module. */
     async getBankParams() {
-        return this.restGetRequest<'bankParams'>(
-            `/cosmos/bank/v1beta1/params`,
-            undefined
-        )
+        return this.restGetRequest<'bankParams'>(`/cosmos/bank/v1beta1/params`, undefined)
     }
 
     /** Returns the parameters of distribution module. */
@@ -467,25 +451,16 @@ export class Cosmos44Chain {
 
     /** Returns the parameters of auth module. */
     async getAuthParams() {
-        return this.restGetRequest<'authParams'>(
-            `/cosmos/auth/v1beta1/params`,
-            undefined
-        )
+        return this.restGetRequest<'authParams'>(`/cosmos/auth/v1beta1/params`, undefined)
     }
 
     /** Returns the total supply of all coins. */
     async getSupplies({ ...query }: RESTQueryParams<'supplies'>) {
-        return this.restGetRequest<'supplies'>(
-            `/cosmos/bank/v1beta1/supply`,
-            query
-        )
+        return this.restGetRequest<'supplies'>(`/cosmos/bank/v1beta1/supply`, query)
     }
 
     /** Returns the supply of a single coin. */
     async getSupply({ denom }: RESTPathParams<'supply'>) {
-        return this.restGetRequest<'supply'>(
-            `/cosmos/bank/v1beta1/supply/${denom}`,
-            undefined
-        )
+        return this.restGetRequest<'supply'>(`/cosmos/bank/v1beta1/supply/${denom}`, undefined)
     }
 }
