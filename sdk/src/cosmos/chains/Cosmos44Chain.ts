@@ -617,6 +617,16 @@ export class Cosmos44Chain {
         )
     }
 
+    /** Returns a list of `Authorization`, granted to the grantee by the granter. */
+    async getAuthorizationsByGranteeGranterPair({
+        ...query
+    }: RESTQueryParams<'authorizationsByGranteeGranterPair'>) {
+        return this.restGetRequest<'authorizationsByGranteeGranterPair'>(
+            `/cosmos/authz/v1beta1/grants`,
+            query
+        )
+    }
+
     /** Returns all the existing accounts. */
     async getAllAccounts({ ...query }: RESTQueryParams<'allAccounts'>) {
         return this.restGetRequest<'allAccounts'>(`/cosmos/auth/v1beta1/accounts`, query)
