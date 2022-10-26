@@ -406,5 +406,19 @@ export class BaseChain {
         )
     }
 
+    /** Returns all evidence. */
+    async getAllEvidence({ ...query }: RESTQueryParams<'allEvidence'>) {
+        return this.restGetRequest<'allEvidence'>(
+            `/cosmos/evidence/v1beta1/evidence`,
+            query
+        )
+    }
 
+    /** Returns evidence based on evidence hash. */
+    async getEvidenceByHash({ evidenceHash }: RESTPathParams<'evidenceByHash'>) {
+        return this.restGetRequest<'evidenceByHash'>(
+            `/cosmos/evidence/v1beta1/evidence/${evidenceHash}`,
+            undefined
+        )
+    }
 }
