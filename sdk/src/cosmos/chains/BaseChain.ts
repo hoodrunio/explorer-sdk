@@ -421,4 +421,23 @@ export class BaseChain {
             undefined
         )
     }
+
+    /** Returns the balance of all coins for a single account. */
+    async getBalances({
+        address,
+        ...query
+    }: RESTPathParams<'balances'> & RESTQueryParams<'balances'>) {
+        return this.restGetRequest<'balances'>(
+            `/cosmos/bank/v1beta1/balances/${address}`,
+            query
+        )
+    }
+
+    /** Returns the balance of a single coin for a single account. */
+    async getBalance({ address, denom }: RESTPathParams<'balance'>) {
+        return this.restGetRequest<'balance'>(
+            `/cosmos/bank/v1beta1/balances/${address}/${denom}`,
+            undefined
+        )
+    }
 }
