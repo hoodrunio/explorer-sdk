@@ -595,8 +595,6 @@ export class Cosmos44Chain {
         )
     }
 
-
-
     /** Returns all the grants for given grantee address. */
     async getGrantsByGrantee({
         granteeAddress,
@@ -608,9 +606,11 @@ export class Cosmos44Chain {
         )
     }
 
-
     /** Returns fee granted to the grantee by the granter. */
-    async getGrantsByGranteeGranterPair({ granterAddress, granteeAddress }: RESTPathParams<'grantsByGranteeGranterPair'>) {
+    async getGrantsByGranteeGranterPair({
+        granterAddress,
+        granteeAddress,
+    }: RESTPathParams<'grantsByGranteeGranterPair'>) {
         return this.restGetRequest<'grantsByGranteeGranterPair'>(
             `/cosmos/feegrant/v1beta1/allowances/${granterAddress}/${granteeAddress}`,
             undefined
