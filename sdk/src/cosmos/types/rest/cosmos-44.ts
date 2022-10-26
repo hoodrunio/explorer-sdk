@@ -995,6 +995,22 @@ export interface RESTDatas {
             }
         }
     }
+
+    /** Queries list of `Authorization`, granted to the grantee by the granter. */
+    authorizationsByGranteeGranterPair: {
+        endpoint: `/cosmos/authz/v1beta1/grants`
+        pathParams: undefined
+        queryParams: PaginationQueryParams & {
+            /** Optional, msg_type_url, when set, will query only grants matching given msg type. */
+            msg_type_url?: string
+            /** The address of the user granting an allowance of their funds. */
+            granterAddress: string
+            /** The address of the user being granted an allowance of another user's funds. */
+            granteeAddress: string
+        }
+        // Let's find a grantee and a granter address and test, to find the type of the server response.
+        response: unknown // TODO!
+    }
 }
 
 /**
