@@ -528,7 +528,10 @@ export class Cosmos44Chain {
 
     /** Returns the historical staking info for given height. */
     async getHistoricalStakingInfo({ height }: RESTPathParams<'historicalStakingInfo'>) {
-        return this.restGetRequest<'historicalStakingInfo'>(`/cosmos/staking/v1beta1/historical_info/${height}`, undefined)
+        return this.restGetRequest<'historicalStakingInfo'>(
+            `/cosmos/staking/v1beta1/historical_info/${height}`,
+            undefined
+        )
     }
 
     /** Returns the historical staking info for given height. */
@@ -543,28 +546,52 @@ export class Cosmos44Chain {
 
     /** Returns validator info for given validator address. */
     async getValidator({ validatorAddress }: RESTPathParams<'validator'>) {
-        return this.restGetRequest<'validator'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}`, undefined)
+        return this.restGetRequest<'validator'>(
+            `/cosmos/staking/v1beta1/validators/${validatorAddress}`,
+            undefined
+        )
     }
 
-
     /** Returns delegation info for given validator. */
-    async getDelegationsByValidator({ validatorAddress, ...query }: RESTPathParams<'delegationsByValidator'> & RESTQueryParams<'delegationsByValidator'>) {
-        return this.restGetRequest<'delegationsByValidator'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations`, query)
+    async getDelegationsByValidator({
+        validatorAddress,
+        ...query
+    }: RESTPathParams<'delegationsByValidator'> & RESTQueryParams<'delegationsByValidator'>) {
+        return this.restGetRequest<'delegationsByValidator'>(
+            `/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations`,
+            query
+        )
     }
 
     /** Returns unbonding delegation info for given validator. */
-    async getUnbondingDelegationsByValidator({ validatorAddress }: RESTPathParams<'unbondingDelegationsByValidator'>) {
-        return this.restGetRequest<'unbondingDelegationsByValidator'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/unbonding_delegations`, undefined)
+    async getUnbondingDelegationsByValidator({
+        validatorAddress,
+    }: RESTPathParams<'unbondingDelegationsByValidator'>) {
+        return this.restGetRequest<'unbondingDelegationsByValidator'>(
+            `/cosmos/staking/v1beta1/validators/${validatorAddress}/unbonding_delegations`,
+            undefined
+        )
     }
 
     /** Returns delegation info for given validator delegator pair. */
-    async getDelegationsByValidatorDelegatorPair({ validatorAddress, delegatorAddress }: RESTPathParams<'delegationsByValidatorDelegatorPair'>) {
-        return this.restGetRequest<'delegationsByValidatorDelegatorPair'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations/${delegatorAddress}`, undefined)
+    async getDelegationsByValidatorDelegatorPair({
+        validatorAddress,
+        delegatorAddress,
+    }: RESTPathParams<'delegationsByValidatorDelegatorPair'>) {
+        return this.restGetRequest<'delegationsByValidatorDelegatorPair'>(
+            `/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations/${delegatorAddress}`,
+            undefined
+        )
     }
 
     /** Returns unbonding delegation info for given validator delegator pair. */
-    async getUnbondingDelegationsByValidatorDelegatorPair({ validatorAddress, delegatorAddress }: RESTPathParams<'unbondingDelegationsByValidatorDelegatorPair'>) {
-        return this.restGetRequest<'unbondingDelegationsByValidatorDelegatorPair'>(`/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations/${delegatorAddress}/unbonding_delegations`, undefined)
+    async getUnbondingDelegationsByValidatorDelegatorPair({
+        validatorAddress,
+        delegatorAddress,
+    }: RESTPathParams<'unbondingDelegationsByValidatorDelegatorPair'>) {
+        return this.restGetRequest<'unbondingDelegationsByValidatorDelegatorPair'>(
+            `/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations/${delegatorAddress}/unbonding_delegations`,
+            undefined
+        )
     }
-
 }

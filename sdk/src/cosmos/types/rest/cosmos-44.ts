@@ -11,8 +11,8 @@ export type RESTSuccessResponse<T extends RESTMethod> = RESTDatas[T] extends {
     response: infer R
 }
     ? Q extends PaginationQueryParams
-    ? R & PaginationResponse
-    : R
+        ? R & PaginationResponse
+        : R
     : never
 
 export type RESTResponse<T extends RESTMethod> =
@@ -50,11 +50,11 @@ export interface RESTDatas {
         queryParams: PaginationQueryParams & {
             /** The status of the proposals */
             proposal_status:
-            | 'PROPOSAL_STATUS_UNSPECIFIED'
-            | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
-            | 'PROPOSAL_STATUS_PASSED'
-            | 'PROPOSAL_STATUS_REJECTED'
-            | 'PROPOSAL_STATUS_FAILED'
+                | 'PROPOSAL_STATUS_UNSPECIFIED'
+                | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
+                | 'PROPOSAL_STATUS_PASSED'
+                | 'PROPOSAL_STATUS_REJECTED'
+                | 'PROPOSAL_STATUS_FAILED'
             /** The voter address for the proposals. */
             voter: string
             /** The deposit addresses from the proposals. */
@@ -646,10 +646,12 @@ export interface RESTDatas {
         }
     }
 
-
     /** Queries the historical info for given height. */
     historicalStakingInfo: {
-        endpoint: `/cosmos/staking/v1beta1/historical_info/${PathParam<'historicalStakingInfo', 'height'>}`
+        endpoint: `/cosmos/staking/v1beta1/historical_info/${PathParam<
+            'historicalStakingInfo',
+            'height'
+        >}`
         pathParams: {
             height: number
         }
@@ -739,7 +741,7 @@ export interface RESTDatas {
             validators: Array<{
                 operator_address: string
                 consensus_pubkey: {
-                    "@type": string
+                    '@type': string
                     key: string
                 }
                 jailed: boolean
@@ -811,7 +813,10 @@ export interface RESTDatas {
 
     /** Queries delegation info for given validator. */
     delegationsByValidator: {
-        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'delegationsByValidator', 'validatorAddress'>}/delegations`
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<
+            'delegationsByValidator',
+            'validatorAddress'
+        >}/delegations`
         pathParams: {
             /** The validator address to query for. */
             validatorAddress: string
@@ -830,12 +835,14 @@ export interface RESTDatas {
                 }
             }>
         }
-
     }
 
     /** Queries unbonding delegation info for given validator. */
     unbondingDelegationsByValidator: {
-        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'unbondingDelegationsByValidator', 'validatorAddress'>}/unbonding_delegations`
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<
+            'unbondingDelegationsByValidator',
+            'validatorAddress'
+        >}/unbonding_delegations`
         pathParams: {
             /** The validator address to query for. */
             validatorAddress: string
@@ -857,7 +864,10 @@ export interface RESTDatas {
 
     /** Queries delegation info for given validator delegator pair. */
     delegationsByValidatorDelegatorPair: {
-        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'delegationsByValidatorDelegatorPair', 'validatorAddress'>}/delegations/${PathParam<'delegationsByValidatorDelegatorPair', 'delegatorAddress'>}`
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<
+            'delegationsByValidatorDelegatorPair',
+            'validatorAddress'
+        >}/delegations/${PathParam<'delegationsByValidatorDelegatorPair', 'delegatorAddress'>}`
         pathParams: {
             /** The validator address to query for. */
             validatorAddress: string
@@ -882,7 +892,13 @@ export interface RESTDatas {
 
     /** Queries unbonding delegation info for given validator delegator pair. */
     unbondingDelegationsByValidatorDelegatorPair: {
-        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<'unbondingDelegationsByValidatorDelegatorPair', 'validatorAddress'>}/delegations/${PathParam<'unbondingDelegationsByValidatorDelegatorPair', 'delegatorAddress'>}/unbonding_delegations`
+        endpoint: `/cosmos/staking/v1beta1/validators/${PathParam<
+            'unbondingDelegationsByValidatorDelegatorPair',
+            'validatorAddress'
+        >}/delegations/${PathParam<
+            'unbondingDelegationsByValidatorDelegatorPair',
+            'delegatorAddress'
+        >}/unbonding_delegations`
         pathParams: {
             /** The validator address to query for. */
             validatorAddress: string
@@ -902,9 +918,7 @@ export interface RESTDatas {
                 }>
             }
         }
-
     }
-
 }
 
 /**
@@ -937,5 +951,8 @@ export interface PaginationResponse {
     }
 }
 
-
-export type BondStatus = 'BOND_STATUS_UNSPECIFIED' | 'BOND_STATUS_UNBONDED' | 'BOND_STATUS_UNBONDING' | 'BOND_STATUS_BONDED'
+export type BondStatus =
+    | 'BOND_STATUS_UNSPECIFIED'
+    | 'BOND_STATUS_UNBONDED'
+    | 'BOND_STATUS_UNBONDING'
+    | 'BOND_STATUS_BONDED'
