@@ -594,4 +594,26 @@ export class Cosmos44Chain {
             undefined
         )
     }
+
+
+
+    /** Returns all the grants for given grantee address. */
+    async getGrantsByGrantee({
+        granteeAddress,
+        ...query
+    }: RESTPathParams<'grantsByGrantee'> & RESTQueryParams<'grantsByGrantee'>) {
+        return this.restGetRequest<'grantsByGrantee'>(
+            `/cosmos/feegrant/v1beta1/allowances/${granteeAddress}`,
+            query
+        )
+    }
+
+
+    /** Returns fee granted to the grantee by the granter. */
+    async getGrantsByGranteeGranterPair({ granterAddress, granteeAddress }: RESTPathParams<'grantsByGranteeGranterPair'>) {
+        return this.restGetRequest<'grantsByGranteeGranterPair'>(
+            `/cosmos/feegrant/v1beta1/allowances/${granterAddress}/${granteeAddress}`,
+            undefined
+        )
+    }
 }
