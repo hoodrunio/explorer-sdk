@@ -7,9 +7,12 @@ export interface RESTErrorResponse {
 }
 
 export type RESTSuccessResponse<T extends RESTMethod> = RESTDatas[T] extends {
-    response: infer E
+    queryParams: infer Q
+    response: infer R
 }
-    ? E
+    ? Q extends PaginationQueryParams
+        ? R & PaginationResponse
+        : R
     : never
 
 export type RESTResponse<T extends RESTMethod> =
@@ -44,7 +47,7 @@ export interface RESTDatas {
     proposals: {
         endpoint: `/cosmos/gov/v1beta1/proposals`
         pathParams: undefined
-        queryParams: {
+        queryParams: PaginationQueryParams & {
             /** The status of the proposals */
             proposal_status:
                 | 'PROPOSAL_STATUS_UNSPECIFIED'
@@ -56,16 +59,6 @@ export interface RESTDatas {
             voter: string
             /** The deposit addresses from the proposals. */
             depositor: string
-            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
-            'pagination.key': unknown
-            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
-            'pagination.offset': number
-            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
-            'pagination.limit': number
-            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
-            'pagination.count_total': boolean
-            /** `reverse` is set to true if results are to be returned in the descending order. */
-            'pagination.reverse': boolean
         }
         response: {
             proposals: Array<{
@@ -90,10 +83,6 @@ export interface RESTDatas {
                 voting_start_time: string
                 voting_end_time: string
             }>
-            pagination: {
-                next_key: string
-                total: string
-            }
         }
     }
 
@@ -142,18 +131,7 @@ export interface RESTDatas {
             /** Defines the unique id of the proposal. */
             proposalId: number
         }
-        queryParams: {
-            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
-            'pagination.key': unknown
-            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
-            'pagination.offset': number
-            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
-            'pagination.limit': number
-            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
-            'pagination.count_total': boolean
-            /** `reverse` is set to true if results are to be returned in the descending order. */
-            'pagination.reverse': boolean
-        }
+        queryParams: PaginationQueryParams
         response: {
             deposits: Array<{
                 proposal_id: string
@@ -163,10 +141,6 @@ export interface RESTDatas {
                     amount: string
                 }>
             }>
-            pagination: {
-                next_key: null | unknown
-                total: string
-            }
         }
     }
 
@@ -226,18 +200,7 @@ export interface RESTDatas {
             /** Defines the unique id of the proposal. */
             proposalId: number
         }
-        queryParams: {
-            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
-            'pagination.key': unknown
-            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
-            'pagination.offset': number
-            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
-            'pagination.limit': number
-            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
-            'pagination.count_total': boolean
-            /** `reverse` is set to true if results are to be returned in the descending order. */
-            'pagination.reverse': boolean
-        }
+        queryParams: PaginationQueryParams
         response: {
             votes: Array<{
                 proposal_id: string
@@ -248,10 +211,6 @@ export interface RESTDatas {
                     weight: string
                 }>
             }>
-            pagination: {
-                next_key: string
-                total: string
-            }
         }
     }
 
@@ -301,18 +260,7 @@ export interface RESTDatas {
     slashingSigningInfos: {
         endpoint: `/cosmos/slashing/v1beta1/signing_infos`
         pathParams: undefined
-        queryParams: {
-            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
-            'pagination.key': unknown
-            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
-            'pagination.offset': number
-            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
-            'pagination.limit': number
-            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
-            'pagination.count_total': boolean
-            /** `reverse` is set to true if results are to be returned in the descending order. */
-            'pagination.reverse': boolean
-        }
+        queryParams: PaginationQueryParams
         response: {
             info: Array<{
                 address: string
@@ -322,10 +270,6 @@ export interface RESTDatas {
                 tombstoned: boolean
                 missed_blocks_counter: string
             }>
-            pagination: {
-                next_key: string
-                total: string
-            }
         }
     }
 
@@ -356,18 +300,7 @@ export interface RESTDatas {
     allEvidence: {
         endpoint: `/cosmos/evidence/v1beta1/evidence`
         pathParams: undefined
-        queryParams: {
-            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
-            'pagination.key': unknown
-            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
-            'pagination.offset': number
-            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
-            'pagination.limit': number
-            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
-            'pagination.count_total': boolean
-            /** `reverse` is set to true if results are to be returned in the descending order. */
-            'pagination.reverse': boolean
-        }
+        queryParams: PaginationQueryParams
         response: {
             evidence: Array<{
                 '@type': string
@@ -376,10 +309,6 @@ export interface RESTDatas {
                 power: string
                 consensus_address: string
             }>
-            pagination: {
-                next_key: any
-                total: string
-            }
         }
     }
 
@@ -404,27 +333,12 @@ export interface RESTDatas {
             /** The address to query balances for. */
             address: string
         }
-        queryParams: {
-            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
-            'pagination.key': unknown
-            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
-            'pagination.offset': number
-            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
-            'pagination.limit': number
-            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
-            'pagination.count_total': boolean
-            /** `reverse` is set to true if results are to be returned in the descending order. */
-            'pagination.reverse': boolean
-        }
+        queryParams: PaginationQueryParams
         response: {
             balances: Array<{
                 denom: string
                 amount: string
             }>
-            pagination: {
-                next_key: any
-                total: string
-            }
         }
     }
 
@@ -513,27 +427,12 @@ export interface RESTDatas {
     supplies: {
         endpoint: `/cosmos/bank/v1beta1/supply`
         pathParams: undefined
-        queryParams: {
-            /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
-            'pagination.key': unknown
-            /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
-            'pagination.offset': number
-            /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
-            'pagination.limit': number
-            /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
-            'pagination.count_total': boolean
-            /** `reverse` is set to true if results are to be returned in the descending order. */
-            'pagination.reverse': boolean
-        }
+        queryParams: PaginationQueryParams
         response: {
             supply: Array<{
                 denom: string
                 amount: string
             }>
-            pagination: {
-                next_key: string
-                total: string
-            }
         }
     }
 
@@ -563,3 +462,23 @@ export interface RESTDatas {
         response: {}
     }
  */
+
+export interface PaginationQueryParams {
+    /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
+    'pagination.key': unknown
+    /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
+    'pagination.offset': number
+    /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
+    'pagination.limit': number
+    /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
+    'pagination.count_total': boolean
+    /** `reverse` is set to true if results are to be returned in the descending order. */
+    'pagination.reverse': boolean
+}
+
+export interface PaginationResponse {
+    pagination: {
+        next_key: string | null
+        total: string
+    }
+}
