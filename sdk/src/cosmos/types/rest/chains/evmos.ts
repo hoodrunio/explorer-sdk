@@ -1,4 +1,4 @@
-import { RESTDatas } from '../cosmos-44'
+import { RESTCosmos44Datas } from '../cosmos-44'
 
 export type EvmosRESTMethod = keyof EvmosRESTDatas
 
@@ -8,7 +8,7 @@ export interface EvmosRESTErrorResponse {
     details: unknown[]
 }
 
-export type EvmosRESTSuccessResponse<T extends EvmosRESTMethod> = RESTDatas[T] extends {
+export type EvmosRESTSuccessResponse<T extends EvmosRESTMethod> = RESTCosmos44Datas[T] extends {
     response: infer E
 }
     ? E
@@ -39,11 +39,11 @@ export type EvmosRESTQueryParams<T extends EvmosRESTMethod> = EvmosRESTDatas[T] 
 type PathParam<
     T extends EvmosRESTMethod,
     E extends keyof EvmosRESTDatas[T]['pathParams']
-> = RESTDatas[T]['pathParams'][E]
+> = RESTCosmos44Datas[T]['pathParams'][E]
 
 type MethodsThatHasToBeRedefined = 'balance' | 'inflation'
 
-export type EvmosRESTDatas = Omit<RESTDatas, MethodsThatHasToBeRedefined> & {
+export type EvmosRESTDatas = Omit<RESTCosmos44Datas, MethodsThatHasToBeRedefined> & {
     /** Queries the balance of a single coin for a single account. */
     balance: {
         endpoint: `/cosmos/bank/v1beta1/balances/${PathParam<'balance', 'address'>}/by_denom`
@@ -55,7 +55,7 @@ export type EvmosRESTDatas = Omit<RESTDatas, MethodsThatHasToBeRedefined> & {
             /** The coin denom to query balances for. */
             denom: string
         }
-        response: RESTDatas['balance']
+        response: RESTCosmos44Datas['balance']
     }
 
     /** Returns the current minting inflation value. */
@@ -63,7 +63,7 @@ export type EvmosRESTDatas = Omit<RESTDatas, MethodsThatHasToBeRedefined> & {
         endpoint: `/evmos/inflation/v1/inflation_rate`
         pathParams: undefined
         queryParams: undefined
-        response: RESTDatas['inflation']
+        response: RESTCosmos44Datas['inflation']
     }
 }
 

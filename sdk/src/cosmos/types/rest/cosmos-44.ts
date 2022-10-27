@@ -1,12 +1,12 @@
-export type RESTMethod = keyof RESTDatas
+export type RESTMethod = keyof RESTCosmos44Datas
 
-export interface RESTErrorResponse {
+export interface RESTCosmos44ErrorResponse {
     code: string
     message: string
     details: unknown[]
 }
 
-export type RESTSuccessResponse<T extends RESTMethod> = RESTDatas[T] extends {
+export type RESTCosmos44SuccessResponse<T extends RESTMethod> = RESTCosmos44Datas[T] extends {
     queryParams: infer Q
     response: infer R
 }
@@ -15,23 +15,23 @@ export type RESTSuccessResponse<T extends RESTMethod> = RESTDatas[T] extends {
         : R
     : never
 
-export type RESTResponse<T extends RESTMethod> =
-    | (RESTSuccessResponse<T> & { message: undefined })
-    | RESTErrorResponse
+export type RESTCosmos44Response<T extends RESTMethod> =
+    | (RESTCosmos44SuccessResponse<T> & { message: undefined })
+    | RESTCosmos44ErrorResponse
 
-export type RESTEndpoint<T extends RESTMethod> = RESTDatas[T] extends {
+export type RESTCosmos44Endpoint<T extends RESTMethod> = RESTCosmos44Datas[T] extends {
     endpoint: infer E
 }
     ? E
     : never
 
-export type RESTPathParams<T extends RESTMethod> = RESTDatas[T] extends {
+export type RESTCosmos44PathParams<T extends RESTMethod> = RESTCosmos44Datas[T] extends {
     pathParams: infer E
 }
     ? E
     : never
 
-export type RESTQueryParams<T extends RESTMethod> = RESTDatas[T] extends {
+export type RESTCosmos44Params<T extends RESTMethod> = RESTCosmos44Datas[T] extends {
     queryParams: infer E
 }
     ? E
@@ -39,10 +39,10 @@ export type RESTQueryParams<T extends RESTMethod> = RESTDatas[T] extends {
 
 type PathParam<
     T extends RESTMethod,
-    E extends keyof RESTDatas[T]['pathParams']
-> = RESTDatas[T]['pathParams'][E]
+    E extends keyof RESTCosmos44Datas[T]['pathParams']
+> = RESTCosmos44Datas[T]['pathParams'][E]
 
-export interface RESTDatas {
+export interface RESTCosmos44Datas {
     /** Queries all proposals based on given status. */
     proposals: {
         endpoint: `/cosmos/gov/v1beta1/proposals`
