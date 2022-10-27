@@ -1,10 +1,11 @@
+/** Represents the type of a successful response from nodes. */
 export type RPCSuccessResponse<T> = {
     id: number
     jsonrpc: string
     result: T
     error: undefined | ''
 }
-
+/** Represents the type of a an error response from nodes. */
 export type RPCErrorResponse = {
     id: number
     jsonrpc: string
