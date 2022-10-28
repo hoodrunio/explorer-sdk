@@ -76,7 +76,7 @@ export type SchemaRef = {
 
 export type SchemaObject = {
     type: 'object'
-    properties: {
+    properties?: {
         [prop in string]: Schema
     }
     title?: string
