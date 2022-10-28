@@ -61,13 +61,6 @@ socket: wss://ws.example.com/
 yarn generate-chains
 ```
 
--   Type below to create a bundle for the SDK.
-    Make sure the current directory is in `sdk/` folder.
-
-```
-yarn run build
-```
-
 ### Add REST API methods.
 Each swagger file must be inside `sdk/inputs/swagger_info` folder. 
 
@@ -82,4 +75,12 @@ PLEASE DO NOT TOUCH `default.yaml`, as it is for Cosmos SDK itself.
 Type below to generate REST API method definitions.
 ```
 yarn run generate-swagger
+```
+
+## Create a bundle.
+    Type below to create a bundle for the SDK.
+    Make sure the current directory is in `sdk/` folder.
+
+```
+yarn run build
 ```
