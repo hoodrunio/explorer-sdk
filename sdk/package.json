@@ -17,7 +17,8 @@
         "clean": "rm -rf compiled",
         "build": "yarn compile && yarn bundle && yarn clean",
         "prettify": "yarn prettier -w .",
-        "generate-chains": "node ../scripts/generate-chains.js"
+        "generate-chains": "node ../scripts/generate_chains/index.js",
+        "generate-swagger": "bun ../scripts/generate_swagger/src/index.ts"
     },
     "devDependencies": {
         "@types/node": "^18.11.3",
