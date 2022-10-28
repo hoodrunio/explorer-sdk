@@ -198,7 +198,7 @@ export function parseParametersToTypescript(swaggerObject: Swagger, params?: Swa
                 break
             }
             case 'body': {
-                queryParams += `'${comment}${param.name}': ${parseSchemaToTypeScript(param.schema, swaggerObject)}\n`
+                bodyParams += `'${comment}${paramName}': ${parseSchemaToTypeScript(param.schema, swaggerObject)}\n`
                 break
             }
         }
@@ -208,7 +208,10 @@ export function parseParametersToTypescript(swaggerObject: Swagger, params?: Swa
     queryParams += '}'
     bodyParams += '}'
 
-    return [pathParams.length === 3 ? 'undefined' : pathParams, queryParams.length === 3 ? 'undefined' : queryParams, bodyParams.length === 3 ? 'undefined' : bodyParams]
+    return [
+        pathParams.length === 3 ? 'undefined' : pathParams,
+        queryParams.length === 3 ? 'undefined' : queryParams,
+        bodyParams.length === 3 ? 'undefined' : bodyParams]
 }
 
 
@@ -336,7 +339,7 @@ ${operationId}: {
             })()}
         body: ${(() => {
                 let bodyString = '{\n'
-                Object.entries(operation.params.query).forEach(([chainName, bodyParams]) => {
+                Object.entries(operation.params.body).forEach(([chainName, bodyParams]) => {
                     bodyString += `${chainName}: ${bodyParams}\n`
                 })
                 bodyString += '}'
