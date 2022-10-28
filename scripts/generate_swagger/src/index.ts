@@ -10,11 +10,11 @@ async function main() {
     // Define an object to store all the operations.
     let operations: Operations = {}
 
-    
+
     // EXPECT THE CURRENT WORKING DIRECTORY IS SET TO `sdk/`.
 
     // Define input folder path.
-    const inputFolderPath: string = './inputs/swagger_info'
+    const inputFolderPath: string = './inputs/swagger_info/'
 
     // Define out file path.
     const outFilePath: string = './src/cosmos/types/methods/rest.ts'
@@ -23,8 +23,15 @@ async function main() {
     // Get all the file names.
     const fileNames = await readdir(inputFolderPath, { encoding: 'utf-8' })
 
+    // Check if is there any file.
+    if (fileNames.length === 0) {
+        console.error(`There isn't any file inside 'sdk/inputs/swagger_info/' folder`)
+        exit(1)
+    }
+
     // Print start message.
     console.log('Swagger extraction starting...')
+
 
     // Do below for each file name in `fileNames`.
     for (const fileName of fileNames) {
