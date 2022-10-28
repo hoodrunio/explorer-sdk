@@ -8,7 +8,7 @@ This SDK is for the upcoming Explorer.
 
 -   It will support all the Web Socket methods.
 
-## Roadmap
+# Roadmap
 
 ✅ Make a prototype for all RPC methods.
 
@@ -22,9 +22,14 @@ This SDK is for the upcoming Explorer.
 
 ❌ Make a prototype for Web Socket methods.
 
-## To Know
+# To Know
 
--   Create a new YAML file in `sdk/cosmos_chains` folder, according to `example.yaml` to add a new chain support.
+
+## Add a new chain.
+
+
+### Add information.
+Create a new YAML file in `sdk/inputs/chain_info/` folder, according to `example.yaml` to add a new chain support.
 
 The content of `example.yaml`:
 
@@ -61,4 +66,18 @@ yarn generate-chains
 
 ```
 yarn run build
+```
+
+### Add REST API methods.
+Install `swagger.yaml` or `swagger.yml` file for the chain.
+
+Rename it based on chain names, using lowercase letters.
+
+For example: `evmos.yaml`, `osmosis.yaml`, `axelar.yaml`, etc.
+
+PLEASE DO NOT TOUCH `default.yaml`, as it is for Cosmos SDK itself.
+
+Type below to generate REST API method definitions.
+```
+yarn run swagger
 ```

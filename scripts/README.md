@@ -1,18 +1,21 @@
 This folder includes scripts which we need to develop the SDK.
 
 # generate-chains.js
-The script reads all the files inside `sdk/cosmos_chains/` folder.
+The script reads all the files inside `sdk/inputs/chain_info/` folder.
 
 Then it parses them, and generates TypeScript objects.
 
-Lastly it generates content for `sdk/src/cosmos/chain-infos.ts`, and saves it.
+Lastly it generates content for `sdk/src/cosmos/chain-info.ts`, and saves it.
 
-### Usage
-Create a new YAML file (for example: `example.yaml`) inside `sdk/cosmos_chains/` folder to add a new cosmos based chain.
+# Usage
+## Add a new chain.
+Create a new YAML file (for example: `example.yaml`) inside `sdk/inputs/chain_info/` folder to add a new cosmos based chain.
 
-Lines start with `#` are comments, you DO NOT need them.
+> Lines start with `#` are comments, you DO NOT need them.
 
-Example file content:
+> Files should be named using this rule: `<lowercase-chain-name>.yaml`.
+
+#### Example file content:
 ```yaml
 # Name of the chain.
 name: Example
@@ -35,6 +38,8 @@ socket: wss://ws.example.com/
 #prefix: exam
 ```
 
+
+## Run the script.
 Set current directory to `sdk/`.
 ```sh
 cd sdk
