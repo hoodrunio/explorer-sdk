@@ -1,4 +1,4 @@
-# Swagger
+# generate-swagger
 
 An application to automatically generate TypeScript types for REST API, endpoints, params, and responses.
 

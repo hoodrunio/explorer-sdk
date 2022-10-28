@@ -1,11 +1,11 @@
 This folder includes scripts which we need to develop the SDK.
 
-# generate-chains.js
+# generate-chains
 The script reads all the files inside `sdk/inputs/chain_info/` folder.
 
 Then it parses them, and generates TypeScript objects.
 
-Lastly it generates content for `sdk/src/cosmos/chain-info.ts`, and saves it.
+Lastly it generates content for `sdk/src/chain-info.ts`, and saves it.
 
 # Usage
 ## Add a new chain.

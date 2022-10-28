@@ -17,7 +17,7 @@ async function main() {
     const inputFolderPath: string = './inputs/swagger_info/'
 
     // Define out file path.
-    const outFilePath: string = './src/cosmos/types/methods/rest.ts'
+    const outFilePath: string = './src/types/methods/rest.ts'
 
 
     // Get all the file names.
