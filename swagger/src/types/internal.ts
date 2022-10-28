@@ -1,7 +1,7 @@
-import { Schema } from "./swagger"
-
+/** The ID of REST API operation. */
 type OperationId = string
 
+/** The data about REST API operation.  */
 export type OperationData = {
     method: 'get' | 'post'
 
@@ -39,16 +39,20 @@ export type OperationData = {
     }
 }
 
+/** The object that holds multiple `OpearionID` and associated `OperationData`. */
 export type Operations = {
     [operationId in OperationId]: OperationData
 }
 
+/** The object that holds multiple `Property` and associated name. */
 export type Properties = {
-    [property in string]: Property
+    [propertyName in string]: Property
 }
 
+/** `Property` represent a property's type, and it's comment, if it exists. */
 export interface Property {
     type: InternalTypes, comment?: string | undefined
 }
 
+/** The types which will be used while generating typescript types. */
 export type InternalTypes = 'string' | 'number' | 'boolean' | `Array<${'string' | 'number' | 'boolean' | `Array${string}` | `{${string}}`}>` | `{${string}}`
