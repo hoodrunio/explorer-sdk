@@ -69,6 +69,8 @@ yarn run build
 ```
 
 ### Add REST API methods.
+Each swagger file must be inside `sdk/inputs/swagger_info` folder. 
+
 Install `swagger.yaml` or `swagger.yml` file for the chain.
 
 Rename it based on chain names, using lowercase letters.
@@ -79,5 +81,5 @@ PLEASE DO NOT TOUCH `default.yaml`, as it is for Cosmos SDK itself.
 
 Type below to generate REST API method definitions.
 ```
-yarn run swagger
+yarn run generate-swagger
 ```

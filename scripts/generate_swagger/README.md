@@ -23,6 +23,8 @@ This project was created using `bun init` in bun v0.2.1. [Bun](https://bun.sh) i
 Make sure to set working directory to `sdk/` folder in project folder.
 
 ## Prepare swagger files.
+Each swagger file must be inside `sdk/inputs/swagger_info` folder. 
+
 You must install every `swagger.yaml` or `swagger.yml` file for each chain.
 
 Rename them based on chain names, using lowercase letters.
