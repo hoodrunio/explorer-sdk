@@ -10,20 +10,15 @@ async function main() {
     // Define an object to store all the operations.
     let operations: Operations = {}
 
+    
+    // EXPECT THE CURRENT WORKING DIRECTORY IS SET TO `sdk/`.
+
     // Define input folder path.
-    const inputFolderPath: undefined | string = './input/'
+    const inputFolderPath: string = './inputs/swagger_info'
 
     // Define out file path.
-    const outFilePath: undefined | string = './out.ts'
+    const outFilePath: string = './src/cosmos/types/methods/rest.ts'
 
-    /// If environment variables aren't set, return error.
-    if (inputFolderPath === undefined) {
-        console.error(`Specify 'INPUT_FOLDER_PATH' to run this app.\n\nFor example: INPUT_FOLDER_PATH="./input" bun start\n`)
-        process.exit(1)
-    } else if (outFilePath === undefined) {
-        console.error(`Specify 'OUT_FILE_PATH' to run this app.\n\nFor example: OUT_FILE_PATH="./out.ts" bun start\n`)
-        process.exit(1)
-    }
 
     // Get all the file names.
     const fileNames = await readdir(inputFolderPath, { encoding: 'utf-8' })
