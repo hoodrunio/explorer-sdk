@@ -274,27 +274,33 @@ export function convertOperationsToTypeScriptTypes(operations: Operations): stri
 
     content += `/** REST API endpoint based on given \`ChainName\` and \`OperationId\`. */
     export type RestApiEndpoint<N extends ChainName, I extends OperationId> =
-    RestApi[I] extends { endpoint: { [chainName in N]: infer E } } ? E : never\n\n`
+    RestApi[I] extends { endpoint: { [chainName in N]: infer E } } ? E : 
+    RestApi[I] extends { endpoint: { default: infer E } } ? E : never\n\n`
 
     content += `/** REST API path parameters based on given \`ChainName\` and \`OperationId\`. */
     export type RestApiPathParams<N extends ChainName, I extends OperationId> =
-    RestApi[I] extends { params: { path: { [chainName in N]: infer E } } } ? E : never\n\n`
+    RestApi[I] extends { params: { path: { [chainName in N]: infer E } } } ? E :
+    RestApi[I] extends { endpoint: { default: infer E } } ? E : never\n\n`
 
     content += `/** REST API query parameters based on given \`ChainName\` and \`OperationId\`. */
     export type RestApiQueryParams<N extends ChainName, I extends OperationId> =
-    RestApi[I] extends { params: { query: { [chainName in N]: infer E } } } ? E : never\n\n`
+    RestApi[I] extends { params: { query: { [chainName in N]: infer E } } } ? E : 
+    RestApi[I] extends { endpoint: { default: infer E } } ? E : never\n\n`
 
     content += `/** REST API body parameters based on given \`ChainName\` and \`OperationId\`. */
     export type RestApiBodyParams<N extends ChainName, I extends OperationId> =
-    RestApi[I] extends { params: { body: { [chainName in N]: infer E } } } ? E : never\n\n`
+    RestApi[I] extends { params: { body: { [chainName in N]: infer E } } } ? E :
+    RestApi[I] extends { endpoint: { default: infer E } } ? E : never\n\n`
 
     content += `/** REST API successful response type based on given \`ChainName\` and \`OperationId\`. */
     export type RestApiSuccessResponse<N extends ChainName, I extends OperationId> =
-    RestApi[I] extends { response: { success: { [chainName in N]: infer E } } } ? E : never\n\n`
+    RestApi[I] extends { response: { success: { [chainName in N]: infer E } } } ? E : 
+    RestApi[I] extends { endpoint: { default: infer E } } ? E : never\n\n`
 
     content += `/** REST API error response type based on given \`ChainName\` and \`OperationId\`. */
     export type RestApiErrorResponse<N extends ChainName, I extends OperationId> =
-    RestApi[I] extends { response: { error: { [chainName in N]: infer E } } } ? E : never\n\n`
+    RestApi[I] extends { response: { error: { [chainName in N]: infer E } } } ? E : 
+    RestApi[I] extends { endpoint: { default: infer E } } ? E : never\n\n`
 
     content += `/** Stores everything related to Rest API. */
     export interface RestApi {`
@@ -386,4 +392,63 @@ ${operationId}: {
 
 
     return content
+}
+
+
+export function makeDefault<T>(mainObj: { [key in string]: T }, extraObj: { [key in string]: T }) {
+    if (!mainObj) return extraObj
+
+    const [[extraPropKey, extraPropData]] = Object.entries(extraObj)
+
+    const newObj: { [key in string]: T } = {}
+
+    let passExtraProp = false
+
+    for (const [oldPropKey, oldPropData] of Object.entries(mainObj)) {
+
+        if (oldPropData === extraPropData) {
+            newObj.default = extraPropData
+            passExtraProp = true
+        } else {
+            if (typeof oldPropData === 'object' && typeof extraPropData === 'object' &&
+                oldPropData !== null && extraPropData !== null
+            ) {
+                const oldValues = Object.values(oldPropData)
+                const extraValues = Object.values(oldPropData)
+
+                let is_equal = true
+
+                for (let i = 0; i < oldValues.length; i++) {
+                    if (oldValues[i] !== extraValues[i]) {
+                        is_equal = false
+                    }
+                }
+
+                if (is_equal) {
+                    newObj.default = extraPropData
+                    passExtraProp = true
+                } else {
+                    newObj[oldPropKey] = oldPropData
+                }
+
+
+            } else {
+                newObj[oldPropKey] = oldPropData
+            }
+
+
+        }
+    }
+
+
+    if (passExtraProp) {
+        return newObj
+    } else {
+        return {
+            ...newObj, ...{ [extraPropKey]: extraPropData }
+        }
+    }
+
+
+
 }
