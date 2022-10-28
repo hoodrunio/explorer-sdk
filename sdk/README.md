@@ -24,11 +24,10 @@ This SDK is for the upcoming Explorer.
 
 # To Know
 
-
 ## Add a new chain.
 
-
 ### Add information.
+
 Create a new YAML file in `sdk/inputs/chain_info/` folder, according to `example.yaml` to add a new chain support.
 
 The content of `example.yaml`:
@@ -62,7 +61,8 @@ yarn generate-chains
 ```
 
 ### Add REST API methods.
-Each swagger file must be inside `sdk/inputs/swagger_info` folder. 
+
+Each swagger file must be inside `sdk/inputs/swagger_info` folder.
 
 Install `swagger.yaml` or `swagger.yml` file for the chain.
 
@@ -73,11 +73,13 @@ For example: `evmos.yaml`, `osmosis.yaml`, `axelar.yaml`, etc.
 PLEASE DO NOT TOUCH `default.yaml`, as it is for Cosmos SDK itself.
 
 Type below to generate REST API method definitions.
+
 ```
 yarn run generate-swagger
 ```
 
 ## Create a bundle.
+
     Type below to create a bundle for the SDK.
     Make sure the current directory is in `sdk/` folder.
 

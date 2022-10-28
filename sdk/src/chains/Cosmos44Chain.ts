@@ -339,7 +339,8 @@ export class Cosmos44Chain {
     async getProposalDeposits({
         proposalId,
         ...query
-    }: RESTCosmos44PathParams<'proposalDepositsById'> & RESTCosmos44Params<'proposalDepositsById'>) {
+    }: RESTCosmos44PathParams<'proposalDepositsById'> &
+        RESTCosmos44Params<'proposalDepositsById'>) {
         return this.restGetRequest<'proposalDepositsById'>(
             `/cosmos/gov/v1beta1/proposals/${proposalId}/deposits`,
             query
@@ -347,7 +348,10 @@ export class Cosmos44Chain {
     }
 
     /** Returns proposal depositor based on `proposalId` & `depositor`. */
-    async getProposalDepositor({ proposalId, depositor }: RESTCosmos44PathParams<'proposalDepositorById'>) {
+    async getProposalDepositor({
+        proposalId,
+        depositor,
+    }: RESTCosmos44PathParams<'proposalDepositorById'>) {
         return this.restGetRequest<'proposalDepositorById'>(
             `/cosmos/gov/v1beta1/proposals/${proposalId}/deposits/${depositor}`,
             undefined
@@ -497,7 +501,8 @@ export class Cosmos44Chain {
     async getUnboundingDelegations({
         delegatorAddress,
         ...query
-    }: RESTCosmos44PathParams<'unbondingDelegations'> & RESTCosmos44Params<'unbondingDelegations'>) {
+    }: RESTCosmos44PathParams<'unbondingDelegations'> &
+        RESTCosmos44Params<'unbondingDelegations'>) {
         return this.restGetRequest<'unbondingDelegations'>(
             `/cosmos/staking/v1beta1/delegations/${delegatorAddress}/unbonding_delegations`,
             query
@@ -508,7 +513,8 @@ export class Cosmos44Chain {
     async getAllValidatorsByDelegator({
         delegatorAddress,
         ...query
-    }: RESTCosmos44PathParams<'allValidatorsByDelegator'> & RESTCosmos44Params<'allValidatorsByDelegator'>) {
+    }: RESTCosmos44PathParams<'allValidatorsByDelegator'> &
+        RESTCosmos44Params<'allValidatorsByDelegator'>) {
         return this.restGetRequest<'allValidatorsByDelegator'>(
             `/cosmos/staking/v1beta1/delegations/${delegatorAddress}/validators`,
             query
@@ -556,7 +562,8 @@ export class Cosmos44Chain {
     async getDelegationsByValidator({
         validatorAddress,
         ...query
-    }: RESTCosmos44PathParams<'delegationsByValidator'> & RESTCosmos44Params<'delegationsByValidator'>) {
+    }: RESTCosmos44PathParams<'delegationsByValidator'> &
+        RESTCosmos44Params<'delegationsByValidator'>) {
         return this.restGetRequest<'delegationsByValidator'>(
             `/cosmos/staking/v1beta1/validators/${validatorAddress}/delegations`,
             query
