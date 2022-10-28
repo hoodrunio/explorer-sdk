@@ -5,12 +5,16 @@ export type RestApiEndpoint<N extends ChainName, I extends OperationId> = RestAp
     endpoint: { [chainName in N]: infer E }
 }
     ? E
+    : RestApi[I] extends { endpoint: { default: infer E } }
+    ? E
     : never
 
 /** REST API path parameters based on given `ChainName` and `OperationId`. */
 export type RestApiPathParams<N extends ChainName, I extends OperationId> = RestApi[I] extends {
     params: { path: { [chainName in N]: infer E } }
 }
+    ? E
+    : RestApi[I] extends { endpoint: { default: infer E } }
     ? E
     : never
 
@@ -19,6 +23,8 @@ export type RestApiQueryParams<N extends ChainName, I extends OperationId> = Res
     params: { query: { [chainName in N]: infer E } }
 }
     ? E
+    : RestApi[I] extends { endpoint: { default: infer E } }
+    ? E
     : never
 
 /** REST API body parameters based on given `ChainName` and `OperationId`. */
@@ -26,18 +32,26 @@ export type RestApiBodyParams<N extends ChainName, I extends OperationId> = Rest
     params: { body: { [chainName in N]: infer E } }
 }
     ? E
+    : RestApi[I] extends { endpoint: { default: infer E } }
+    ? E
     : never
 
 /** REST API successful response type based on given `ChainName` and `OperationId`. */
 export type RestApiSuccessResponse<
     N extends ChainName,
     I extends OperationId
-> = RestApi[I] extends { response: { success: { [chainName in N]: infer E } } } ? E : never
+> = RestApi[I] extends { response: { success: { [chainName in N]: infer E } } }
+    ? E
+    : RestApi[I] extends { endpoint: { default: infer E } }
+    ? E
+    : never
 
 /** REST API error response type based on given `ChainName` and `OperationId`. */
 export type RestApiErrorResponse<N extends ChainName, I extends OperationId> = RestApi[I] extends {
     response: { error: { [chainName in N]: infer E } }
 }
+    ? E
+    : RestApi[I] extends { endpoint: { default: infer E } }
     ? E
     : never
 
@@ -1432,33 +1446,38 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/auth/v1beta1/accounts/{address}' */
-            axelar: `/cosmos/auth/v1beta1/accounts/${string}`
-            /** '/ethermint/evm/v1/account/{address}' */
-            evmos: `/ethermint/evm/v1/account/${string}`
+            default: `/cosmos/auth/v1beta1/accounts/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** address defines the address to query for. */
-                    address: string
-                }
                 evmos: {
                     /** address is the ethereum hex address to query the account for. */
+                    address: string
+                }
+                axelar: {
+                    /** address defines the address to query for. */
                     address: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
+                evmos: /** QueryAccountResponse is the response type for the Query/Account RPC method. */
+                {
+                    /** balance is the balance of the EVM denomination. */
+                    balance: string
+                    /** code hash is the hex-formatted code bytes from the EOA. */
+                    code_hash: string
+                    /** nonce is the account's sequence number. */
+                    nonce: string
+                }
                 axelar: /** QueryAccountResponse is the response type for the Query/Account RPC method. */
                 {
                     /** `Any` contains an arbitrary serialized protocol buffer message along with a
@@ -1549,28 +1568,9 @@ method. */
                         value: string
                     }
                 }
-                evmos: /** QueryAccountResponse is the response type for the Query/Account RPC method. */
-                {
-                    /** balance is the balance of the EVM denomination. */
-                    balance: string
-                    /** code hash is the hex-formatted code bytes from the EOA. */
-                    code_hash: string
-                    /** nonce is the account's sequence number. */
-                    nonce: string
-                }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -1589,36 +1589,38 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/bank/v1beta1/balances/{address}/by_denom' */
-            axelar: `/cosmos/bank/v1beta1/balances/${string}/by_denom`
-            /** '/ethermint/evm/v1/balances/{address}' */
-            evmos: `/ethermint/evm/v1/balances/${string}`
+            default: `/cosmos/bank/v1beta1/balances/${string}/by_denom`
         }
         params: {
             path: {
-                axelar: {
-                    /** address is the address to query balances for. */
-                    address: string
-                }
                 evmos: {
                     /** address is the ethereum hex address to query the balance for. */
+                    address: string
+                }
+                axelar: {
+                    /** address is the address to query balances for. */
                     address: string
                 }
             }
 
             query: {
+                evmos: undefined
                 axelar: {
                     /** denom is the coin denom to query balances for. */
                     denom: string
                 }
-                evmos: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
+                evmos: /** QueryBalanceResponse is the response type for the Query/Balance RPC method. */
+                {
+                    /** balance is the balance of the EVM denomination. */
+                    balance: string
+                }
                 axelar: /** QueryBalanceResponse is the response type for the Query/Balance RPC method. */
                 {
                     /** Coin defines a token with a denomination and an amount.
@@ -1630,22 +1632,8 @@ method. */
                         amount: string
                     }
                 }
-                evmos: /** QueryBalanceResponse is the response type for the Query/Balance RPC method. */
-                {
-                    /** balance is the balance of the EVM denomination. */
-                    balance: string
-                }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
                 evmos: {
                     error: string
                     code: number
@@ -1653,6 +1641,15 @@ method. */
                     details: Array<{
                         type_url: string
                         /** Must be a valid serialized protocol buffer of the above specified type. */
+                        value: string
+                    }>
+                }
+                axelar: {
+                    error: string
+                    code: number
+                    message: string
+                    details: Array<{
+                        type_url: string
                         value: string
                     }>
                 }
@@ -2498,40 +2495,26 @@ Query/ValidatorAccount RPC method. */
         method: 'get'
         endpoint: {
             /** '/ibc/apps/transfer/v1/denom_hashes/{trace}' */
-            axelar: `/ibc/apps/transfer/v1/denom_hashes/${string}`
-            /** '/ibc/apps/transfer/v1/denom_hashes/{trace}' */
-            evmos: `/ibc/apps/transfer/v1/denom_hashes/${string}`
+            default: `/ibc/apps/transfer/v1/denom_hashes/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** The denomination trace ([port_id]/[channel_id])+/[denom] */
-                    trace: string
-                }
-                evmos: {
+                default: {
                     /** The denomination trace ([port_id]/[channel_id])+/[denom] */
                     trace: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDenomHashResponse is the response type for the Query/DenomHash RPC
-method. */
-                {
-                    /** hash (in hex format) of the denomination trace information. */
-                    hash: string
-                }
-                evmos: /** QueryDenomHashResponse is the response type for the Query/DenomHash RPC
+                default: /** QueryDenomHashResponse is the response type for the Query/DenomHash RPC
 method. */
                 {
                     /** hash (in hex format) of the denomination trace information. */
@@ -2539,16 +2522,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -2566,40 +2540,15 @@ method. */
         method: 'get'
         endpoint: {
             /** '/ibc/apps/transfer/v1/denom_traces' */
-            axelar: `/ibc/apps/transfer/v1/denom_traces`
-            /** '/ibc/apps/transfer/v1/denom_traces' */
-            evmos: `/ibc/apps/transfer/v1/denom_traces`
+            default: `/ibc/apps/transfer/v1/denom_traces`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -2623,34 +2572,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryConnectionsResponse is the response type for the Query/DenomTraces RPC
-method. */
-                {
-                    /** denom_traces returns all denominations trace information. */
-                    denom_traces: Array<{
-                        /** path defines the chain of port/channel identifiers used for tracing the
-                        source of the fungible token. */
-                        path: string
-                        /** base denomination of the relayed fungible token. */
-                        base_denom: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryConnectionsResponse is the response type for the Query/DenomTraces RPC
+                default: /** QueryConnectionsResponse is the response type for the Query/DenomTraces RPC
 method. */
                 {
                     /** denom_traces returns all denominations trace information. */
@@ -2673,16 +2600,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -2700,47 +2618,26 @@ method. */
         method: 'get'
         endpoint: {
             /** '/ibc/apps/transfer/v1/denom_traces/{hash}' */
-            axelar: `/ibc/apps/transfer/v1/denom_traces/${string}`
-            /** '/ibc/apps/transfer/v1/denom_traces/{hash}' */
-            evmos: `/ibc/apps/transfer/v1/denom_traces/${string}`
+            default: `/ibc/apps/transfer/v1/denom_traces/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** hash (in hex format) of the denomination trace information. */
-                    hash: string
-                }
-                evmos: {
+                default: {
                     /** hash (in hex format) of the denomination trace information. */
                     hash: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDenomTraceResponse is the response type for the Query/DenomTrace RPC
-method. */
-                {
-                    /** DenomTrace contains the base denomination for ICS20 fungible tokens and the
-                    source tracing information path. */
-                    denom_trace: {
-                        /** path defines the chain of port/channel identifiers used for tracing the
-                        source of the fungible token. */
-                        path: string
-                        /** base denomination of the relayed fungible token. */
-                        base_denom: string
-                    }
-                }
-                evmos: /** QueryDenomTraceResponse is the response type for the Query/DenomTrace RPC
+                default: /** QueryDenomTraceResponse is the response type for the Query/DenomTrace RPC
 method. */
                 {
                     /** DenomTrace contains the base denomination for ICS20 fungible tokens and the
@@ -2755,16 +2652,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -2830,37 +2718,23 @@ method. */
         method: 'get'
         endpoint: {
             /** '/ibc/client/v1/params' */
-            axelar: `/ibc/client/v1/params`
-            /** '/ibc/client/v1/params' */
-            evmos: `/ibc/client/v1/params`
+            default: `/ibc/client/v1/params`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryClientParamsResponse is the response type for the Query/ClientParams RPC
-method. */
-                {
-                    /** params defines the parameters of the module. */
-                    params: {
-                        /** allowed_clients defines the list of allowed client state types. */
-                        allowed_clients: Array<string>
-                    }
-                }
-                evmos: /** QueryClientParamsResponse is the response type for the Query/ClientParams RPC
+                default: /** QueryClientParamsResponse is the response type for the Query/ClientParams RPC
 method. */
                 {
                     /** params defines the parameters of the module. */
@@ -2871,17 +2745,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -2900,40 +2764,15 @@ method. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/client/v1/client_states' */
-            axelar: `/ibc/core/client/v1/client_states`
-            /** '/ibc/core/client/v1/client_states' */
-            evmos: `/ibc/core/client/v1/client_states`
+            default: `/ibc/core/client/v1/client_states`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -2957,37 +2796,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryClientStatesResponse is the response type for the Query/ClientStates RPC
-method. */
-                {
-                    /** list of stored ClientStates of the chain. */
-                    client_states: Array<{
-                        /** client identifier */
-                        client_id: string
-                        /** client state */
-                        client_state: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                    }>
-                    /** pagination response */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryClientStatesResponse is the response type for the Query/ClientStates RPC
+                default: /** QueryClientStatesResponse is the response type for the Query/ClientStates RPC
 method. */
                 {
                     /** list of stored ClientStates of the chain. */
@@ -3013,17 +2827,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3042,54 +2846,26 @@ method. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/client/v1/client_states/{client_id}' */
-            axelar: `/ibc/core/client/v1/client_states/${string}`
-            /** '/ibc/core/client/v1/client_states/{client_id}' */
-            evmos: `/ibc/core/client/v1/client_states/${string}`
+            default: `/ibc/core/client/v1/client_states/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** client state unique identifier */
-                    client_id: string
-                }
-                evmos: {
+                default: {
                     /** client state unique identifier */
                     client_id: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryClientStateResponse is the response type for the Query/ClientState RPC
-method. Besides the client state, it includes a proof and the height from
-which the proof was retrieved. */
-                {
-                    /** client state associated with the request identifier */
-                    client_state: {
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryClientStateResponse is the response type for the Query/ClientState RPC
+                default: /** QueryClientStateResponse is the response type for the Query/ClientState RPC
 method. Besides the client state, it includes a proof and the height from
 which the proof was retrieved. */
                 {
@@ -3111,17 +2887,7 @@ which the proof was retrieved. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3140,56 +2906,33 @@ which the proof was retrieved. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/client/v1/client_status/{client_id}' */
-            axelar: `/ibc/core/client/v1/client_status/${string}`
-            /** '/ibc/core/client/v1/client_status/{client_id}' */
-            evmos: `/ibc/core/client/v1/client_status/${string}`
+            default: `/ibc/core/client/v1/client_status/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** client unique identifier */
-                    client_id: string
-                }
-                evmos: {
+                default: {
                     /** client unique identifier */
                     client_id: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryClientStatusResponse is the response type for the Query/ClientStatus RPC
-method. It returns the current status of the IBC client. */
-                {
-                    status: string
-                }
-                evmos: /** QueryClientStatusResponse is the response type for the Query/ClientStatus RPC
+                default: /** QueryClientStatusResponse is the response type for the Query/ClientStatus RPC
 method. It returns the current status of the IBC client. */
                 {
                     status: string
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3209,46 +2952,18 @@ method. It returns the current status of the IBC client. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/client/v1/consensus_states/{client_id}' */
-            axelar: `/ibc/core/client/v1/consensus_states/${string}`
-            /** '/ibc/core/client/v1/consensus_states/{client_id}' */
-            evmos: `/ibc/core/client/v1/consensus_states/${string}`
+            default: `/ibc/core/client/v1/consensus_states/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** client identifier */
-                    client_id: string
-                }
-                evmos: {
+                default: {
                     /** client identifier */
                     client_id: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -3272,42 +2987,12 @@ method. It returns the current status of the IBC client. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryConsensusStatesResponse is the response type for the
-Query/ConsensusStates RPC method */
-                {
-                    /** consensus states associated with the identifier */
-                    consensus_states: Array<{
-                        /** consensus state height */
-                        height: {
-                            /** the revision that the client is currently on */
-                            revision_number: string
-                            /** the height within the given revision */
-                            revision_height: string
-                        }
-                        /** consensus state */
-                        consensus_state: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                    }>
-                    /** pagination response */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryConsensusStatesResponse is the response type for the
+                default: /** QueryConsensusStatesResponse is the response type for the
 Query/ConsensusStates RPC method */
                 {
                     /** consensus states associated with the identifier */
@@ -3338,17 +3023,7 @@ Query/ConsensusStates RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3368,21 +3043,11 @@ Query/ConsensusStates RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}' */
-            axelar: `/ibc/core/client/v1/consensus_states/${string}/revision/${number}/height/${number}`
-            /** '/ibc/core/client/v1/consensus_states/{client_id}/revision/{revision_number}/height/{revision_height}' */
-            evmos: `/ibc/core/client/v1/consensus_states/${string}/revision/${number}/height/${number}`
+            default: `/ibc/core/client/v1/consensus_states/${string}/revision/${number}/height/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    /** client identifier */
-                    client_id: string
-                    /** consensus state revision number */
-                    revision_number: number
-                    /** consensus state revision height */
-                    revision_height: number
-                }
-                evmos: {
+                default: {
                     /** client identifier */
                     client_id: string
                     /** consensus state revision number */
@@ -3393,44 +3058,19 @@ Query/ConsensusStates RPC method */
             }
 
             query: {
-                axelar: {
-                    /** latest_height overrrides the height field and queries the latest stored
-                    ConsensusState. */
-                    latest_height: string
-                }
-                evmos: {
+                default: {
                     /** latest_height overrrides the height field and queries the latest stored
                     ConsensusState. */
                     latest_height: string
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryConsensusStateResponse is the response type for the Query/ConsensusState
-RPC method */
-                {
-                    /** consensus state associated with the client identifier at the given height */
-                    consensus_state: {
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryConsensusStateResponse is the response type for the Query/ConsensusState
+                default: /** QueryConsensusStateResponse is the response type for the Query/ConsensusState
 RPC method */
                 {
                     /** consensus state associated with the client identifier at the given height */
@@ -3451,17 +3091,7 @@ RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3480,38 +3110,23 @@ RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/client/v1/upgraded_client_states' */
-            axelar: `/ibc/core/client/v1/upgraded_client_states`
-            /** '/ibc/core/client/v1/upgraded_client_states' */
-            evmos: `/ibc/core/client/v1/upgraded_client_states`
+            default: `/ibc/core/client/v1/upgraded_client_states`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryUpgradedClientStateResponse is the response type for the
-Query/UpgradedClientState RPC method. */
-                {
-                    /** client state associated with the request identifier */
-                    upgraded_client_state: {
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }
-                }
-                evmos: /** QueryUpgradedClientStateResponse is the response type for the
+                default: /** QueryUpgradedClientStateResponse is the response type for the
 Query/UpgradedClientState RPC method. */
                 {
                     /** client state associated with the request identifier */
@@ -3523,17 +3138,7 @@ Query/UpgradedClientState RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3552,38 +3157,23 @@ Query/UpgradedClientState RPC method. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/client/v1/upgraded_consensus_states' */
-            axelar: `/ibc/core/client/v1/upgraded_consensus_states`
-            /** '/ibc/core/client/v1/upgraded_consensus_states' */
-            evmos: `/ibc/core/client/v1/upgraded_consensus_states`
+            default: `/ibc/core/client/v1/upgraded_consensus_states`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryUpgradedConsensusStateResponse is the response type for the
-Query/UpgradedConsensusState RPC method. */
-                {
-                    /** Consensus state associated with the request identifier */
-                    upgraded_consensus_state: {
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }
-                }
-                evmos: /** QueryUpgradedConsensusStateResponse is the response type for the
+                default: /** QueryUpgradedConsensusStateResponse is the response type for the
 Query/UpgradedConsensusState RPC method. */
                 {
                     /** Consensus state associated with the request identifier */
@@ -3595,17 +3185,7 @@ Query/UpgradedConsensusState RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3625,49 +3205,26 @@ Query/UpgradedConsensusState RPC method. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/connection/v1/client_connections/{client_id}' */
-            axelar: `/ibc/core/connection/v1/client_connections/${string}`
-            /** '/ibc/core/connection/v1/client_connections/{client_id}' */
-            evmos: `/ibc/core/connection/v1/client_connections/${string}`
+            default: `/ibc/core/connection/v1/client_connections/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** client identifier associated with a connection */
-                    client_id: string
-                }
-                evmos: {
+                default: {
                     /** client identifier associated with a connection */
                     client_id: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryClientConnectionsResponse is the response type for the
-Query/ClientConnections RPC method */
-                {
-                    /** slice of all the connection paths associated with a client. */
-                    connection_paths: Array<string>
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was generated */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryClientConnectionsResponse is the response type for the
+                default: /** QueryClientConnectionsResponse is the response type for the
 Query/ClientConnections RPC method */
                 {
                     /** slice of all the connection paths associated with a client. */
@@ -3684,17 +3241,7 @@ Query/ClientConnections RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3713,40 +3260,15 @@ Query/ClientConnections RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/connection/v1/connections' */
-            axelar: `/ibc/core/connection/v1/connections`
-            /** '/ibc/core/connection/v1/connections' */
-            evmos: `/ibc/core/connection/v1/connections`
+            default: `/ibc/core/connection/v1/connections`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -3770,67 +3292,12 @@ Query/ClientConnections RPC method */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryConnectionsResponse is the response type for the Query/Connections RPC
-method. */
-                {
-                    /** list of stored connections of the chain. */
-                    connections: Array<{
-                        /** connection identifier. */
-                        id: string
-                        /** client associated with this connection. */
-                        client_id: string
-                        /** IBC version which can be utilised to determine encodings or protocols for
-                        channels or packets utilising this connection */
-                        versions: Array<{
-                            /** unique version identifier */
-                            identifier: string
-                            /** list of features compatible with the specified identifier */
-                            features: Array<string>
-                        }>
-                        /** current state of the connection end. */
-                        state: string
-                        /** counterparty chain associated with this connection. */
-                        counterparty: {
-                            /** identifies the client on the counterparty chain associated with a given
-                            connection. */
-                            client_id: string
-                            /** identifies the connection end on the counterparty chain associated with a
-                            given connection. */
-                            connection_id: string
-                            /** MerklePrefix is merkle path prefixed to the key.
-                            The constructed key from the Path and the key will be append(Path.KeyPath,
-                            append(Path.KeyPrefix, key...)) */
-                            prefix: {
-                                key_prefix: string
-                            }
-                        }
-                        /** delay period associated with this connection. */
-                        delay_period: string
-                    }>
-                    /** pagination response */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                    /** query block height */
-                    height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryConnectionsResponse is the response type for the Query/Connections RPC
+                default: /** QueryConnectionsResponse is the response type for the Query/Connections RPC
 method. */
                 {
                     /** list of stored connections of the chain. */
@@ -3886,17 +3353,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -3915,82 +3372,26 @@ method. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/connection/v1/connections/{connection_id}' */
-            axelar: `/ibc/core/connection/v1/connections/${string}`
-            /** '/ibc/core/connection/v1/connections/{connection_id}' */
-            evmos: `/ibc/core/connection/v1/connections/${string}`
+            default: `/ibc/core/connection/v1/connections/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** connection unique identifier */
-                    connection_id: string
-                }
-                evmos: {
+                default: {
                     /** connection unique identifier */
                     connection_id: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryConnectionResponse is the response type for the Query/Connection RPC
-method. Besides the connection end, it includes a proof and the height from
-which the proof was retrieved. */
-                {
-                    /** connection associated with the request identifier */
-                    connection: {
-                        /** client associated with this connection. */
-                        client_id: string
-                        /** IBC version which can be utilised to determine encodings or protocols for
-                        channels or packets utilising this connection. */
-                        versions: Array<{
-                            /** unique version identifier */
-                            identifier: string
-                            /** list of features compatible with the specified identifier */
-                            features: Array<string>
-                        }>
-                        /** current state of the connection end. */
-                        state: string
-                        /** counterparty chain associated with this connection. */
-                        counterparty: {
-                            /** identifies the client on the counterparty chain associated with a given
-                            connection. */
-                            client_id: string
-                            /** identifies the connection end on the counterparty chain associated with a
-                            given connection. */
-                            connection_id: string
-                            /** MerklePrefix is merkle path prefixed to the key.
-                            The constructed key from the Path and the key will be append(Path.KeyPath,
-                            append(Path.KeyPrefix, key...)) */
-                            prefix: {
-                                key_prefix: string
-                            }
-                        }
-                        /** delay period that must pass before a consensus state can be used for
-                        packet-verification NOTE: delay period logic is only implemented by some
-                        clients. */
-                        delay_period: string
-                    }
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryConnectionResponse is the response type for the Query/Connection RPC
+                default: /** QueryConnectionResponse is the response type for the Query/Connection RPC
 method. Besides the connection end, it includes a proof and the height from
 which the proof was retrieved. */
                 {
@@ -4040,17 +3441,7 @@ which the proof was retrieved. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -4070,58 +3461,26 @@ which the proof was retrieved. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/connection/v1/connections/{connection_id}/client_state' */
-            axelar: `/ibc/core/connection/v1/connections/${string}/client_state`
-            /** '/ibc/core/connection/v1/connections/{connection_id}/client_state' */
-            evmos: `/ibc/core/connection/v1/connections/${string}/client_state`
+            default: `/ibc/core/connection/v1/connections/${string}/client_state`
         }
         params: {
             path: {
-                axelar: {
-                    /** connection identifier */
-                    connection_id: string
-                }
-                evmos: {
+                default: {
                     /** connection identifier */
                     connection_id: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryConnectionClientStateResponse is the response type for the
-Query/ConnectionClientState RPC method */
-                {
-                    /** client state associated with the channel */
-                    identified_client_state: {
-                        /** client identifier */
-                        client_id: string
-                        /** client state */
-                        client_state: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                    }
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryConnectionClientStateResponse is the response type for the
+                default: /** QueryConnectionClientStateResponse is the response type for the
 Query/ConnectionClientState RPC method */
                 {
                     /** client state associated with the channel */
@@ -4147,17 +3506,7 @@ Query/ConnectionClientState RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -4177,19 +3526,11 @@ Query/ConnectionClientState RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}' */
-            axelar: `/ibc/core/connection/v1/connections/${string}/consensus_state/revision/${number}/height/${number}`
-            /** '/ibc/core/connection/v1/connections/{connection_id}/consensus_state/revision/{revision_number}/height/{revision_height}' */
-            evmos: `/ibc/core/connection/v1/connections/${string}/consensus_state/revision/${number}/height/${number}`
+            default: `/ibc/core/connection/v1/connections/${string}/consensus_state/revision/${number}/height/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    /** connection identifier */
-                    connection_id: string
-                    revision_number: number
-                    revision_height: number
-                }
-                evmos: {
+                default: {
                     /** connection identifier */
                     connection_id: string
                     revision_number: number
@@ -4198,38 +3539,15 @@ Query/ConnectionClientState RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryConnectionConsensusStateResponse is the response type for the
-Query/ConnectionConsensusState RPC method */
-                {
-                    /** consensus state associated with the channel */
-                    consensus_state: {
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }
-                    /** client ID associated with the consensus state */
-                    client_id: string
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryConnectionConsensusStateResponse is the response type for the
+                default: /** QueryConnectionConsensusStateResponse is the response type for the
 Query/ConnectionConsensusState RPC method */
                 {
                     /** consensus state associated with the channel */
@@ -4252,17 +3570,7 @@ Query/ConnectionConsensusState RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -4281,40 +3589,15 @@ Query/ConnectionConsensusState RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels' */
-            axelar: `/ibc/core/channel/v1/channels`
-            /** '/ibc/core/channel/v1/channels' */
-            evmos: `/ibc/core/channel/v1/channels`
+            default: `/ibc/core/channel/v1/channels`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -4338,55 +3621,12 @@ Query/ConnectionConsensusState RPC method */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryChannelsResponse is the response type for the Query/Channels RPC method. */
-                {
-                    /** list of stored channels of the chain. */
-                    channels: Array<{
-                        /** current state of the channel end */
-                        state: string
-                        /** whether the channel is ordered or unordered */
-                        ordering: string
-                        /** counterparty channel end */
-                        counterparty: {
-                            /** port on the counterparty chain which owns the other end of the channel. */
-                            port_id: string
-                            /** channel end on the counterparty chain */
-                            channel_id: string
-                        }
-                        /** list of connection identifiers, in order, along which packets sent on
-                        this channel will travel */
-                        connection_hops: Array<string>
-                        /** opaque channel version, which is agreed upon during the handshake */
-                        version: string
-                        /** port identifier */
-                        port_id: string
-                        /** channel identifier */
-                        channel_id: string
-                    }>
-                    /** pagination response */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                    /** query block height */
-                    height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryChannelsResponse is the response type for the Query/Channels RPC method. */
+                default: /** QueryChannelsResponse is the response type for the Query/Channels RPC method. */
                 {
                     /** list of stored channels of the chain. */
                     channels: Array<{
@@ -4430,17 +3670,7 @@ Query/ConnectionConsensusState RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -4459,19 +3689,11 @@ Query/ConnectionConsensusState RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -4480,50 +3702,15 @@ Query/ConnectionConsensusState RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryChannelResponse is the response type for the Query/Channel RPC method.
-Besides the Channel end, it includes a proof and the height from which the
-proof was retrieved. */
-                {
-                    /** channel associated with the request identifiers */
-                    channel: {
-                        /** current state of the channel end */
-                        state: string
-                        /** whether the channel is ordered or unordered */
-                        ordering: string
-                        /** counterparty channel end */
-                        counterparty: {
-                            /** port on the counterparty chain which owns the other end of the channel. */
-                            port_id: string
-                            /** channel end on the counterparty chain */
-                            channel_id: string
-                        }
-                        /** list of connection identifiers, in order, along which packets sent on
-                        this channel will travel */
-                        connection_hops: Array<string>
-                        /** opaque channel version, which is agreed upon during the handshake */
-                        version: string
-                    }
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryChannelResponse is the response type for the Query/Channel RPC method.
+                default: /** QueryChannelResponse is the response type for the Query/Channel RPC method.
 Besides the Channel end, it includes a proof and the height from which the
 proof was retrieved. */
                 {
@@ -4558,17 +3745,7 @@ proof was retrieved. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -4588,19 +3765,11 @@ proof was retrieved. */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/client_state`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/client_state' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/client_state`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/client_state`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -4609,41 +3778,15 @@ proof was retrieved. */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryChannelClientStateResponse is the Response type for the
-Query/QueryChannelClientState RPC method */
-                {
-                    /** client state associated with the channel */
-                    identified_client_state: {
-                        /** client identifier */
-                        client_id: string
-                        /** client state */
-                        client_state: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                    }
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryChannelClientStateResponse is the Response type for the
+                default: /** QueryChannelClientStateResponse is the Response type for the
 Query/QueryChannelClientState RPC method */
                 {
                     /** client state associated with the channel */
@@ -4669,17 +3812,7 @@ Query/QueryChannelClientState RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -4699,23 +3832,11 @@ Query/QueryChannelClientState RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/consensus_state/revision/${number}/height/${number}`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/consensus_state/revision/{revision_number}/height/{revision_height}' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/consensus_state/revision/${number}/height/${number}`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/consensus_state/revision/${number}/height/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                    /** revision number of the consensus state */
-                    revision_number: number
-                    /** revision height of the consensus state */
-                    revision_height: number
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -4728,38 +3849,15 @@ Query/QueryChannelClientState RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryChannelClientStateResponse is the Response type for the
-Query/QueryChannelClientState RPC method */
-                {
-                    /** consensus state associated with the channel */
-                    consensus_state: {
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }
-                    /** client ID associated with the consensus state */
-                    client_id: string
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryChannelClientStateResponse is the Response type for the
+                default: /** QueryChannelClientStateResponse is the Response type for the
 Query/QueryChannelClientState RPC method */
                 {
                     /** consensus state associated with the channel */
@@ -4782,17 +3880,7 @@ Query/QueryChannelClientState RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -4811,19 +3899,11 @@ Query/QueryChannelClientState RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/next_sequence`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/next_sequence' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/next_sequence`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/next_sequence`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -4832,32 +3912,15 @@ Query/QueryChannelClientState RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QuerySequenceResponse is the request type for the
-Query/QueryNextSequenceReceiveResponse RPC method */
-                {
-                    /** next sequence receive number */
-                    next_sequence_receive: string
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QuerySequenceResponse is the request type for the
+                default: /** QuerySequenceResponse is the request type for the
 Query/QueryNextSequenceReceiveResponse RPC method */
                 {
                     /** next sequence receive number */
@@ -4874,17 +3937,7 @@ Query/QueryNextSequenceReceiveResponse RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -4904,19 +3957,11 @@ Query/QueryNextSequenceReceiveResponse RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_acknowledgements`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acknowledgements' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_acknowledgements`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_acknowledgements`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -4925,31 +3970,7 @@ Query/QueryNextSequenceReceiveResponse RPC method */
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                    /** list of packet sequences. */
-                    packet_commitment_sequences: string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -4975,43 +3996,12 @@ Query/QueryNextSequenceReceiveResponse RPC method */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryPacketAcknowledgemetsResponse is the request type for the
-Query/QueryPacketAcknowledgements RPC method */
-                {
-                    acknowledgements: Array<{
-                        /** channel port identifier. */
-                        port_id: string
-                        /** channel unique identifier. */
-                        channel_id: string
-                        /** packet sequence. */
-                        sequence: string
-                        /** embedded data that represents packet state. */
-                        data: string
-                    }>
-                    /** pagination response */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                    /** query block height */
-                    height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryPacketAcknowledgemetsResponse is the request type for the
+                default: /** QueryPacketAcknowledgemetsResponse is the request type for the
 Query/QueryPacketAcknowledgements RPC method */
                 {
                     acknowledgements: Array<{
@@ -5043,17 +4033,7 @@ Query/QueryPacketAcknowledgements RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -5072,21 +4052,11 @@ Query/QueryPacketAcknowledgements RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_acks/${number}`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_acks/{sequence}' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_acks/${number}`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_acks/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                    /** packet sequence */
-                    sequence: number
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -5097,33 +4067,15 @@ Query/QueryPacketAcknowledgements RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryPacketAcknowledgementResponse defines the client query response for a
-packet which also includes a proof and the height from which the
-proof was retrieved */
-                {
-                    /** packet associated with the request fields */
-                    acknowledgement: string
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryPacketAcknowledgementResponse defines the client query response for a
+                default: /** QueryPacketAcknowledgementResponse defines the client query response for a
 packet which also includes a proof and the height from which the
 proof was retrieved */
                 {
@@ -5141,17 +4093,7 @@ proof was retrieved */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -5171,19 +4113,11 @@ proof was retrieved */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -5192,29 +4126,7 @@ proof was retrieved */
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -5238,43 +4150,12 @@ proof was retrieved */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryPacketCommitmentsResponse is the request type for the
-Query/QueryPacketCommitments RPC method */
-                {
-                    commitments: Array<{
-                        /** channel port identifier. */
-                        port_id: string
-                        /** channel unique identifier. */
-                        channel_id: string
-                        /** packet sequence. */
-                        sequence: string
-                        /** embedded data that represents packet state. */
-                        data: string
-                    }>
-                    /** pagination response */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                    /** query block height */
-                    height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryPacketCommitmentsResponse is the request type for the
+                default: /** QueryPacketCommitmentsResponse is the request type for the
 Query/QueryPacketCommitments RPC method */
                 {
                     commitments: Array<{
@@ -5306,17 +4187,7 @@ Query/QueryPacketCommitments RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -5336,21 +4207,11 @@ Query/QueryPacketCommitments RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${string}/unreceived_acks`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_ack_sequences}/unreceived_acks' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${string}/unreceived_acks`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${string}/unreceived_acks`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                    /** list of acknowledgement sequences */
-                    packet_ack_sequences: string
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -5361,30 +4222,15 @@ Query/QueryPacketCommitments RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryUnreceivedAcksResponse is the response type for the
-Query/UnreceivedAcks RPC method */
-                {
-                    /** list of unreceived acknowledgement sequences */
-                    sequences: Array<string>
-                    /** query block height */
-                    height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryUnreceivedAcksResponse is the response type for the
+                default: /** QueryUnreceivedAcksResponse is the response type for the
 Query/UnreceivedAcks RPC method */
                 {
                     /** list of unreceived acknowledgement sequences */
@@ -5399,17 +4245,7 @@ Query/UnreceivedAcks RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -5429,21 +4265,11 @@ Query/UnreceivedAcks RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${string}/unreceived_packets`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{packet_commitment_sequences}/unreceived_packets' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${string}/unreceived_packets`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${string}/unreceived_packets`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                    /** list of packet sequences */
-                    packet_commitment_sequences: string
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -5454,30 +4280,15 @@ Query/UnreceivedAcks RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryUnreceivedPacketsResponse is the response type for the
-Query/UnreceivedPacketCommitments RPC method */
-                {
-                    /** list of unreceived packet sequences */
-                    sequences: Array<string>
-                    /** query block height */
-                    height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryUnreceivedPacketsResponse is the response type for the
+                default: /** QueryUnreceivedPacketsResponse is the response type for the
 Query/UnreceivedPacketCommitments RPC method */
                 {
                     /** list of unreceived packet sequences */
@@ -5492,17 +4303,7 @@ Query/UnreceivedPacketCommitments RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -5521,21 +4322,11 @@ Query/UnreceivedPacketCommitments RPC method */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${number}`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_commitments/{sequence}' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${number}`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_commitments/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                    /** packet sequence */
-                    sequence: number
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -5546,33 +4337,15 @@ Query/UnreceivedPacketCommitments RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryPacketCommitmentResponse defines the client query response for a packet
-which also includes a proof and the height from which the proof was
-retrieved */
-                {
-                    /** packet associated with the request fields */
-                    commitment: string
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryPacketCommitmentResponse defines the client query response for a packet
+                default: /** QueryPacketCommitmentResponse defines the client query response for a packet
 which also includes a proof and the height from which the proof was
 retrieved */
                 {
@@ -5590,17 +4363,7 @@ retrieved */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -5620,21 +4383,11 @@ retrieved */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}' */
-            axelar: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_receipts/${number}`
-            /** '/ibc/core/channel/v1/channels/{channel_id}/ports/{port_id}/packet_receipts/{sequence}' */
-            evmos: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_receipts/${number}`
+            default: `/ibc/core/channel/v1/channels/${string}/ports/${string}/packet_receipts/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    /** channel unique identifier */
-                    channel_id: string
-                    /** port unique identifier */
-                    port_id: string
-                    /** packet sequence */
-                    sequence: number
-                }
-                evmos: {
+                default: {
                     /** channel unique identifier */
                     channel_id: string
                     /** port unique identifier */
@@ -5645,33 +4398,15 @@ retrieved */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryPacketReceiptResponse defines the client query response for a packet
-receipt which also includes a proof, and the height from which the proof was
-retrieved */
-                {
-                    /** success flag for if receipt exists */
-                    received: boolean
-                    /** merkle proof of existence */
-                    proof: string
-                    /** height at which the proof was retrieved */
-                    proof_height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryPacketReceiptResponse defines the client query response for a packet
+                default: /** QueryPacketReceiptResponse defines the client query response for a packet
 receipt which also includes a proof, and the height from which the proof was
 retrieved */
                 {
@@ -5689,17 +4424,7 @@ retrieved */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -5719,46 +4444,18 @@ retrieved */
         method: 'get'
         endpoint: {
             /** '/ibc/core/channel/v1/connections/{connection}/channels' */
-            axelar: `/ibc/core/channel/v1/connections/${string}/channels`
-            /** '/ibc/core/channel/v1/connections/{connection}/channels' */
-            evmos: `/ibc/core/channel/v1/connections/${string}/channels`
+            default: `/ibc/core/channel/v1/connections/${string}/channels`
         }
         params: {
             path: {
-                axelar: {
-                    /** connection unique identifier */
-                    connection: string
-                }
-                evmos: {
+                default: {
                     /** connection unique identifier */
                     connection: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -5782,56 +4479,12 @@ retrieved */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryConnectionChannelsResponse is the Response type for the
-Query/QueryConnectionChannels RPC method */
-                {
-                    /** list of channels associated with a connection. */
-                    channels: Array<{
-                        /** current state of the channel end */
-                        state: string
-                        /** whether the channel is ordered or unordered */
-                        ordering: string
-                        /** counterparty channel end */
-                        counterparty: {
-                            /** port on the counterparty chain which owns the other end of the channel. */
-                            port_id: string
-                            /** channel end on the counterparty chain */
-                            channel_id: string
-                        }
-                        /** list of connection identifiers, in order, along which packets sent on
-                        this channel will travel */
-                        connection_hops: Array<string>
-                        /** opaque channel version, which is agreed upon during the handshake */
-                        version: string
-                        /** port identifier */
-                        port_id: string
-                        /** channel identifier */
-                        channel_id: string
-                    }>
-                    /** pagination response */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                    /** query block height */
-                    height: {
-                        /** the revision that the client is currently on */
-                        revision_number: string
-                        /** the height within the given revision */
-                        revision_height: string
-                    }
-                }
-                evmos: /** QueryConnectionChannelsResponse is the Response type for the
+                default: /** QueryConnectionChannelsResponse is the Response type for the
 Query/QueryConnectionChannels RPC method */
                 {
                     /** list of channels associated with a connection. */
@@ -5876,17 +4529,7 @@ Query/QueryConnectionChannels RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -5905,40 +4548,15 @@ Query/QueryConnectionChannels RPC method */
         method: 'get'
         endpoint: {
             /** '/cosmos/auth/v1beta1/accounts' */
-            axelar: `/cosmos/auth/v1beta1/accounts`
-            /** '/cosmos/auth/v1beta1/accounts' */
-            evmos: `/cosmos/auth/v1beta1/accounts`
+            default: `/cosmos/auth/v1beta1/accounts`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -5962,33 +4580,12 @@ Query/QueryConnectionChannels RPC method */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryAccountsResponse is the response type for the Query/Accounts RPC method.
-
-Since: cosmos-sdk 0.43 */
-                {
-                    /** accounts are the existing accounts */
-                    accounts: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryAccountsResponse is the response type for the Query/Accounts RPC method.
+                default: /** QueryAccountsResponse is the response type for the Query/Accounts RPC method.
 
 Since: cosmos-sdk 0.43 */
                 {
@@ -6010,17 +4607,7 @@ Since: cosmos-sdk 0.43 */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -6169,39 +4756,23 @@ Since: cosmos-sdk 0.43 */
         method: 'get'
         endpoint: {
             /** '/cosmos/auth/v1beta1/params' */
-            axelar: `/cosmos/auth/v1beta1/params`
-            /** '/cosmos/auth/v1beta1/params' */
-            evmos: `/cosmos/auth/v1beta1/params`
+            default: `/cosmos/auth/v1beta1/params`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
-                {
-                    /** params defines the parameters of the module. */
-                    params: {
-                        max_memo_characters: string
-                        tx_sig_limit: string
-                        tx_size_cost_per_byte: string
-                        sig_verify_cost_ed25519: string
-                        sig_verify_cost_secp256k1: string
-                    }
-                }
-                evmos: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
+                default: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
                 {
                     /** params defines the parameters of the module. */
                     params: {
@@ -6214,17 +4785,7 @@ Since: cosmos-sdk 0.43 */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -6738,46 +5299,18 @@ Since: cosmos-sdk 0.43 */
         method: 'get'
         endpoint: {
             /** '/cosmos/bank/v1beta1/balances/{address}' */
-            axelar: `/cosmos/bank/v1beta1/balances/${string}`
-            /** '/cosmos/bank/v1beta1/balances/{address}' */
-            evmos: `/cosmos/bank/v1beta1/balances/${string}`
+            default: `/cosmos/bank/v1beta1/balances/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** address is the address to query balances for. */
-                    address: string
-                }
-                evmos: {
+                default: {
                     /** address is the address to query balances for. */
                     address: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -6801,31 +5334,12 @@ Since: cosmos-sdk 0.43 */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryAllBalancesResponse is the response type for the Query/AllBalances RPC
-method. */
-                {
-                    /** balances is the balances of all the coins. */
-                    balances: Array<{
-                        denom: string
-                        amount: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryAllBalancesResponse is the response type for the Query/AllBalances RPC
+                default: /** QueryAllBalancesResponse is the response type for the Query/AllBalances RPC
 method. */
                 {
                     /** balances is the balances of all the coins. */
@@ -6845,16 +5359,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -6925,40 +5430,15 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/bank/v1beta1/denoms_metadata' */
-            axelar: `/cosmos/bank/v1beta1/denoms_metadata`
-            /** '/cosmos/bank/v1beta1/denoms_metadata' */
-            evmos: `/cosmos/bank/v1beta1/denoms_metadata`
+            default: `/cosmos/bank/v1beta1/denoms_metadata`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -6982,55 +5462,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDenomsMetadataResponse is the response type for the Query/DenomsMetadata RPC
-method. */
-                {
-                    /** metadata provides the client information for all the registered tokens. */
-                    metadatas: Array<{
-                        description: string
-                        /** denom_units represents the list of DenomUnit's for a given coin */
-                        denom_units: Array<{
-                            /** denom represents the string name of the given denom unit (e.g uatom). */
-                            denom: string
-                            /** exponent represents power of 10 exponent that one must
-                            raise the base_denom to in order to equal the given DenomUnit's denom
-                            1 denom = 1^exponent base_denom
-                            (e.g. with a base_denom of uatom, one can create a DenomUnit of 'atom' with
-                            exponent = 6, thus: 1 atom = 10^6 uatom). */
-                            exponent: number
-                            /** aliases is a list of string aliases for the given denom */
-                            aliases: Array<string>
-                        }>
-                        /** base represents the base denom (should be the DenomUnit with exponent = 0). */
-                        base: string
-                        /** display indicates the suggested denom that should be
-                        displayed in clients. */
-                        display: string
-                        /** name defines the name of the token (eg: Cosmos Atom) */
-                        name: string
-                        /** symbol is the token symbol usually shown on exchanges (eg: ATOM). This can
-                        be the same as the display.
-                        
-                        Since: cosmos-sdk 0.43 */
-                        symbol: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryDenomsMetadataResponse is the response type for the Query/DenomsMetadata RPC
+                default: /** QueryDenomsMetadataResponse is the response type for the Query/DenomsMetadata RPC
 method. */
                 {
                     /** metadata provides the client information for all the registered tokens. */
@@ -7074,16 +5511,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7101,68 +5529,26 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/bank/v1beta1/denoms_metadata/{denom}' */
-            axelar: `/cosmos/bank/v1beta1/denoms_metadata/${string}`
-            /** '/cosmos/bank/v1beta1/denoms_metadata/{denom}' */
-            evmos: `/cosmos/bank/v1beta1/denoms_metadata/${string}`
+            default: `/cosmos/bank/v1beta1/denoms_metadata/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** denom is the coin denom to query the metadata for. */
-                    denom: string
-                }
-                evmos: {
+                default: {
                     /** denom is the coin denom to query the metadata for. */
                     denom: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDenomMetadataResponse is the response type for the Query/DenomMetadata RPC
-method. */
-                {
-                    /** Metadata represents a struct that describes
-                    a basic token. */
-                    metadata: {
-                        description: string
-                        /** denom_units represents the list of DenomUnit's for a given coin */
-                        denom_units: Array<{
-                            /** denom represents the string name of the given denom unit (e.g uatom). */
-                            denom: string
-                            /** exponent represents power of 10 exponent that one must
-                            raise the base_denom to in order to equal the given DenomUnit's denom
-                            1 denom = 1^exponent base_denom
-                            (e.g. with a base_denom of uatom, one can create a DenomUnit of 'atom' with
-                            exponent = 6, thus: 1 atom = 10^6 uatom). */
-                            exponent: number
-                            /** aliases is a list of string aliases for the given denom */
-                            aliases: Array<string>
-                        }>
-                        /** base represents the base denom (should be the DenomUnit with exponent = 0). */
-                        base: string
-                        /** display indicates the suggested denom that should be
-                        displayed in clients. */
-                        display: string
-                        /** name defines the name of the token (eg: Cosmos Atom) */
-                        name: string
-                        /** symbol is the token symbol usually shown on exchanges (eg: ATOM). This can
-                        be the same as the display.
-                        
-                        Since: cosmos-sdk 0.43 */
-                        symbol: string
-                    }
-                }
-                evmos: /** QueryDenomMetadataResponse is the response type for the Query/DenomMetadata RPC
+                default: /** QueryDenomMetadataResponse is the response type for the Query/DenomMetadata RPC
 method. */
                 {
                     /** Metadata represents a struct that describes
@@ -7198,16 +5584,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7225,39 +5602,23 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/bank/v1beta1/params' */
-            axelar: `/cosmos/bank/v1beta1/params`
-            /** '/cosmos/bank/v1beta1/params' */
-            evmos: `/cosmos/bank/v1beta1/params`
+            default: `/cosmos/bank/v1beta1/params`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryParamsResponse defines the response type for querying x/bank parameters. */
-                {
-                    /** Params defines the parameters for the bank module. */
-                    params: {
-                        send_enabled: Array<{
-                            denom: string
-                            enabled: boolean
-                        }>
-                        default_send_enabled: boolean
-                    }
-                }
-                evmos: /** QueryParamsResponse defines the response type for querying x/bank parameters. */
+                default: /** QueryParamsResponse defines the response type for querying x/bank parameters. */
                 {
                     /** Params defines the parameters for the bank module. */
                     params: {
@@ -7270,16 +5631,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7298,46 +5650,18 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/bank/v1beta1/spendable_balances/{address}' */
-            axelar: `/cosmos/bank/v1beta1/spendable_balances/${string}`
-            /** '/cosmos/bank/v1beta1/spendable_balances/{address}' */
-            evmos: `/cosmos/bank/v1beta1/spendable_balances/${string}`
+            default: `/cosmos/bank/v1beta1/spendable_balances/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** address is the address to query spendable balances for. */
-                    address: string
-                }
-                evmos: {
+                default: {
                     /** address is the address to query spendable balances for. */
                     address: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -7361,31 +5685,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QuerySpendableBalancesResponse defines the gRPC response structure for querying
-an account's spendable balances. */
-                {
-                    /** balances is the spendable balances of all the coins. */
-                    balances: Array<{
-                        denom: string
-                        amount: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QuerySpendableBalancesResponse defines the gRPC response structure for querying
+                default: /** QuerySpendableBalancesResponse defines the gRPC response structure for querying
 an account's spendable balances. */
                 {
                     /** balances is the spendable balances of all the coins. */
@@ -7405,16 +5710,7 @@ an account's spendable balances. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7432,40 +5728,15 @@ an account's spendable balances. */
         method: 'get'
         endpoint: {
             /** '/cosmos/bank/v1beta1/supply' */
-            axelar: `/cosmos/bank/v1beta1/supply`
-            /** '/cosmos/bank/v1beta1/supply' */
-            evmos: `/cosmos/bank/v1beta1/supply`
+            default: `/cosmos/bank/v1beta1/supply`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -7489,33 +5760,12 @@ an account's spendable balances. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryTotalSupplyResponse is the response type for the Query/TotalSupply RPC
-method */
-                {
-                    /** supply is the supply of the coins */
-                    supply: Array<{
-                        denom: string
-                        amount: string
-                    }>
-                    /** pagination defines the pagination in the response.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryTotalSupplyResponse is the response type for the Query/TotalSupply RPC
+                default: /** QueryTotalSupplyResponse is the response type for the Query/TotalSupply RPC
 method */
                 {
                     /** supply is the supply of the coins */
@@ -7537,16 +5787,7 @@ method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7564,45 +5805,26 @@ method */
         method: 'get'
         endpoint: {
             /** '/cosmos/bank/v1beta1/supply/{denom}' */
-            axelar: `/cosmos/bank/v1beta1/supply/${string}`
-            /** '/cosmos/bank/v1beta1/supply/{denom}' */
-            evmos: `/cosmos/bank/v1beta1/supply/${string}`
+            default: `/cosmos/bank/v1beta1/supply/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** denom is the coin denom to query balances for. */
-                    denom: string
-                }
-                evmos: {
+                default: {
                     /** denom is the coin denom to query balances for. */
                     denom: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QuerySupplyOfResponse is the response type for the Query/SupplyOf RPC method. */
-                {
-                    /** Coin defines a token with a denomination and an amount.
-                    
-                    NOTE: The amount field is an Int which implements the custom method
-                    signatures required by gogoproto. */
-                    amount: {
-                        denom: string
-                        amount: string
-                    }
-                }
-                evmos: /** QuerySupplyOfResponse is the response type for the Query/SupplyOf RPC method. */
+                default: /** QuerySupplyOfResponse is the response type for the Query/SupplyOf RPC method. */
                 {
                     /** Coin defines a token with a denomination and an amount.
                     
@@ -7615,16 +5837,7 @@ method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7642,37 +5855,23 @@ method */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/community_pool' */
-            axelar: `/cosmos/distribution/v1beta1/community_pool`
-            /** '/cosmos/distribution/v1beta1/community_pool' */
-            evmos: `/cosmos/distribution/v1beta1/community_pool`
+            default: `/cosmos/distribution/v1beta1/community_pool`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryCommunityPoolResponse is the response type for the Query/CommunityPool
-RPC method. */
-                {
-                    /** pool defines community pool's coins. */
-                    pool: Array<{
-                        denom: string
-                        amount: string
-                    }>
-                }
-                evmos: /** QueryCommunityPoolResponse is the response type for the Query/CommunityPool
+                default: /** QueryCommunityPoolResponse is the response type for the Query/CommunityPool
 RPC method. */
                 {
                     /** pool defines community pool's coins. */
@@ -7683,16 +5882,7 @@ RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7711,51 +5901,26 @@ RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards' */
-            axelar: `/cosmos/distribution/v1beta1/delegators/${string}/rewards`
-            /** '/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards' */
-            evmos: `/cosmos/distribution/v1beta1/delegators/${string}/rewards`
+            default: `/cosmos/distribution/v1beta1/delegators/${string}/rewards`
         }
         params: {
             path: {
-                axelar: {
-                    /** delegator_address defines the delegator address to query for. */
-                    delegator_address: string
-                }
-                evmos: {
+                default: {
                     /** delegator_address defines the delegator address to query for. */
                     delegator_address: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDelegationTotalRewardsResponse is the response type for the
-Query/DelegationTotalRewards RPC method. */
-                {
-                    /** rewards defines all the rewards accrued by a delegator. */
-                    rewards: Array<{
-                        validator_address: string
-                        reward: Array<{
-                            denom: string
-                            amount: string
-                        }>
-                    }>
-                    /** total defines the sum of all the rewards. */
-                    total: Array<{
-                        denom: string
-                        amount: string
-                    }>
-                }
-                evmos: /** QueryDelegationTotalRewardsResponse is the response type for the
+                default: /** QueryDelegationTotalRewardsResponse is the response type for the
 Query/DelegationTotalRewards RPC method. */
                 {
                     /** rewards defines all the rewards accrued by a delegator. */
@@ -7774,16 +5939,7 @@ Query/DelegationTotalRewards RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7801,19 +5957,11 @@ Query/DelegationTotalRewards RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}' */
-            axelar: `/cosmos/distribution/v1beta1/delegators/${string}/rewards/${string}`
-            /** '/cosmos/distribution/v1beta1/delegators/{delegator_address}/rewards/{validator_address}' */
-            evmos: `/cosmos/distribution/v1beta1/delegators/${string}/rewards/${string}`
+            default: `/cosmos/distribution/v1beta1/delegators/${string}/rewards/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** delegator_address defines the delegator address to query for. */
-                    delegator_address: string
-                    /** validator_address defines the validator address to query for. */
-                    validator_address: string
-                }
-                evmos: {
+                default: {
                     /** delegator_address defines the delegator address to query for. */
                     delegator_address: string
                     /** validator_address defines the validator address to query for. */
@@ -7822,26 +5970,15 @@ Query/DelegationTotalRewards RPC method. */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDelegationRewardsResponse is the response type for the
-Query/DelegationRewards RPC method. */
-                {
-                    /** rewards defines the rewards accrued by a delegation. */
-                    rewards: Array<{
-                        denom: string
-                        amount: string
-                    }>
-                }
-                evmos: /** QueryDelegationRewardsResponse is the response type for the
+                default: /** QueryDelegationRewardsResponse is the response type for the
 Query/DelegationRewards RPC method. */
                 {
                     /** rewards defines the rewards accrued by a delegation. */
@@ -7852,16 +5989,7 @@ Query/DelegationRewards RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7924,40 +6052,26 @@ Query/DelegatorValidators RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address' */
-            axelar: `/cosmos/distribution/v1beta1/delegators/${string}/withdraw_address`
-            /** '/cosmos/distribution/v1beta1/delegators/{delegator_address}/withdraw_address' */
-            evmos: `/cosmos/distribution/v1beta1/delegators/${string}/withdraw_address`
+            default: `/cosmos/distribution/v1beta1/delegators/${string}/withdraw_address`
         }
         params: {
             path: {
-                axelar: {
-                    /** delegator_address defines the delegator address to query for. */
-                    delegator_address: string
-                }
-                evmos: {
+                default: {
                     /** delegator_address defines the delegator address to query for. */
                     delegator_address: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDelegatorWithdrawAddressResponse is the response type for the
-Query/DelegatorWithdrawAddress RPC method. */
-                {
-                    /** withdraw_address defines the delegator address to query for. */
-                    withdraw_address: string
-                }
-                evmos: /** QueryDelegatorWithdrawAddressResponse is the response type for the
+                default: /** QueryDelegatorWithdrawAddressResponse is the response type for the
 Query/DelegatorWithdrawAddress RPC method. */
                 {
                     /** withdraw_address defines the delegator address to query for. */
@@ -7965,16 +6079,7 @@ Query/DelegatorWithdrawAddress RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -7992,38 +6097,23 @@ Query/DelegatorWithdrawAddress RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/params' */
-            axelar: `/cosmos/distribution/v1beta1/params`
-            /** '/cosmos/distribution/v1beta1/params' */
-            evmos: `/cosmos/distribution/v1beta1/params`
+            default: `/cosmos/distribution/v1beta1/params`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
-                {
-                    /** params defines the parameters of the module. */
-                    params: {
-                        community_tax: string
-                        base_proposer_reward: string
-                        bonus_proposer_reward: string
-                        withdraw_addr_enabled: boolean
-                    }
-                }
-                evmos: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
+                default: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
                 {
                     /** params defines the parameters of the module. */
                     params: {
@@ -8035,16 +6125,7 @@ Query/DelegatorWithdrawAddress RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -8062,45 +6143,26 @@ Query/DelegatorWithdrawAddress RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/validators/{validator_address}/commission' */
-            axelar: `/cosmos/distribution/v1beta1/validators/${string}/commission`
-            /** '/cosmos/distribution/v1beta1/validators/{validator_address}/commission' */
-            evmos: `/cosmos/distribution/v1beta1/validators/${string}/commission`
+            default: `/cosmos/distribution/v1beta1/validators/${string}/commission`
         }
         params: {
             path: {
-                axelar: {
-                    /** validator_address defines the validator address to query for. */
-                    validator_address: string
-                }
-                evmos: {
+                default: {
                     /** validator_address defines the validator address to query for. */
                     validator_address: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryValidatorCommissionResponse is the response type for the
-Query/ValidatorCommission RPC method */
-                {
-                    /** commission defines the commision the validator received. */
-                    commission: {
-                        commission: Array<{
-                            denom: string
-                            amount: string
-                        }>
-                    }
-                }
-                evmos: /** QueryValidatorCommissionResponse is the response type for the
+                default: /** QueryValidatorCommissionResponse is the response type for the
 Query/ValidatorCommission RPC method */
                 {
                     /** commission defines the commision the validator received. */
@@ -8113,16 +6175,7 @@ Query/ValidatorCommission RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -8140,46 +6193,26 @@ Query/ValidatorCommission RPC method */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards' */
-            axelar: `/cosmos/distribution/v1beta1/validators/${string}/outstanding_rewards`
-            /** '/cosmos/distribution/v1beta1/validators/{validator_address}/outstanding_rewards' */
-            evmos: `/cosmos/distribution/v1beta1/validators/${string}/outstanding_rewards`
+            default: `/cosmos/distribution/v1beta1/validators/${string}/outstanding_rewards`
         }
         params: {
             path: {
-                axelar: {
-                    /** validator_address defines the validator address to query for. */
-                    validator_address: string
-                }
-                evmos: {
+                default: {
                     /** validator_address defines the validator address to query for. */
                     validator_address: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryValidatorOutstandingRewardsResponse is the response type for the
-Query/ValidatorOutstandingRewards RPC method. */
-                {
-                    /** ValidatorOutstandingRewards represents outstanding (un-withdrawn) rewards
-                    for a validator inexpensive to track, allows simple sanity checks. */
-                    rewards: {
-                        rewards: Array<{
-                            denom: string
-                            amount: string
-                        }>
-                    }
-                }
-                evmos: /** QueryValidatorOutstandingRewardsResponse is the response type for the
+                default: /** QueryValidatorOutstandingRewardsResponse is the response type for the
 Query/ValidatorOutstandingRewards RPC method. */
                 {
                     /** ValidatorOutstandingRewards represents outstanding (un-withdrawn) rewards
@@ -8193,16 +6226,7 @@ Query/ValidatorOutstandingRewards RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -8220,50 +6244,18 @@ Query/ValidatorOutstandingRewards RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/validators/{validator_address}/slashes' */
-            axelar: `/cosmos/distribution/v1beta1/validators/${string}/slashes`
-            /** '/cosmos/distribution/v1beta1/validators/{validator_address}/slashes' */
-            evmos: `/cosmos/distribution/v1beta1/validators/${string}/slashes`
+            default: `/cosmos/distribution/v1beta1/validators/${string}/slashes`
         }
         params: {
             path: {
-                axelar: {
-                    /** validator_address defines the validator address to query for. */
-                    validator_address: string
-                }
-                evmos: {
+                default: {
                     /** validator_address defines the validator address to query for. */
                     validator_address: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** starting_height defines the optional starting height to query the slashes. */
-                    starting_height: number
-                    /** starting_height defines the optional ending height to query the slashes. */
-                    ending_height: number
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** starting_height defines the optional starting height to query the slashes. */
                     starting_height: number
                     /** starting_height defines the optional ending height to query the slashes. */
@@ -8291,31 +6283,12 @@ Query/ValidatorOutstandingRewards RPC method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryValidatorSlashesResponse is the response type for the
-Query/ValidatorSlashes RPC method. */
-                {
-                    /** slashes defines the slashes the validator received. */
-                    slashes: Array<{
-                        validator_period: string
-                        fraction: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryValidatorSlashesResponse is the response type for the
+                default: /** QueryValidatorSlashesResponse is the response type for the
 Query/ValidatorSlashes RPC method. */
                 {
                     /** slashes defines the slashes the validator received. */
@@ -8335,16 +6308,7 @@ Query/ValidatorSlashes RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -8362,19 +6326,11 @@ Query/ValidatorSlashes RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}' */
-            axelar: `/cosmos/feegrant/v1beta1/allowance/${string}/${string}`
-            /** '/cosmos/feegrant/v1beta1/allowance/{granter}/{grantee}' */
-            evmos: `/cosmos/feegrant/v1beta1/allowance/${string}/${string}`
+            default: `/cosmos/feegrant/v1beta1/allowance/${string}/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** granter is the address of the user granting an allowance of their funds. */
-                    granter: string
-                    /** grantee is the address of the user being granted an allowance of another user's funds. */
-                    grantee: string
-                }
-                evmos: {
+                default: {
                     /** granter is the address of the user granting an allowance of their funds. */
                     granter: string
                     /** grantee is the address of the user being granted an allowance of another user's funds. */
@@ -8383,33 +6339,15 @@ Query/ValidatorSlashes RPC method. */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryAllowanceResponse is the response type for the Query/Allowance RPC method. */
-                {
-                    /** Grant is stored in the KVStore to record a grant with full context */
-                    allowance: {
-                        /** granter is the address of the user granting an allowance of their funds. */
-                        granter: string
-                        /** grantee is the address of the user being granted an allowance of another user's funds. */
-                        grantee: string
-                        /** allowance can be any of basic and filtered fee allowance. */
-                        allowance: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                    }
-                }
-                evmos: /** QueryAllowanceResponse is the response type for the Query/Allowance RPC method. */
+                default: /** QueryAllowanceResponse is the response type for the Query/Allowance RPC method. */
                 {
                     /** Grant is stored in the KVStore to record a grant with full context */
                     allowance: {
@@ -8427,17 +6365,7 @@ Query/ValidatorSlashes RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -8456,44 +6384,17 @@ Query/ValidatorSlashes RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/feegrant/v1beta1/allowances/{grantee}' */
-            axelar: `/cosmos/feegrant/v1beta1/allowances/${string}`
-            /** '/cosmos/feegrant/v1beta1/allowances/{grantee}' */
-            evmos: `/cosmos/feegrant/v1beta1/allowances/${string}`
+            default: `/cosmos/feegrant/v1beta1/allowances/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    grantee: string
-                }
-                evmos: {
+                default: {
                     grantee: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -8517,38 +6418,12 @@ Query/ValidatorSlashes RPC method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryAllowancesResponse is the response type for the Query/Allowances RPC method. */
-                {
-                    /** allowances are allowance's granted for grantee by granter. */
-                    allowances: Array<{
-                        /** granter is the address of the user granting an allowance of their funds. */
-                        granter: string
-                        /** grantee is the address of the user being granted an allowance of another user's funds. */
-                        grantee: string
-                        /** allowance can be any of basic and filtered fee allowance. */
-                        allowance: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                    }>
-                    /** pagination defines an pagination for the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryAllowancesResponse is the response type for the Query/Allowances RPC method. */
+                default: /** QueryAllowancesResponse is the response type for the Query/Allowances RPC method. */
                 {
                     /** allowances are allowance's granted for grantee by granter. */
                     allowances: Array<{
@@ -8575,17 +6450,7 @@ Query/ValidatorSlashes RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -8604,40 +6469,15 @@ Query/ValidatorSlashes RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/evidence/v1beta1/evidence' */
-            axelar: `/cosmos/evidence/v1beta1/evidence`
-            /** '/cosmos/evidence/v1beta1/evidence' */
-            evmos: `/cosmos/evidence/v1beta1/evidence`
+            default: `/cosmos/evidence/v1beta1/evidence`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -8661,32 +6501,12 @@ Query/ValidatorSlashes RPC method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryAllEvidenceResponse is the response type for the Query/AllEvidence RPC
-method. */
-                {
-                    /** evidence returns all evidences. */
-                    evidence: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryAllEvidenceResponse is the response type for the Query/AllEvidence RPC
+                default: /** QueryAllEvidenceResponse is the response type for the Query/AllEvidence RPC
 method. */
                 {
                     /** evidence returns all evidences. */
@@ -8707,17 +6527,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -8736,124 +6546,26 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/evidence/v1beta1/evidence/{evidence_hash}' */
-            axelar: `/cosmos/evidence/v1beta1/evidence/${string}`
-            /** '/cosmos/evidence/v1beta1/evidence/{evidence_hash}' */
-            evmos: `/cosmos/evidence/v1beta1/evidence/${string}`
+            default: `/cosmos/evidence/v1beta1/evidence/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** evidence_hash defines the hash of the requested evidence. */
-                    evidence_hash: string
-                }
-                evmos: {
+                default: {
                     /** evidence_hash defines the hash of the requested evidence. */
                     evidence_hash: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryEvidenceResponse is the response type for the Query/Evidence RPC method. */
-                {
-                    /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                    URL that describes the type of the serialized message.
-                    
-                    Protobuf library provides support to pack/unpack Any values in the form
-                    of utility functions or additional generated methods of the Any type.
-                    
-                    Example 1: Pack and unpack a message in C++.
-                    
-                        Foo foo = ...;
-                        Any any;
-                        any.PackFrom(foo);
-                        ...
-                        if (any.UnpackTo(&foo)) {
-                          ...
-                        }
-                    
-                    Example 2: Pack and unpack a message in Java.
-                    
-                        Foo foo = ...;
-                        Any any = Any.pack(foo);
-                        ...
-                        if (any.is(Foo.class)) {
-                          foo = any.unpack(Foo.class);
-                        }
-                    
-                     Example 3: Pack and unpack a message in Python.
-                    
-                        foo = Foo(...)
-                        any = Any()
-                        any.Pack(foo)
-                        ...
-                        if any.Is(Foo.DESCRIPTOR):
-                          any.Unpack(foo)
-                          ...
-                    
-                     Example 4: Pack and unpack a message in Go
-                    
-                         foo := &pb.Foo{...}
-                         any, err := anypb.New(foo)
-                         if err != nil {
-                           ...
-                         }
-                         ...
-                         foo := &pb.Foo{}
-                         if err := any.UnmarshalTo(foo); err != nil {
-                           ...
-                         }
-                    
-                    The pack methods provided by protobuf library will by default use
-                    'type.googleapis.com/full.type.name' as the type URL and the unpack
-                    methods only use the fully qualified type name after the last '/'
-                    in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                    name "y.z".
-                    
-                    
-                    JSON
-                    ====
-                    The JSON representation of an `Any` value uses the regular
-                    representation of the deserialized, embedded message, with an
-                    additional field `@type` which contains the type URL. Example:
-                    
-                        package google.profile;
-                        message Person {
-                          string first_name = 1;
-                          string last_name = 2;
-                        }
-                    
-                        {
-                          "@type": "type.googleapis.com/google.profile.Person",
-                          "firstName": <string>,
-                          "lastName": <string>
-                        }
-                    
-                    If the embedded message type is well-known and has a custom JSON
-                    representation, that representation will be embedded adding a field
-                    `value` which holds the custom JSON in addition to the `@type`
-                    field. Example (for message [google.protobuf.Duration][]):
-                    
-                        {
-                          "@type": "type.googleapis.com/google.protobuf.Duration",
-                          "value": "1.212s"
-                        } */
-                    evidence: {
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }
-                }
-                evmos: /** QueryEvidenceResponse is the response type for the Query/Evidence RPC method. */
+                default: /** QueryEvidenceResponse is the response type for the Query/Evidence RPC method. */
                 {
                     /** `Any` contains an arbitrary serialized protocol buffer message along with a
                     URL that describes the type of the serialized message.
@@ -8945,17 +6657,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -8974,18 +6676,11 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/gov/v1beta1/params/{params_type}' */
-            axelar: `/cosmos/gov/v1beta1/params/${string}`
-            /** '/cosmos/gov/v1beta1/params/{params_type}' */
-            evmos: `/cosmos/gov/v1beta1/params/${string}`
+            default: `/cosmos/gov/v1beta1/params/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** params_type defines which parameters to query for, can be one of "voting",
-                    "tallying" or "deposit". */
-                    params_type: string
-                }
-                evmos: {
+                default: {
                     /** params_type defines which parameters to query for, can be one of "voting",
                     "tallying" or "deposit". */
                     params_type: string
@@ -8993,47 +6688,15 @@ method. */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
-                {
-                    /** voting_params defines the parameters related to voting. */
-                    voting_params: {
-                        /** Length of the voting period. */
-                        voting_period: string
-                    }
-                    /** deposit_params defines the parameters related to deposit. */
-                    deposit_params: {
-                        /** Minimum deposit for a proposal to enter voting period. */
-                        min_deposit: Array<{
-                            denom: string
-                            amount: string
-                        }>
-                        /** Maximum period for Atom holders to deposit on a proposal. Initial value: 2
-                         months. */
-                        max_deposit_period: string
-                    }
-                    /** tally_params defines the parameters related to tally. */
-                    tally_params: {
-                        /** Minimum percentage of total stake needed to vote for a result to be
-                         considered valid. */
-                        quorum: string
-                        /** Minimum proportion of Yes votes for proposal to pass. Default value: 0.5. */
-                        threshold: string
-                        /** Minimum value of Veto votes to Total votes ratio for proposal to be
-                         vetoed. Default value: 1/3. */
-                        veto_threshold: string
-                    }
-                }
-                evmos: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
+                default: /** QueryParamsResponse is the response type for the Query/Params RPC method. */
                 {
                     /** voting_params defines the parameters related to voting. */
                     voting_params: {
@@ -9065,17 +6728,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -9094,58 +6747,15 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/gov/v1beta1/proposals' */
-            axelar: `/cosmos/gov/v1beta1/proposals`
-            /** '/cosmos/gov/v1beta1/proposals' */
-            evmos: `/cosmos/gov/v1beta1/proposals`
+            default: `/cosmos/gov/v1beta1/proposals`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** proposal_status defines the status of the proposals.
-                    
-                     - PROPOSAL_STATUS_UNSPECIFIED: PROPOSAL_STATUS_UNSPECIFIED defines the default propopsal status.
-                     - PROPOSAL_STATUS_DEPOSIT_PERIOD: PROPOSAL_STATUS_DEPOSIT_PERIOD defines a proposal status during the deposit
-                    period.
-                     - PROPOSAL_STATUS_VOTING_PERIOD: PROPOSAL_STATUS_VOTING_PERIOD defines a proposal status during the voting
-                    period.
-                     - PROPOSAL_STATUS_PASSED: PROPOSAL_STATUS_PASSED defines a proposal status of a proposal that has
-                    passed.
-                     - PROPOSAL_STATUS_REJECTED: PROPOSAL_STATUS_REJECTED defines a proposal status of a proposal that has
-                    been rejected.
-                     - PROPOSAL_STATUS_FAILED: PROPOSAL_STATUS_FAILED defines a proposal status of a proposal that has
-                    failed. */
-                    proposal_status: string
-                    /** voter defines the voter address for the proposals. */
-                    voter: string
-                    /** depositor defines the deposit addresses from the proposals. */
-                    depositor: string
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** proposal_status defines the status of the proposals.
                     
                      - PROPOSAL_STATUS_UNSPECIFIED: PROPOSAL_STATUS_UNSPECIFIED defines the default propopsal status.
@@ -9187,145 +6797,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryProposalsResponse is the response type for the Query/Proposals RPC
-method. */
-                {
-                    proposals: Array<{
-                        proposal_id: string
-                        /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                        URL that describes the type of the serialized message.
-                        
-                        Protobuf library provides support to pack/unpack Any values in the form
-                        of utility functions or additional generated methods of the Any type.
-                        
-                        Example 1: Pack and unpack a message in C++.
-                        
-                            Foo foo = ...;
-                            Any any;
-                            any.PackFrom(foo);
-                            ...
-                            if (any.UnpackTo(&foo)) {
-                              ...
-                            }
-                        
-                        Example 2: Pack and unpack a message in Java.
-                        
-                            Foo foo = ...;
-                            Any any = Any.pack(foo);
-                            ...
-                            if (any.is(Foo.class)) {
-                              foo = any.unpack(Foo.class);
-                            }
-                        
-                         Example 3: Pack and unpack a message in Python.
-                        
-                            foo = Foo(...)
-                            any = Any()
-                            any.Pack(foo)
-                            ...
-                            if any.Is(Foo.DESCRIPTOR):
-                              any.Unpack(foo)
-                              ...
-                        
-                         Example 4: Pack and unpack a message in Go
-                        
-                             foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
-                             ...
-                             foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
-                               ...
-                             }
-                        
-                        The pack methods provided by protobuf library will by default use
-                        'type.googleapis.com/full.type.name' as the type URL and the unpack
-                        methods only use the fully qualified type name after the last '/'
-                        in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                        name "y.z".
-                        
-                        
-                        JSON
-                        ====
-                        The JSON representation of an `Any` value uses the regular
-                        representation of the deserialized, embedded message, with an
-                        additional field `@type` which contains the type URL. Example:
-                        
-                            package google.profile;
-                            message Person {
-                              string first_name = 1;
-                              string last_name = 2;
-                            }
-                        
-                            {
-                              "@type": "type.googleapis.com/google.profile.Person",
-                              "firstName": <string>,
-                              "lastName": <string>
-                            }
-                        
-                        If the embedded message type is well-known and has a custom JSON
-                        representation, that representation will be embedded adding a field
-                        `value` which holds the custom JSON in addition to the `@type`
-                        field. Example (for message [google.protobuf.Duration][]):
-                        
-                            {
-                              "@type": "type.googleapis.com/google.protobuf.Duration",
-                              "value": "1.212s"
-                            } */
-                        content: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                        /** ProposalStatus enumerates the valid statuses of a proposal.
-                        
-                         - PROPOSAL_STATUS_UNSPECIFIED: PROPOSAL_STATUS_UNSPECIFIED defines the default propopsal status.
-                         - PROPOSAL_STATUS_DEPOSIT_PERIOD: PROPOSAL_STATUS_DEPOSIT_PERIOD defines a proposal status during the deposit
-                        period.
-                         - PROPOSAL_STATUS_VOTING_PERIOD: PROPOSAL_STATUS_VOTING_PERIOD defines a proposal status during the voting
-                        period.
-                         - PROPOSAL_STATUS_PASSED: PROPOSAL_STATUS_PASSED defines a proposal status of a proposal that has
-                        passed.
-                         - PROPOSAL_STATUS_REJECTED: PROPOSAL_STATUS_REJECTED defines a proposal status of a proposal that has
-                        been rejected.
-                         - PROPOSAL_STATUS_FAILED: PROPOSAL_STATUS_FAILED defines a proposal status of a proposal that has
-                        failed. */
-                        status: string
-                        /** TallyResult defines a standard tally for a governance proposal. */
-                        final_tally_result: {
-                            yes: string
-                            abstain: string
-                            no: string
-                            no_with_veto: string
-                        }
-                        submit_time: string
-                        deposit_end_time: string
-                        total_deposit: Array<{
-                            denom: string
-                            amount: string
-                        }>
-                        voting_start_time: string
-                        voting_end_time: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryProposalsResponse is the response type for the Query/Proposals RPC
+                default: /** QueryProposalsResponse is the response type for the Query/Proposals RPC
 method. */
                 {
                     proposals: Array<{
@@ -9459,17 +6936,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -9488,157 +6955,26 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/gov/v1beta1/proposals/{proposal_id}' */
-            axelar: `/cosmos/gov/v1beta1/proposals/${number}`
-            /** '/cosmos/gov/v1beta1/proposals/{proposal_id}' */
-            evmos: `/cosmos/gov/v1beta1/proposals/${number}`
+            default: `/cosmos/gov/v1beta1/proposals/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    /** proposal_id defines the unique id of the proposal. */
-                    proposal_id: number
-                }
-                evmos: {
+                default: {
                     /** proposal_id defines the unique id of the proposal. */
                     proposal_id: number
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryProposalResponse is the response type for the Query/Proposal RPC method. */
-                {
-                    /** Proposal defines the core field members of a governance proposal. */
-                    proposal: {
-                        proposal_id: string
-                        /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                        URL that describes the type of the serialized message.
-                        
-                        Protobuf library provides support to pack/unpack Any values in the form
-                        of utility functions or additional generated methods of the Any type.
-                        
-                        Example 1: Pack and unpack a message in C++.
-                        
-                            Foo foo = ...;
-                            Any any;
-                            any.PackFrom(foo);
-                            ...
-                            if (any.UnpackTo(&foo)) {
-                              ...
-                            }
-                        
-                        Example 2: Pack and unpack a message in Java.
-                        
-                            Foo foo = ...;
-                            Any any = Any.pack(foo);
-                            ...
-                            if (any.is(Foo.class)) {
-                              foo = any.unpack(Foo.class);
-                            }
-                        
-                         Example 3: Pack and unpack a message in Python.
-                        
-                            foo = Foo(...)
-                            any = Any()
-                            any.Pack(foo)
-                            ...
-                            if any.Is(Foo.DESCRIPTOR):
-                              any.Unpack(foo)
-                              ...
-                        
-                         Example 4: Pack and unpack a message in Go
-                        
-                             foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
-                             ...
-                             foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
-                               ...
-                             }
-                        
-                        The pack methods provided by protobuf library will by default use
-                        'type.googleapis.com/full.type.name' as the type URL and the unpack
-                        methods only use the fully qualified type name after the last '/'
-                        in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                        name "y.z".
-                        
-                        
-                        JSON
-                        ====
-                        The JSON representation of an `Any` value uses the regular
-                        representation of the deserialized, embedded message, with an
-                        additional field `@type` which contains the type URL. Example:
-                        
-                            package google.profile;
-                            message Person {
-                              string first_name = 1;
-                              string last_name = 2;
-                            }
-                        
-                            {
-                              "@type": "type.googleapis.com/google.profile.Person",
-                              "firstName": <string>,
-                              "lastName": <string>
-                            }
-                        
-                        If the embedded message type is well-known and has a custom JSON
-                        representation, that representation will be embedded adding a field
-                        `value` which holds the custom JSON in addition to the `@type`
-                        field. Example (for message [google.protobuf.Duration][]):
-                        
-                            {
-                              "@type": "type.googleapis.com/google.protobuf.Duration",
-                              "value": "1.212s"
-                            } */
-                        content: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                        /** ProposalStatus enumerates the valid statuses of a proposal.
-                        
-                         - PROPOSAL_STATUS_UNSPECIFIED: PROPOSAL_STATUS_UNSPECIFIED defines the default propopsal status.
-                         - PROPOSAL_STATUS_DEPOSIT_PERIOD: PROPOSAL_STATUS_DEPOSIT_PERIOD defines a proposal status during the deposit
-                        period.
-                         - PROPOSAL_STATUS_VOTING_PERIOD: PROPOSAL_STATUS_VOTING_PERIOD defines a proposal status during the voting
-                        period.
-                         - PROPOSAL_STATUS_PASSED: PROPOSAL_STATUS_PASSED defines a proposal status of a proposal that has
-                        passed.
-                         - PROPOSAL_STATUS_REJECTED: PROPOSAL_STATUS_REJECTED defines a proposal status of a proposal that has
-                        been rejected.
-                         - PROPOSAL_STATUS_FAILED: PROPOSAL_STATUS_FAILED defines a proposal status of a proposal that has
-                        failed. */
-                        status: string
-                        /** TallyResult defines a standard tally for a governance proposal. */
-                        final_tally_result: {
-                            yes: string
-                            abstain: string
-                            no: string
-                            no_with_veto: string
-                        }
-                        submit_time: string
-                        deposit_end_time: string
-                        total_deposit: Array<{
-                            denom: string
-                            amount: string
-                        }>
-                        voting_start_time: string
-                        voting_end_time: string
-                    }
-                }
-                evmos: /** QueryProposalResponse is the response type for the Query/Proposal RPC method. */
+                default: /** QueryProposalResponse is the response type for the Query/Proposal RPC method. */
                 {
                     /** Proposal defines the core field members of a governance proposal. */
                     proposal: {
@@ -9763,17 +7099,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -9792,46 +7118,18 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits' */
-            axelar: `/cosmos/gov/v1beta1/proposals/${number}/deposits`
-            /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits' */
-            evmos: `/cosmos/gov/v1beta1/proposals/${number}/deposits`
+            default: `/cosmos/gov/v1beta1/proposals/${number}/deposits`
         }
         params: {
             path: {
-                axelar: {
-                    /** proposal_id defines the unique id of the proposal. */
-                    proposal_id: number
-                }
-                evmos: {
+                default: {
                     /** proposal_id defines the unique id of the proposal. */
                     proposal_id: number
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -9855,33 +7153,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDepositsResponse is the response type for the Query/Deposits RPC method. */
-                {
-                    deposits: Array<{
-                        proposal_id: string
-                        depositor: string
-                        amount: Array<{
-                            denom: string
-                            amount: string
-                        }>
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryDepositsResponse is the response type for the Query/Deposits RPC method. */
+                default: /** QueryDepositsResponse is the response type for the Query/Deposits RPC method. */
                 {
                     deposits: Array<{
                         proposal_id: string
@@ -9903,17 +7180,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -9932,19 +7199,11 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}' */
-            axelar: `/cosmos/gov/v1beta1/proposals/${number}/deposits/${string}`
-            /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/deposits/{depositor}' */
-            evmos: `/cosmos/gov/v1beta1/proposals/${number}/deposits/${string}`
+            default: `/cosmos/gov/v1beta1/proposals/${number}/deposits/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** proposal_id defines the unique id of the proposal. */
-                    proposal_id: number
-                    /** depositor defines the deposit addresses from the proposals. */
-                    depositor: string
-                }
-                evmos: {
+                default: {
                     /** proposal_id defines the unique id of the proposal. */
                     proposal_id: number
                     /** depositor defines the deposit addresses from the proposals. */
@@ -9953,30 +7212,15 @@ method. */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDepositResponse is the response type for the Query/Deposit RPC method. */
-                {
-                    /** Deposit defines an amount deposited by an account address to an active
-                    proposal. */
-                    deposit: {
-                        proposal_id: string
-                        depositor: string
-                        amount: Array<{
-                            denom: string
-                            amount: string
-                        }>
-                    }
-                }
-                evmos: /** QueryDepositResponse is the response type for the Query/Deposit RPC method. */
+                default: /** QueryDepositResponse is the response type for the Query/Deposit RPC method. */
                 {
                     /** Deposit defines an amount deposited by an account address to an active
                     proposal. */
@@ -9991,17 +7235,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -10020,44 +7254,26 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/tally' */
-            axelar: `/cosmos/gov/v1beta1/proposals/${number}/tally`
-            /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/tally' */
-            evmos: `/cosmos/gov/v1beta1/proposals/${number}/tally`
+            default: `/cosmos/gov/v1beta1/proposals/${number}/tally`
         }
         params: {
             path: {
-                axelar: {
-                    /** proposal_id defines the unique id of the proposal. */
-                    proposal_id: number
-                }
-                evmos: {
+                default: {
                     /** proposal_id defines the unique id of the proposal. */
                     proposal_id: number
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryTallyResultResponse is the response type for the Query/Tally RPC method. */
-                {
-                    /** TallyResult defines a standard tally for a governance proposal. */
-                    tally: {
-                        yes: string
-                        abstain: string
-                        no: string
-                        no_with_veto: string
-                    }
-                }
-                evmos: /** QueryTallyResultResponse is the response type for the Query/Tally RPC method. */
+                default: /** QueryTallyResultResponse is the response type for the Query/Tally RPC method. */
                 {
                     /** TallyResult defines a standard tally for a governance proposal. */
                     tally: {
@@ -10069,17 +7285,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -10098,46 +7304,18 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes' */
-            axelar: `/cosmos/gov/v1beta1/proposals/${number}/votes`
-            /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes' */
-            evmos: `/cosmos/gov/v1beta1/proposals/${number}/votes`
+            default: `/cosmos/gov/v1beta1/proposals/${number}/votes`
         }
         params: {
             path: {
-                axelar: {
-                    /** proposal_id defines the unique id of the proposal. */
-                    proposal_id: number
-                }
-                evmos: {
+                default: {
                     /** proposal_id defines the unique id of the proposal. */
                     proposal_id: number
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -10161,46 +7339,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryVotesResponse is the response type for the Query/Votes RPC method. */
-                {
-                    /** votes defined the queried votes. */
-                    votes: Array<{
-                        proposal_id: string
-                        voter: string
-                        /** Deprecated: Prefer to use `options` instead. This field is set in queries
-                        if and only if `len(options) == 1` and that option has weight 1. In all
-                        other cases, this field will default to VOTE_OPTION_UNSPECIFIED. */
-                        option: string
-                        /** Since: cosmos-sdk 0.43 */
-                        options: Array<{
-                            /** VoteOption enumerates the valid vote options for a given governance proposal.
-                            
-                             - VOTE_OPTION_UNSPECIFIED: VOTE_OPTION_UNSPECIFIED defines a no-op vote option.
-                             - VOTE_OPTION_YES: VOTE_OPTION_YES defines a yes vote option.
-                             - VOTE_OPTION_ABSTAIN: VOTE_OPTION_ABSTAIN defines an abstain vote option.
-                             - VOTE_OPTION_NO: VOTE_OPTION_NO defines a no vote option.
-                             - VOTE_OPTION_NO_WITH_VETO: VOTE_OPTION_NO_WITH_VETO defines a no with veto vote option. */
-                            option: string
-                            weight: string
-                        }>
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryVotesResponse is the response type for the Query/Votes RPC method. */
+                default: /** QueryVotesResponse is the response type for the Query/Votes RPC method. */
                 {
                     /** votes defined the queried votes. */
                     votes: Array<{
@@ -10235,17 +7379,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -10264,19 +7398,11 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}' */
-            axelar: `/cosmos/gov/v1beta1/proposals/${number}/votes/${string}`
-            /** '/cosmos/gov/v1beta1/proposals/{proposal_id}/votes/{voter}' */
-            evmos: `/cosmos/gov/v1beta1/proposals/${number}/votes/${string}`
+            default: `/cosmos/gov/v1beta1/proposals/${number}/votes/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** proposal_id defines the unique id of the proposal. */
-                    proposal_id: number
-                    /** voter defines the oter address for the proposals. */
-                    voter: string
-                }
-                evmos: {
+                default: {
                     /** proposal_id defines the unique id of the proposal. */
                     proposal_id: number
                     /** voter defines the oter address for the proposals. */
@@ -10285,42 +7411,15 @@ method. */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryVoteResponse is the response type for the Query/Vote RPC method. */
-                {
-                    /** Vote defines a vote on a governance proposal.
-                    A Vote consists of a proposal ID, the voter, and the vote option. */
-                    vote: {
-                        proposal_id: string
-                        voter: string
-                        /** Deprecated: Prefer to use `options` instead. This field is set in queries
-                        if and only if `len(options) == 1` and that option has weight 1. In all
-                        other cases, this field will default to VOTE_OPTION_UNSPECIFIED. */
-                        option: string
-                        /** Since: cosmos-sdk 0.43 */
-                        options: Array<{
-                            /** VoteOption enumerates the valid vote options for a given governance proposal.
-                            
-                             - VOTE_OPTION_UNSPECIFIED: VOTE_OPTION_UNSPECIFIED defines a no-op vote option.
-                             - VOTE_OPTION_YES: VOTE_OPTION_YES defines a yes vote option.
-                             - VOTE_OPTION_ABSTAIN: VOTE_OPTION_ABSTAIN defines an abstain vote option.
-                             - VOTE_OPTION_NO: VOTE_OPTION_NO defines a no vote option.
-                             - VOTE_OPTION_NO_WITH_VETO: VOTE_OPTION_NO_WITH_VETO defines a no with veto vote option. */
-                            option: string
-                            weight: string
-                        }>
-                    }
-                }
-                evmos: /** QueryVoteResponse is the response type for the Query/Vote RPC method. */
+                default: /** QueryVoteResponse is the response type for the Query/Vote RPC method. */
                 {
                     /** Vote defines a vote on a governance proposal.
                     A Vote consists of a proposal ID, the voter, and the vote option. */
@@ -10347,17 +7446,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -10376,39 +7465,23 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/slashing/v1beta1/params' */
-            axelar: `/cosmos/slashing/v1beta1/params`
-            /** '/cosmos/slashing/v1beta1/params' */
-            evmos: `/cosmos/slashing/v1beta1/params`
+            default: `/cosmos/slashing/v1beta1/params`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryParamsResponse is the response type for the Query/Params RPC method */
-                {
-                    /** Params represents the parameters used for by the slashing module. */
-                    params: {
-                        signed_blocks_window: string
-                        min_signed_per_window: string
-                        downtime_jail_duration: string
-                        slash_fraction_double_sign: string
-                        slash_fraction_downtime: string
-                    }
-                }
-                evmos: /** QueryParamsResponse is the response type for the Query/Params RPC method */
+                default: /** QueryParamsResponse is the response type for the Query/Params RPC method */
                 {
                     /** Params represents the parameters used for by the slashing module. */
                     params: {
@@ -10421,16 +7494,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -10448,40 +7512,15 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/slashing/v1beta1/signing_infos' */
-            axelar: `/cosmos/slashing/v1beta1/signing_infos`
-            /** '/cosmos/slashing/v1beta1/signing_infos' */
-            evmos: `/cosmos/slashing/v1beta1/signing_infos`
+            default: `/cosmos/slashing/v1beta1/signing_infos`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -10505,50 +7544,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QuerySigningInfosResponse is the response type for the Query/SigningInfos RPC
-method */
-                {
-                    /** info is the signing info of all validators */
-                    info: Array<{
-                        address: string
-                        /** Height at which validator was first a candidate OR was unjailed */
-                        start_height: string
-                        /** Index which is incremented each time the validator was a bonded
-                        in a block and may have signed a precommit or not. This in conjunction with the
-                        `SignedBlocksWindow` param determines the index in the `MissedBlocksBitArray`. */
-                        index_offset: string
-                        /** Timestamp until which the validator is jailed due to liveness downtime. */
-                        jailed_until: string
-                        /** Whether or not a validator has been tombstoned (killed out of validator set). It is set
-                        once the validator commits an equivocation or for any other configured misbehiavor. */
-                        tombstoned: boolean
-                        /** A counter kept to avoid unnecessary array reads.
-                        Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`. */
-                        missed_blocks_counter: string
-                    }>
-                    /** PageResponse is to be embedded in gRPC response messages where the
-                    corresponding request message has used PageRequest.
-                    
-                     message SomeResponse {
-                             repeated Bar results = 1;
-                             PageResponse page = 2;
-                     } */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QuerySigningInfosResponse is the response type for the Query/SigningInfos RPC
+                default: /** QuerySigningInfosResponse is the response type for the Query/SigningInfos RPC
 method */
                 {
                     /** info is the signing info of all validators */
@@ -10587,16 +7588,7 @@ method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -10614,56 +7606,26 @@ method */
         method: 'get'
         endpoint: {
             /** '/cosmos/slashing/v1beta1/signing_infos/{cons_address}' */
-            axelar: `/cosmos/slashing/v1beta1/signing_infos/${string}`
-            /** '/cosmos/slashing/v1beta1/signing_infos/{cons_address}' */
-            evmos: `/cosmos/slashing/v1beta1/signing_infos/${string}`
+            default: `/cosmos/slashing/v1beta1/signing_infos/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** cons_address is the address to query signing info of */
-                    cons_address: string
-                }
-                evmos: {
+                default: {
                     /** cons_address is the address to query signing info of */
                     cons_address: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
-method */
-                {
-                    /** val_signing_info is the signing info of requested val cons address */
-                    val_signing_info: {
-                        address: string
-                        /** Height at which validator was first a candidate OR was unjailed */
-                        start_height: string
-                        /** Index which is incremented each time the validator was a bonded
-                        in a block and may have signed a precommit or not. This in conjunction with the
-                        `SignedBlocksWindow` param determines the index in the `MissedBlocksBitArray`. */
-                        index_offset: string
-                        /** Timestamp until which the validator is jailed due to liveness downtime. */
-                        jailed_until: string
-                        /** Whether or not a validator has been tombstoned (killed out of validator set). It is set
-                        once the validator commits an equivocation or for any other configured misbehiavor. */
-                        tombstoned: boolean
-                        /** A counter kept to avoid unnecessary array reads.
-                        Note that `Sum(MissedBlocksBitArray)` always equals `MissedBlocksCounter`. */
-                        missed_blocks_counter: string
-                    }
-                }
-                evmos: /** QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
+                default: /** QuerySigningInfoResponse is the response type for the Query/SigningInfo RPC
 method */
                 {
                     /** val_signing_info is the signing info of requested val cons address */
@@ -10687,16 +7649,7 @@ method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -10714,46 +7667,18 @@ method */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/delegations/{delegator_addr}' */
-            axelar: `/cosmos/staking/v1beta1/delegations/${string}`
-            /** '/cosmos/staking/v1beta1/delegations/{delegator_addr}' */
-            evmos: `/cosmos/staking/v1beta1/delegations/${string}`
+            default: `/cosmos/staking/v1beta1/delegations/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** delegator_addr defines the delegator address to query for. */
-                    delegator_addr: string
-                }
-                evmos: {
+                default: {
                     /** delegator_addr defines the delegator address to query for. */
                     delegator_addr: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -10777,48 +7702,12 @@ method */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDelegatorDelegationsResponse is response type for the
-Query/DelegatorDelegations RPC method. */
-                {
-                    /** delegation_responses defines all the delegations' info of a delegator. */
-                    delegation_responses: Array<{
-                        /** Delegation represents the bond with tokens held by an account. It is
-                        owned by one delegator, and is associated with the voting power of one
-                        validator. */
-                        delegation: {
-                            /** delegator_address is the bech32-encoded address of the delegator. */
-                            delegator_address: string
-                            /** validator_address is the bech32-encoded address of the validator. */
-                            validator_address: string
-                            /** shares define the delegation shares received. */
-                            shares: string
-                        }
-                        /** Coin defines a token with a denomination and an amount.
-                        
-                        NOTE: The amount field is an Int which implements the custom method
-                        signatures required by gogoproto. */
-                        balance: {
-                            denom: string
-                            amount: string
-                        }
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryDelegatorDelegationsResponse is response type for the
+                default: /** QueryDelegatorDelegationsResponse is response type for the
 Query/DelegatorDelegations RPC method. */
                 {
                     /** delegation_responses defines all the delegations' info of a delegator. */
@@ -10855,17 +7744,7 @@ Query/DelegatorDelegations RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -10884,50 +7763,18 @@ Query/DelegatorDelegations RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations' */
-            axelar: `/cosmos/staking/v1beta1/delegators/${string}/redelegations`
-            /** '/cosmos/staking/v1beta1/delegators/{delegator_addr}/redelegations' */
-            evmos: `/cosmos/staking/v1beta1/delegators/${string}/redelegations`
+            default: `/cosmos/staking/v1beta1/delegators/${string}/redelegations`
         }
         params: {
             path: {
-                axelar: {
-                    /** delegator_addr defines the delegator address to query for. */
-                    delegator_addr: string
-                }
-                evmos: {
+                default: {
                     /** delegator_addr defines the delegator address to query for. */
                     delegator_addr: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** src_validator_addr defines the validator address to redelegate from. */
-                    src_validator_addr: string
-                    /** dst_validator_addr defines the validator address to redelegate to. */
-                    dst_validator_addr: string
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** src_validator_addr defines the validator address to redelegate from. */
                     src_validator_addr: string
                     /** dst_validator_addr defines the validator address to redelegate to. */
@@ -10955,63 +7802,12 @@ Query/DelegatorDelegations RPC method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryRedelegationsResponse is response type for the Query/Redelegations RPC
-method. */
-                {
-                    redelegation_responses: Array<{
-                        /** Redelegation contains the list of a particular delegator's redelegating bonds
-                        from a particular source validator to a particular destination validator. */
-                        redelegation: {
-                            /** delegator_address is the bech32-encoded address of the delegator. */
-                            delegator_address: string
-                            /** validator_src_address is the validator redelegation source operator address. */
-                            validator_src_address: string
-                            /** validator_dst_address is the validator redelegation destination operator address. */
-                            validator_dst_address: string
-                            /** entries are the redelegation entries. */
-                            entries: Array<{
-                                /** creation_height  defines the height which the redelegation took place. */
-                                creation_height: string
-                                /** completion_time defines the unix time for redelegation completion. */
-                                completion_time: string
-                                /** initial_balance defines the initial balance when redelegation started. */
-                                initial_balance: string
-                                /** shares_dst is the amount of destination-validator shares created by redelegation. */
-                                shares_dst: string
-                            }>
-                        }
-                        entries: Array<{
-                            /** RedelegationEntry defines a redelegation object with relevant metadata. */
-                            redelegation_entry: {
-                                /** creation_height  defines the height which the redelegation took place. */
-                                creation_height: string
-                                /** completion_time defines the unix time for redelegation completion. */
-                                completion_time: string
-                                /** initial_balance defines the initial balance when redelegation started. */
-                                initial_balance: string
-                                /** shares_dst is the amount of destination-validator shares created by redelegation. */
-                                shares_dst: string
-                            }
-                            balance: string
-                        }>
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryRedelegationsResponse is response type for the Query/Redelegations RPC
+                default: /** QueryRedelegationsResponse is response type for the Query/Redelegations RPC
 method. */
                 {
                     redelegation_responses: Array<{
@@ -11063,17 +7859,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -11093,46 +7879,18 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations' */
-            axelar: `/cosmos/staking/v1beta1/delegators/${string}/unbonding_delegations`
-            /** '/cosmos/staking/v1beta1/delegators/{delegator_addr}/unbonding_delegations' */
-            evmos: `/cosmos/staking/v1beta1/delegators/${string}/unbonding_delegations`
+            default: `/cosmos/staking/v1beta1/delegators/${string}/unbonding_delegations`
         }
         params: {
             path: {
-                axelar: {
-                    /** delegator_addr defines the delegator address to query for. */
-                    delegator_addr: string
-                }
-                evmos: {
+                default: {
                     /** delegator_addr defines the delegator address to query for. */
                     delegator_addr: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -11156,43 +7914,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryUnbondingDelegatorDelegationsResponse is response type for the
-Query/UnbondingDelegatorDelegations RPC method. */
-                {
-                    unbonding_responses: Array<{
-                        /** delegator_address is the bech32-encoded address of the delegator. */
-                        delegator_address: string
-                        /** validator_address is the bech32-encoded address of the validator. */
-                        validator_address: string
-                        /** entries are the unbonding delegation entries. */
-                        entries: Array<{
-                            /** creation_height is the height which the unbonding took place. */
-                            creation_height: string
-                            /** completion_time is the unix time for unbonding completion. */
-                            completion_time: string
-                            /** initial_balance defines the tokens initially scheduled to receive at completion. */
-                            initial_balance: string
-                            /** balance defines the tokens to receive at completion. */
-                            balance: string
-                        }>
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryUnbondingDelegatorDelegationsResponse is response type for the
+                default: /** QueryUnbondingDelegatorDelegationsResponse is response type for the
 Query/UnbondingDelegatorDelegations RPC method. */
                 {
                     unbonding_responses: Array<{
@@ -11224,17 +7951,7 @@ Query/UnbondingDelegatorDelegations RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -11253,24 +7970,21 @@ Query/UnbondingDelegatorDelegations RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/distribution/v1beta1/delegators/{delegator_address}/validators' */
-            axelar: `/cosmos/distribution/v1beta1/delegators/${string}/validators`
-            /** '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators' */
-            evmos: `/cosmos/staking/v1beta1/delegators/${string}/validators`
+            default: `/cosmos/distribution/v1beta1/delegators/${string}/validators`
         }
         params: {
             path: {
-                axelar: {
-                    /** delegator_address defines the delegator address to query for. */
-                    delegator_address: string
-                }
                 evmos: {
                     /** delegator_addr defines the delegator address to query for. */
                     delegator_addr: string
                 }
+                axelar: {
+                    /** delegator_address defines the delegator address to query for. */
+                    delegator_address: string
+                }
             }
 
             query: {
-                axelar: undefined
                 evmos: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
@@ -11293,20 +8007,14 @@ Query/UnbondingDelegatorDelegations RPC method. */
                     Since: cosmos-sdk 0.43 */
                     'pagination.reverse': string
                 }
+                axelar: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDelegatorValidatorsResponse is the response type for the
-Query/DelegatorValidators RPC method. */
-                {
-                    /** validators defines the validators a delegator is delegating for. */
-                    validators: Array<string>
-                }
                 evmos: /** QueryDelegatorValidatorsResponse is response type for the
 Query/DelegatorValidators RPC method. */
                 {
@@ -11453,17 +8161,14 @@ Query/DelegatorValidators RPC method. */
                         total: string
                     }
                 }
+                axelar: /** QueryDelegatorValidatorsResponse is the response type for the
+Query/DelegatorValidators RPC method. */
+                {
+                    /** validators defines the validators a delegator is delegating for. */
+                    validators: Array<string>
+                }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
                 evmos: {
                     error: string
                     code: number
@@ -11471,6 +8176,15 @@ Query/DelegatorValidators RPC method. */
                     details: Array<{
                         type_url: string
                         /** Must be a valid serialized protocol buffer of the above specified type. */
+                        value: string
+                    }>
+                }
+                axelar: {
+                    error: string
+                    code: number
+                    message: string
+                    details: Array<{
+                        type_url: string
                         value: string
                     }>
                 }
@@ -11484,19 +8198,11 @@ Query/DelegatorValidators RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}' */
-            axelar: `/cosmos/staking/v1beta1/delegators/${string}/validators/${string}`
-            /** '/cosmos/staking/v1beta1/delegators/{delegator_addr}/validators/{validator_addr}' */
-            evmos: `/cosmos/staking/v1beta1/delegators/${string}/validators/${string}`
+            default: `/cosmos/staking/v1beta1/delegators/${string}/validators/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** delegator_addr defines the delegator address to query for. */
-                    delegator_addr: string
-                    /** validator_addr defines the validator address to query for. */
-                    validator_addr: string
-                }
-                evmos: {
+                default: {
                     /** delegator_addr defines the delegator address to query for. */
                     delegator_addr: string
                     /** validator_addr defines the validator address to query for. */
@@ -11505,161 +8211,15 @@ Query/DelegatorValidators RPC method. */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDelegatorValidatorResponse response type for the
-Query/DelegatorValidator RPC method. */
-                {
-                    /** Validator defines a validator, together with the total amount of the
-                    Validator's bond shares and their exchange rate to coins. Slashing results in
-                    a decrease in the exchange rate, allowing correct calculation of future
-                    undelegations without iterating over delegators. When coins are delegated to
-                    this validator, the validator is credited with a delegation whose number of
-                    bond shares is based on the amount of coins delegated divided by the current
-                    exchange rate. Voting power can be calculated as total bonded shares
-                    multiplied by exchange rate. */
-                    validator: {
-                        /** operator_address defines the address of the validator's operator; bech encoded in JSON. */
-                        operator_address: string
-                        /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                        URL that describes the type of the serialized message.
-                        
-                        Protobuf library provides support to pack/unpack Any values in the form
-                        of utility functions or additional generated methods of the Any type.
-                        
-                        Example 1: Pack and unpack a message in C++.
-                        
-                            Foo foo = ...;
-                            Any any;
-                            any.PackFrom(foo);
-                            ...
-                            if (any.UnpackTo(&foo)) {
-                              ...
-                            }
-                        
-                        Example 2: Pack and unpack a message in Java.
-                        
-                            Foo foo = ...;
-                            Any any = Any.pack(foo);
-                            ...
-                            if (any.is(Foo.class)) {
-                              foo = any.unpack(Foo.class);
-                            }
-                        
-                         Example 3: Pack and unpack a message in Python.
-                        
-                            foo = Foo(...)
-                            any = Any()
-                            any.Pack(foo)
-                            ...
-                            if any.Is(Foo.DESCRIPTOR):
-                              any.Unpack(foo)
-                              ...
-                        
-                         Example 4: Pack and unpack a message in Go
-                        
-                             foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
-                             ...
-                             foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
-                               ...
-                             }
-                        
-                        The pack methods provided by protobuf library will by default use
-                        'type.googleapis.com/full.type.name' as the type URL and the unpack
-                        methods only use the fully qualified type name after the last '/'
-                        in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                        name "y.z".
-                        
-                        
-                        JSON
-                        ====
-                        The JSON representation of an `Any` value uses the regular
-                        representation of the deserialized, embedded message, with an
-                        additional field `@type` which contains the type URL. Example:
-                        
-                            package google.profile;
-                            message Person {
-                              string first_name = 1;
-                              string last_name = 2;
-                            }
-                        
-                            {
-                              "@type": "type.googleapis.com/google.profile.Person",
-                              "firstName": <string>,
-                              "lastName": <string>
-                            }
-                        
-                        If the embedded message type is well-known and has a custom JSON
-                        representation, that representation will be embedded adding a field
-                        `value` which holds the custom JSON in addition to the `@type`
-                        field. Example (for message [google.protobuf.Duration][]):
-                        
-                            {
-                              "@type": "type.googleapis.com/google.protobuf.Duration",
-                              "value": "1.212s"
-                            } */
-                        consensus_pubkey: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                        /** jailed defined whether the validator has been jailed from bonded status or not. */
-                        jailed: boolean
-                        /** status is the validator status (bonded/unbonding/unbonded). */
-                        status: string
-                        /** tokens define the delegated tokens (incl. self-delegation). */
-                        tokens: string
-                        /** delegator_shares defines total shares issued to a validator's delegators. */
-                        delegator_shares: string
-                        /** description defines the description terms for the validator. */
-                        description: {
-                            /** moniker defines a human-readable name for the validator. */
-                            moniker: string
-                            /** identity defines an optional identity signature (ex. UPort or Keybase). */
-                            identity: string
-                            /** website defines an optional website link. */
-                            website: string
-                            /** security_contact defines an optional email for security contact. */
-                            security_contact: string
-                            /** details define other optional details. */
-                            details: string
-                        }
-                        /** unbonding_height defines, if unbonding, the height at which this validator has begun unbonding. */
-                        unbonding_height: string
-                        /** unbonding_time defines, if unbonding, the min time for the validator to complete unbonding. */
-                        unbonding_time: string
-                        /** commission defines the commission parameters. */
-                        commission: {
-                            /** commission_rates defines the initial commission rates to be used for creating a validator. */
-                            commission_rates: {
-                                /** rate is the commission rate charged to delegators, as a fraction. */
-                                rate: string
-                                /** max_rate defines the maximum commission rate which validator can ever charge, as a fraction. */
-                                max_rate: string
-                                /** max_change_rate defines the maximum daily increase of the validator commission, as a fraction. */
-                                max_change_rate: string
-                            }
-                            /** update_time is the last time the commission rate was changed. */
-                            update_time: string
-                        }
-                        /** min_self_delegation is the validator's self declared minimum self delegation. */
-                        min_self_delegation: string
-                    }
-                }
-                evmos: /** QueryDelegatorValidatorResponse response type for the
+                default: /** QueryDelegatorValidatorResponse response type for the
 Query/DelegatorValidator RPC method. */
                 {
                     /** Validator defines a validator, together with the total amount of the
@@ -11805,17 +8365,7 @@ Query/DelegatorValidator RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -11834,205 +8384,26 @@ Query/DelegatorValidator RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/historical_info/{height}' */
-            axelar: `/cosmos/staking/v1beta1/historical_info/${number}`
-            /** '/cosmos/staking/v1beta1/historical_info/{height}' */
-            evmos: `/cosmos/staking/v1beta1/historical_info/${number}`
+            default: `/cosmos/staking/v1beta1/historical_info/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    /** height defines at which height to query the historical info. */
-                    height: number
-                }
-                evmos: {
+                default: {
                     /** height defines at which height to query the historical info. */
                     height: number
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryHistoricalInfoResponse is response type for the Query/HistoricalInfo RPC
-method. */
-                {
-                    /** hist defines the historical info at the given height. */
-                    hist: {
-                        /** Header defines the structure of a Tendermint block header. */
-                        header: {
-                            /** basic block info */
-                            version: {
-                                block: string
-                                app: string
-                            }
-                            chain_id: string
-                            height: string
-                            time: string
-                            /** prev block info */
-                            last_block_id: {
-                                hash: string
-                                /** PartsetHeader */
-                                part_set_header: {
-                                    total: number
-                                    hash: string
-                                }
-                            }
-                            /** hashes of block data */
-                            last_commit_hash: string
-                            data_hash: string
-                            /** hashes from the app output from the prev block */
-                            validators_hash: string
-                            next_validators_hash: string
-                            consensus_hash: string
-                            app_hash: string
-                            last_results_hash: string
-                            /** consensus info */
-                            evidence_hash: string
-                            proposer_address: string
-                        }
-                        valset: Array<{
-                            /** operator_address defines the address of the validator's operator; bech encoded in JSON. */
-                            operator_address: string
-                            /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                            URL that describes the type of the serialized message.
-                            
-                            Protobuf library provides support to pack/unpack Any values in the form
-                            of utility functions or additional generated methods of the Any type.
-                            
-                            Example 1: Pack and unpack a message in C++.
-                            
-                                Foo foo = ...;
-                                Any any;
-                                any.PackFrom(foo);
-                                ...
-                                if (any.UnpackTo(&foo)) {
-                                  ...
-                                }
-                            
-                            Example 2: Pack and unpack a message in Java.
-                            
-                                Foo foo = ...;
-                                Any any = Any.pack(foo);
-                                ...
-                                if (any.is(Foo.class)) {
-                                  foo = any.unpack(Foo.class);
-                                }
-                            
-                             Example 3: Pack and unpack a message in Python.
-                            
-                                foo = Foo(...)
-                                any = Any()
-                                any.Pack(foo)
-                                ...
-                                if any.Is(Foo.DESCRIPTOR):
-                                  any.Unpack(foo)
-                                  ...
-                            
-                             Example 4: Pack and unpack a message in Go
-                            
-                                 foo := &pb.Foo{...}
-                                 any, err := anypb.New(foo)
-                                 if err != nil {
-                                   ...
-                                 }
-                                 ...
-                                 foo := &pb.Foo{}
-                                 if err := any.UnmarshalTo(foo); err != nil {
-                                   ...
-                                 }
-                            
-                            The pack methods provided by protobuf library will by default use
-                            'type.googleapis.com/full.type.name' as the type URL and the unpack
-                            methods only use the fully qualified type name after the last '/'
-                            in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                            name "y.z".
-                            
-                            
-                            JSON
-                            ====
-                            The JSON representation of an `Any` value uses the regular
-                            representation of the deserialized, embedded message, with an
-                            additional field `@type` which contains the type URL. Example:
-                            
-                                package google.profile;
-                                message Person {
-                                  string first_name = 1;
-                                  string last_name = 2;
-                                }
-                            
-                                {
-                                  "@type": "type.googleapis.com/google.profile.Person",
-                                  "firstName": <string>,
-                                  "lastName": <string>
-                                }
-                            
-                            If the embedded message type is well-known and has a custom JSON
-                            representation, that representation will be embedded adding a field
-                            `value` which holds the custom JSON in addition to the `@type`
-                            field. Example (for message [google.protobuf.Duration][]):
-                            
-                                {
-                                  "@type": "type.googleapis.com/google.protobuf.Duration",
-                                  "value": "1.212s"
-                                } */
-                            consensus_pubkey: {
-                                type_url: string
-                                /** Must be a valid serialized protocol buffer of the above specified type. */
-                                value: string
-                            }
-                            /** jailed defined whether the validator has been jailed from bonded status or not. */
-                            jailed: boolean
-                            /** status is the validator status (bonded/unbonding/unbonded). */
-                            status: string
-                            /** tokens define the delegated tokens (incl. self-delegation). */
-                            tokens: string
-                            /** delegator_shares defines total shares issued to a validator's delegators. */
-                            delegator_shares: string
-                            /** description defines the description terms for the validator. */
-                            description: {
-                                /** moniker defines a human-readable name for the validator. */
-                                moniker: string
-                                /** identity defines an optional identity signature (ex. UPort or Keybase). */
-                                identity: string
-                                /** website defines an optional website link. */
-                                website: string
-                                /** security_contact defines an optional email for security contact. */
-                                security_contact: string
-                                /** details define other optional details. */
-                                details: string
-                            }
-                            /** unbonding_height defines, if unbonding, the height at which this validator has begun unbonding. */
-                            unbonding_height: string
-                            /** unbonding_time defines, if unbonding, the min time for the validator to complete unbonding. */
-                            unbonding_time: string
-                            /** commission defines the commission parameters. */
-                            commission: {
-                                /** commission_rates defines the initial commission rates to be used for creating a validator. */
-                                commission_rates: {
-                                    /** rate is the commission rate charged to delegators, as a fraction. */
-                                    rate: string
-                                    /** max_rate defines the maximum commission rate which validator can ever charge, as a fraction. */
-                                    max_rate: string
-                                    /** max_change_rate defines the maximum daily increase of the validator commission, as a fraction. */
-                                    max_change_rate: string
-                                }
-                                /** update_time is the last time the commission rate was changed. */
-                                update_time: string
-                            }
-                            /** min_self_delegation is the validator's self declared minimum self delegation. */
-                            min_self_delegation: string
-                        }>
-                    }
-                }
-                evmos: /** QueryHistoricalInfoResponse is response type for the Query/HistoricalInfo RPC
+                default: /** QueryHistoricalInfoResponse is response type for the Query/HistoricalInfo RPC
 method. */
                 {
                     /** hist defines the historical info at the given height. */
@@ -12205,17 +8576,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -12234,44 +8595,23 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/params' */
-            axelar: `/cosmos/staking/v1beta1/params`
-            /** '/cosmos/staking/v1beta1/params' */
-            evmos: `/cosmos/staking/v1beta1/params`
+            default: `/cosmos/staking/v1beta1/params`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryParamsResponse is response type for the Query/Params RPC method. */
-                {
-                    /** params holds all the parameters of this module. */
-                    params: {
-                        /** unbonding_time is the time duration of unbonding. */
-                        unbonding_time: string
-                        /** max_validators is the maximum number of validators. */
-                        max_validators: number
-                        /** max_entries is the max entries for either unbonding delegation or redelegation (per pair/trio). */
-                        max_entries: number
-                        /** historical_entries is the number of historical entries to persist. */
-                        historical_entries: number
-                        /** bond_denom defines the bondable coin denomination. */
-                        bond_denom: string
-                    }
-                }
-                evmos: /** QueryParamsResponse is response type for the Query/Params RPC method. */
+                default: /** QueryParamsResponse is response type for the Query/Params RPC method. */
                 {
                     /** params holds all the parameters of this module. */
                     params: {
@@ -12289,17 +8629,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -12318,30 +8648,34 @@ method. */
         method: 'get'
         endpoint: {
             /** '/kyve/query/v1beta1/pool/{id}' */
-            kyve: `/kyve/query/v1beta1/pool/${number}`
-            /** '/cosmos/staking/v1beta1/pool' */
-            evmos: `/cosmos/staking/v1beta1/pool`
+            default: `/kyve/query/v1beta1/pool/${number}`
         }
         params: {
             path: {
+                evmos: undefined
                 kyve: {
                     /** id defines the unique ID of the pool. */
                     id: number
                 }
-                evmos: undefined
             }
 
             query: {
-                kyve: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                kyve: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
+                evmos: /** QueryPoolResponse is response type for the Query/Pool RPC method. */
+                {
+                    /** pool defines the pool info. */
+                    pool: {
+                        not_bonded_tokens: string
+                        bonded_tokens: string
+                    }
+                }
                 kyve: /** QueryPoolResponse is the response type for the Query/Pool RPC method. */
                 {
                     /** pool ... */
@@ -12451,27 +8785,9 @@ method. */
                         status: string
                     }
                 }
-                evmos: /** QueryPoolResponse is response type for the Query/Pool RPC method. */
-                {
-                    /** pool defines the pool info. */
-                    pool: {
-                        not_bonded_tokens: string
-                        bonded_tokens: string
-                    }
-                }
             }
             error: {
-                kyve: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -12490,42 +8806,15 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/validators' */
-            axelar: `/cosmos/staking/v1beta1/validators`
-            /** '/cosmos/staking/v1beta1/validators' */
-            evmos: `/cosmos/staking/v1beta1/validators`
+            default: `/cosmos/staking/v1beta1/validators`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** status enables to query for validators matching a given status. */
-                    status: string
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** status enables to query for validators matching a given status. */
                     status: string
                     /** key is a value returned in PageResponse.next_key to begin
@@ -12551,158 +8840,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryValidatorsResponse is response type for the Query/Validators RPC method */
-                {
-                    /** validators contains all the queried validators. */
-                    validators: Array<{
-                        /** operator_address defines the address of the validator's operator; bech encoded in JSON. */
-                        operator_address: string
-                        /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                        URL that describes the type of the serialized message.
-                        
-                        Protobuf library provides support to pack/unpack Any values in the form
-                        of utility functions or additional generated methods of the Any type.
-                        
-                        Example 1: Pack and unpack a message in C++.
-                        
-                            Foo foo = ...;
-                            Any any;
-                            any.PackFrom(foo);
-                            ...
-                            if (any.UnpackTo(&foo)) {
-                              ...
-                            }
-                        
-                        Example 2: Pack and unpack a message in Java.
-                        
-                            Foo foo = ...;
-                            Any any = Any.pack(foo);
-                            ...
-                            if (any.is(Foo.class)) {
-                              foo = any.unpack(Foo.class);
-                            }
-                        
-                         Example 3: Pack and unpack a message in Python.
-                        
-                            foo = Foo(...)
-                            any = Any()
-                            any.Pack(foo)
-                            ...
-                            if any.Is(Foo.DESCRIPTOR):
-                              any.Unpack(foo)
-                              ...
-                        
-                         Example 4: Pack and unpack a message in Go
-                        
-                             foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
-                             ...
-                             foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
-                               ...
-                             }
-                        
-                        The pack methods provided by protobuf library will by default use
-                        'type.googleapis.com/full.type.name' as the type URL and the unpack
-                        methods only use the fully qualified type name after the last '/'
-                        in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                        name "y.z".
-                        
-                        
-                        JSON
-                        ====
-                        The JSON representation of an `Any` value uses the regular
-                        representation of the deserialized, embedded message, with an
-                        additional field `@type` which contains the type URL. Example:
-                        
-                            package google.profile;
-                            message Person {
-                              string first_name = 1;
-                              string last_name = 2;
-                            }
-                        
-                            {
-                              "@type": "type.googleapis.com/google.profile.Person",
-                              "firstName": <string>,
-                              "lastName": <string>
-                            }
-                        
-                        If the embedded message type is well-known and has a custom JSON
-                        representation, that representation will be embedded adding a field
-                        `value` which holds the custom JSON in addition to the `@type`
-                        field. Example (for message [google.protobuf.Duration][]):
-                        
-                            {
-                              "@type": "type.googleapis.com/google.protobuf.Duration",
-                              "value": "1.212s"
-                            } */
-                        consensus_pubkey: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                        /** jailed defined whether the validator has been jailed from bonded status or not. */
-                        jailed: boolean
-                        /** status is the validator status (bonded/unbonding/unbonded). */
-                        status: string
-                        /** tokens define the delegated tokens (incl. self-delegation). */
-                        tokens: string
-                        /** delegator_shares defines total shares issued to a validator's delegators. */
-                        delegator_shares: string
-                        /** description defines the description terms for the validator. */
-                        description: {
-                            /** moniker defines a human-readable name for the validator. */
-                            moniker: string
-                            /** identity defines an optional identity signature (ex. UPort or Keybase). */
-                            identity: string
-                            /** website defines an optional website link. */
-                            website: string
-                            /** security_contact defines an optional email for security contact. */
-                            security_contact: string
-                            /** details define other optional details. */
-                            details: string
-                        }
-                        /** unbonding_height defines, if unbonding, the height at which this validator has begun unbonding. */
-                        unbonding_height: string
-                        /** unbonding_time defines, if unbonding, the min time for the validator to complete unbonding. */
-                        unbonding_time: string
-                        /** commission defines the commission parameters. */
-                        commission: {
-                            /** commission_rates defines the initial commission rates to be used for creating a validator. */
-                            commission_rates: {
-                                /** rate is the commission rate charged to delegators, as a fraction. */
-                                rate: string
-                                /** max_rate defines the maximum commission rate which validator can ever charge, as a fraction. */
-                                max_rate: string
-                                /** max_change_rate defines the maximum daily increase of the validator commission, as a fraction. */
-                                max_change_rate: string
-                            }
-                            /** update_time is the last time the commission rate was changed. */
-                            update_time: string
-                        }
-                        /** min_self_delegation is the validator's self declared minimum self delegation. */
-                        min_self_delegation: string
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryValidatorsResponse is response type for the Query/Validators RPC method */
+                default: /** QueryValidatorsResponse is response type for the Query/Validators RPC method */
                 {
                     /** validators contains all the queried validators. */
                     validators: Array<{
@@ -12849,17 +8992,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -12878,177 +9011,26 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/validators/{validator_addr}' */
-            axelar: `/cosmos/staking/v1beta1/validators/${string}`
-            /** '/cosmos/staking/v1beta1/validators/{validator_addr}' */
-            evmos: `/cosmos/staking/v1beta1/validators/${string}`
+            default: `/cosmos/staking/v1beta1/validators/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** validator_addr defines the validator address to query for. */
-                    validator_addr: string
-                }
-                evmos: {
+                default: {
                     /** validator_addr defines the validator address to query for. */
                     validator_addr: string
                 }
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryValidatorResponse is response type for the Query/Validator RPC method */
-                {
-                    /** Validator defines a validator, together with the total amount of the
-                    Validator's bond shares and their exchange rate to coins. Slashing results in
-                    a decrease in the exchange rate, allowing correct calculation of future
-                    undelegations without iterating over delegators. When coins are delegated to
-                    this validator, the validator is credited with a delegation whose number of
-                    bond shares is based on the amount of coins delegated divided by the current
-                    exchange rate. Voting power can be calculated as total bonded shares
-                    multiplied by exchange rate. */
-                    validator: {
-                        /** operator_address defines the address of the validator's operator; bech encoded in JSON. */
-                        operator_address: string
-                        /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                        URL that describes the type of the serialized message.
-                        
-                        Protobuf library provides support to pack/unpack Any values in the form
-                        of utility functions or additional generated methods of the Any type.
-                        
-                        Example 1: Pack and unpack a message in C++.
-                        
-                            Foo foo = ...;
-                            Any any;
-                            any.PackFrom(foo);
-                            ...
-                            if (any.UnpackTo(&foo)) {
-                              ...
-                            }
-                        
-                        Example 2: Pack and unpack a message in Java.
-                        
-                            Foo foo = ...;
-                            Any any = Any.pack(foo);
-                            ...
-                            if (any.is(Foo.class)) {
-                              foo = any.unpack(Foo.class);
-                            }
-                        
-                         Example 3: Pack and unpack a message in Python.
-                        
-                            foo = Foo(...)
-                            any = Any()
-                            any.Pack(foo)
-                            ...
-                            if any.Is(Foo.DESCRIPTOR):
-                              any.Unpack(foo)
-                              ...
-                        
-                         Example 4: Pack and unpack a message in Go
-                        
-                             foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
-                             ...
-                             foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
-                               ...
-                             }
-                        
-                        The pack methods provided by protobuf library will by default use
-                        'type.googleapis.com/full.type.name' as the type URL and the unpack
-                        methods only use the fully qualified type name after the last '/'
-                        in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                        name "y.z".
-                        
-                        
-                        JSON
-                        ====
-                        The JSON representation of an `Any` value uses the regular
-                        representation of the deserialized, embedded message, with an
-                        additional field `@type` which contains the type URL. Example:
-                        
-                            package google.profile;
-                            message Person {
-                              string first_name = 1;
-                              string last_name = 2;
-                            }
-                        
-                            {
-                              "@type": "type.googleapis.com/google.profile.Person",
-                              "firstName": <string>,
-                              "lastName": <string>
-                            }
-                        
-                        If the embedded message type is well-known and has a custom JSON
-                        representation, that representation will be embedded adding a field
-                        `value` which holds the custom JSON in addition to the `@type`
-                        field. Example (for message [google.protobuf.Duration][]):
-                        
-                            {
-                              "@type": "type.googleapis.com/google.protobuf.Duration",
-                              "value": "1.212s"
-                            } */
-                        consensus_pubkey: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                        /** jailed defined whether the validator has been jailed from bonded status or not. */
-                        jailed: boolean
-                        /** status is the validator status (bonded/unbonding/unbonded). */
-                        status: string
-                        /** tokens define the delegated tokens (incl. self-delegation). */
-                        tokens: string
-                        /** delegator_shares defines total shares issued to a validator's delegators. */
-                        delegator_shares: string
-                        /** description defines the description terms for the validator. */
-                        description: {
-                            /** moniker defines a human-readable name for the validator. */
-                            moniker: string
-                            /** identity defines an optional identity signature (ex. UPort or Keybase). */
-                            identity: string
-                            /** website defines an optional website link. */
-                            website: string
-                            /** security_contact defines an optional email for security contact. */
-                            security_contact: string
-                            /** details define other optional details. */
-                            details: string
-                        }
-                        /** unbonding_height defines, if unbonding, the height at which this validator has begun unbonding. */
-                        unbonding_height: string
-                        /** unbonding_time defines, if unbonding, the min time for the validator to complete unbonding. */
-                        unbonding_time: string
-                        /** commission defines the commission parameters. */
-                        commission: {
-                            /** commission_rates defines the initial commission rates to be used for creating a validator. */
-                            commission_rates: {
-                                /** rate is the commission rate charged to delegators, as a fraction. */
-                                rate: string
-                                /** max_rate defines the maximum commission rate which validator can ever charge, as a fraction. */
-                                max_rate: string
-                                /** max_change_rate defines the maximum daily increase of the validator commission, as a fraction. */
-                                max_change_rate: string
-                            }
-                            /** update_time is the last time the commission rate was changed. */
-                            update_time: string
-                        }
-                        /** min_self_delegation is the validator's self declared minimum self delegation. */
-                        min_self_delegation: string
-                    }
-                }
-                evmos: /** QueryValidatorResponse is response type for the Query/Validator RPC method */
+                default: /** QueryValidatorResponse is response type for the Query/Validator RPC method */
                 {
                     /** Validator defines a validator, together with the total amount of the
                     Validator's bond shares and their exchange rate to coins. Slashing results in
@@ -13193,17 +9175,7 @@ method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -13222,46 +9194,18 @@ method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations' */
-            axelar: `/cosmos/staking/v1beta1/validators/${string}/delegations`
-            /** '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations' */
-            evmos: `/cosmos/staking/v1beta1/validators/${string}/delegations`
+            default: `/cosmos/staking/v1beta1/validators/${string}/delegations`
         }
         params: {
             path: {
-                axelar: {
-                    /** validator_addr defines the validator address to query for. */
-                    validator_addr: string
-                }
-                evmos: {
+                default: {
                     /** validator_addr defines the validator address to query for. */
                     validator_addr: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -13285,47 +9229,12 @@ method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryValidatorDelegationsResponse is response type for the
-Query/ValidatorDelegations RPC method */
-                {
-                    delegation_responses: Array<{
-                        /** Delegation represents the bond with tokens held by an account. It is
-                        owned by one delegator, and is associated with the voting power of one
-                        validator. */
-                        delegation: {
-                            /** delegator_address is the bech32-encoded address of the delegator. */
-                            delegator_address: string
-                            /** validator_address is the bech32-encoded address of the validator. */
-                            validator_address: string
-                            /** shares define the delegation shares received. */
-                            shares: string
-                        }
-                        /** Coin defines a token with a denomination and an amount.
-                        
-                        NOTE: The amount field is an Int which implements the custom method
-                        signatures required by gogoproto. */
-                        balance: {
-                            denom: string
-                            amount: string
-                        }
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryValidatorDelegationsResponse is response type for the
+                default: /** QueryValidatorDelegationsResponse is response type for the
 Query/ValidatorDelegations RPC method */
                 {
                     delegation_responses: Array<{
@@ -13361,17 +9270,7 @@ Query/ValidatorDelegations RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -13390,19 +9289,11 @@ Query/ValidatorDelegations RPC method */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}' */
-            axelar: `/cosmos/staking/v1beta1/validators/${string}/delegations/${string}`
-            /** '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}' */
-            evmos: `/cosmos/staking/v1beta1/validators/${string}/delegations/${string}`
+            default: `/cosmos/staking/v1beta1/validators/${string}/delegations/${string}`
         }
         params: {
             path: {
-                axelar: {
-                    /** validator_addr defines the validator address to query for. */
-                    validator_addr: string
-                    /** delegator_addr defines the delegator address to query for. */
-                    delegator_addr: string
-                }
-                evmos: {
+                default: {
                     /** validator_addr defines the validator address to query for. */
                     validator_addr: string
                     /** delegator_addr defines the delegator address to query for. */
@@ -13411,43 +9302,15 @@ Query/ValidatorDelegations RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDelegationResponse is response type for the Query/Delegation RPC method. */
-                {
-                    /** DelegationResponse is equivalent to Delegation except that it contains a
-                    balance in addition to shares which is more suitable for client responses. */
-                    delegation_response: {
-                        /** Delegation represents the bond with tokens held by an account. It is
-                        owned by one delegator, and is associated with the voting power of one
-                        validator. */
-                        delegation: {
-                            /** delegator_address is the bech32-encoded address of the delegator. */
-                            delegator_address: string
-                            /** validator_address is the bech32-encoded address of the validator. */
-                            validator_address: string
-                            /** shares define the delegation shares received. */
-                            shares: string
-                        }
-                        /** Coin defines a token with a denomination and an amount.
-                        
-                        NOTE: The amount field is an Int which implements the custom method
-                        signatures required by gogoproto. */
-                        balance: {
-                            denom: string
-                            amount: string
-                        }
-                    }
-                }
-                evmos: /** QueryDelegationResponse is response type for the Query/Delegation RPC method. */
+                default: /** QueryDelegationResponse is response type for the Query/Delegation RPC method. */
                 {
                     /** DelegationResponse is equivalent to Delegation except that it contains a
                     balance in addition to shares which is more suitable for client responses. */
@@ -13475,17 +9338,7 @@ Query/ValidatorDelegations RPC method */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -13505,19 +9358,11 @@ Query/ValidatorDelegations RPC method */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation' */
-            axelar: `/cosmos/staking/v1beta1/validators/${string}/delegations/${string}/unbonding_delegation`
-            /** '/cosmos/staking/v1beta1/validators/{validator_addr}/delegations/{delegator_addr}/unbonding_delegation' */
-            evmos: `/cosmos/staking/v1beta1/validators/${string}/delegations/${string}/unbonding_delegation`
+            default: `/cosmos/staking/v1beta1/validators/${string}/delegations/${string}/unbonding_delegation`
         }
         params: {
             path: {
-                axelar: {
-                    /** validator_addr defines the validator address to query for. */
-                    validator_addr: string
-                    /** delegator_addr defines the delegator address to query for. */
-                    delegator_addr: string
-                }
-                evmos: {
+                default: {
                     /** validator_addr defines the validator address to query for. */
                     validator_addr: string
                     /** delegator_addr defines the delegator address to query for. */
@@ -13526,40 +9371,15 @@ Query/ValidatorDelegations RPC method */
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryDelegationResponse is response type for the Query/UnbondingDelegation
-RPC method. */
-                {
-                    /** UnbondingDelegation stores all of a single delegator's unbonding bonds
-                    for a single validator in an time-ordered list. */
-                    unbond: {
-                        /** delegator_address is the bech32-encoded address of the delegator. */
-                        delegator_address: string
-                        /** validator_address is the bech32-encoded address of the validator. */
-                        validator_address: string
-                        /** entries are the unbonding delegation entries. */
-                        entries: Array<{
-                            /** creation_height is the height which the unbonding took place. */
-                            creation_height: string
-                            /** completion_time is the unix time for unbonding completion. */
-                            completion_time: string
-                            /** initial_balance defines the tokens initially scheduled to receive at completion. */
-                            initial_balance: string
-                            /** balance defines the tokens to receive at completion. */
-                            balance: string
-                        }>
-                    }
-                }
-                evmos: /** QueryDelegationResponse is response type for the Query/UnbondingDelegation
+                default: /** QueryDelegationResponse is response type for the Query/UnbondingDelegation
 RPC method. */
                 {
                     /** UnbondingDelegation stores all of a single delegator's unbonding bonds
@@ -13584,17 +9404,7 @@ RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -13613,46 +9423,18 @@ RPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations' */
-            axelar: `/cosmos/staking/v1beta1/validators/${string}/unbonding_delegations`
-            /** '/cosmos/staking/v1beta1/validators/{validator_addr}/unbonding_delegations' */
-            evmos: `/cosmos/staking/v1beta1/validators/${string}/unbonding_delegations`
+            default: `/cosmos/staking/v1beta1/validators/${string}/unbonding_delegations`
         }
         params: {
             path: {
-                axelar: {
-                    /** validator_addr defines the validator address to query for. */
-                    validator_addr: string
-                }
-                evmos: {
+                default: {
                     /** validator_addr defines the validator address to query for. */
                     validator_addr: string
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -13676,43 +9458,12 @@ RPC method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryValidatorUnbondingDelegationsResponse is response type for the
-Query/ValidatorUnbondingDelegations RPC method. */
-                {
-                    unbonding_responses: Array<{
-                        /** delegator_address is the bech32-encoded address of the delegator. */
-                        delegator_address: string
-                        /** validator_address is the bech32-encoded address of the validator. */
-                        validator_address: string
-                        /** entries are the unbonding delegation entries. */
-                        entries: Array<{
-                            /** creation_height is the height which the unbonding took place. */
-                            creation_height: string
-                            /** completion_time is the unix time for unbonding completion. */
-                            completion_time: string
-                            /** initial_balance defines the tokens initially scheduled to receive at completion. */
-                            initial_balance: string
-                            /** balance defines the tokens to receive at completion. */
-                            balance: string
-                        }>
-                    }>
-                    /** pagination defines the pagination in the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** QueryValidatorUnbondingDelegationsResponse is response type for the
+                default: /** QueryValidatorUnbondingDelegationsResponse is response type for the
 Query/ValidatorUnbondingDelegations RPC method. */
                 {
                     unbonding_responses: Array<{
@@ -13744,17 +9495,7 @@ Query/ValidatorUnbondingDelegations RPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -14009,255 +9750,22 @@ Service.SimulateRPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/base/tendermint/v1beta1/blocks/latest' */
-            axelar: `/cosmos/base/tendermint/v1beta1/blocks/latest`
-            /** '/cosmos/base/tendermint/v1beta1/blocks/latest' */
-            evmos: `/cosmos/base/tendermint/v1beta1/blocks/latest`
+            default: `/cosmos/base/tendermint/v1beta1/blocks/latest`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** GetLatestBlockResponse is the response type for the Query/GetLatestBlock RPC method. */
-                {
-                    /** BlockID */
-                    block_id: {
-                        hash: string
-                        /** PartsetHeader */
-                        part_set_header: {
-                            total: number
-                            hash: string
-                        }
-                    }
-                    block: {
-                        /** Header defines the structure of a Tendermint block header. */
-                        header: {
-                            /** basic block info */
-                            version: {
-                                block: string
-                                app: string
-                            }
-                            chain_id: string
-                            height: string
-                            time: string
-                            /** BlockID */
-                            last_block_id: {
-                                hash: string
-                                /** PartsetHeader */
-                                part_set_header: {
-                                    total: number
-                                    hash: string
-                                }
-                            }
-                            /** hashes of block data */
-                            last_commit_hash: string
-                            data_hash: string
-                            /** hashes from the app output from the prev block */
-                            validators_hash: string
-                            next_validators_hash: string
-                            consensus_hash: string
-                            app_hash: string
-                            last_results_hash: string
-                            /** consensus info */
-                            evidence_hash: string
-                            proposer_address: string
-                        }
-                        /** Data contains the set of transactions included in the block */
-                        data: {
-                            /** Txs that will be applied by state @ block.Height+1.
-                            NOTE: not all txs here are valid.  We're just agreeing on the order first.
-                            This means that block.AppHash does not include these txs. */
-                            txs: Array<string>
-                        }
-                        evidence: {
-                            evidence: Array<{
-                                /** DuplicateVoteEvidence contains evidence of a validator signed two conflicting votes. */
-                                duplicate_vote_evidence: {
-                                    /** Vote represents a prevote, precommit, or commit vote from validators for
-                                    consensus. */
-                                    vote_a: {
-                                        /** SignedMsgType is a type of signed message in the consensus.
-                                        
-                                         - SIGNED_MSG_TYPE_PREVOTE: Votes
-                                         - SIGNED_MSG_TYPE_PROPOSAL: Proposals */
-                                        type: string
-                                        height: string
-                                        round: number
-                                        /** BlockID */
-                                        block_id: {
-                                            hash: string
-                                            /** PartsetHeader */
-                                            part_set_header: {
-                                                total: number
-                                                hash: string
-                                            }
-                                        }
-                                        timestamp: string
-                                        validator_address: string
-                                        validator_index: number
-                                        signature: string
-                                    }
-                                    /** Vote represents a prevote, precommit, or commit vote from validators for
-                                    consensus. */
-                                    vote_b: {
-                                        /** SignedMsgType is a type of signed message in the consensus.
-                                        
-                                         - SIGNED_MSG_TYPE_PREVOTE: Votes
-                                         - SIGNED_MSG_TYPE_PROPOSAL: Proposals */
-                                        type: string
-                                        height: string
-                                        round: number
-                                        /** BlockID */
-                                        block_id: {
-                                            hash: string
-                                            /** PartsetHeader */
-                                            part_set_header: {
-                                                total: number
-                                                hash: string
-                                            }
-                                        }
-                                        timestamp: string
-                                        validator_address: string
-                                        validator_index: number
-                                        signature: string
-                                    }
-                                    total_voting_power: string
-                                    validator_power: string
-                                    timestamp: string
-                                }
-                                /** LightClientAttackEvidence contains evidence of a set of validators attempting to mislead a light client. */
-                                light_client_attack_evidence: {
-                                    conflicting_block: {
-                                        signed_header: {
-                                            /** Header defines the structure of a Tendermint block header. */
-                                            header: {
-                                                /** basic block info */
-                                                version: {
-                                                    block: string
-                                                    app: string
-                                                }
-                                                chain_id: string
-                                                height: string
-                                                time: string
-                                                /** BlockID */
-                                                last_block_id: {
-                                                    hash: string
-                                                    /** PartsetHeader */
-                                                    part_set_header: {
-                                                        total: number
-                                                        hash: string
-                                                    }
-                                                }
-                                                /** hashes of block data */
-                                                last_commit_hash: string
-                                                data_hash: string
-                                                /** hashes from the app output from the prev block */
-                                                validators_hash: string
-                                                next_validators_hash: string
-                                                consensus_hash: string
-                                                app_hash: string
-                                                last_results_hash: string
-                                                /** consensus info */
-                                                evidence_hash: string
-                                                proposer_address: string
-                                            }
-                                            /** Commit contains the evidence that a block was committed by a set of validators. */
-                                            commit: {
-                                                height: string
-                                                round: number
-                                                /** BlockID */
-                                                block_id: {
-                                                    hash: string
-                                                    /** PartsetHeader */
-                                                    part_set_header: {
-                                                        total: number
-                                                        hash: string
-                                                    }
-                                                }
-                                                signatures: Array<{
-                                                    /** BlockIdFlag indicates which BlcokID the signature is for */
-                                                    block_id_flag: string
-                                                    validator_address: string
-                                                    timestamp: string
-                                                    signature: string
-                                                }>
-                                            }
-                                        }
-                                        validator_set: {
-                                            validators: Array<{
-                                                address: string
-                                                /** PublicKey defines the keys available for use with Tendermint Validators */
-                                                pub_key: {
-                                                    ed25519: string
-                                                    secp256k1: string
-                                                }
-                                                voting_power: string
-                                                proposer_priority: string
-                                            }>
-                                            proposer: {
-                                                address: string
-                                                /** PublicKey defines the keys available for use with Tendermint Validators */
-                                                pub_key: {
-                                                    ed25519: string
-                                                    secp256k1: string
-                                                }
-                                                voting_power: string
-                                                proposer_priority: string
-                                            }
-                                            total_voting_power: string
-                                        }
-                                    }
-                                    common_height: string
-                                    byzantine_validators: Array<{
-                                        address: string
-                                        /** PublicKey defines the keys available for use with Tendermint Validators */
-                                        pub_key: {
-                                            ed25519: string
-                                            secp256k1: string
-                                        }
-                                        voting_power: string
-                                        proposer_priority: string
-                                    }>
-                                    total_voting_power: string
-                                    timestamp: string
-                                }
-                            }>
-                        }
-                        /** Commit contains the evidence that a block was committed by a set of validators. */
-                        last_commit: {
-                            height: string
-                            round: number
-                            /** BlockID */
-                            block_id: {
-                                hash: string
-                                /** PartsetHeader */
-                                part_set_header: {
-                                    total: number
-                                    hash: string
-                                }
-                            }
-                            signatures: Array<{
-                                /** BlockIdFlag indicates which BlcokID the signature is for */
-                                block_id_flag: string
-                                validator_address: string
-                                timestamp: string
-                                signature: string
-                            }>
-                        }
-                    }
-                }
                 evmos: /** GetLatestBlockResponse is the response type for the Query/GetLatestBlock RPC method. */
                 {
                     /** BlockID */
@@ -14490,63 +9998,7 @@ Service.SimulateRPC method. */
                         }
                     }
                 }
-            }
-            error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-            }
-        }
-    }
-
-    /** GetBlockByHeight queries block for given height. */
-    GetBlockByHeight: {
-        method: 'get'
-        endpoint: {
-            /** '/cosmos/base/tendermint/v1beta1/blocks/{height}' */
-            axelar: `/cosmos/base/tendermint/v1beta1/blocks/${number}`
-            /** '/cosmos/base/tendermint/v1beta1/blocks/{height}' */
-            evmos: `/cosmos/base/tendermint/v1beta1/blocks/${number}`
-        }
-        params: {
-            path: {
-                axelar: {
-                    height: number
-                }
-                evmos: {
-                    height: number
-                }
-            }
-
-            query: {
-                axelar: undefined
-                evmos: undefined
-            }
-            body: {
-                axelar: undefined
-                evmos: undefined
-            }
-        }
-        response: {
-            success: {
-                axelar: /** GetBlockByHeightResponse is the response type for the Query/GetBlockByHeight RPC method. */
+                axelar: /** GetLatestBlockResponse is the response type for the Query/GetLatestBlock RPC method. */
                 {
                     /** BlockID */
                     block_id: {
@@ -14774,6 +10226,45 @@ Service.SimulateRPC method. */
                         }
                     }
                 }
+            }
+            error: {
+                default: {
+                    error: string
+                    code: number
+                    message: string
+                    details: Array<{
+                        type_url: string
+                        /** Must be a valid serialized protocol buffer of the above specified type. */
+                        value: string
+                    }>
+                }
+            }
+        }
+    }
+
+    /** GetBlockByHeight queries block for given height. */
+    GetBlockByHeight: {
+        method: 'get'
+        endpoint: {
+            /** '/cosmos/base/tendermint/v1beta1/blocks/{height}' */
+            default: `/cosmos/base/tendermint/v1beta1/blocks/${number}`
+        }
+        params: {
+            path: {
+                default: {
+                    height: number
+                }
+            }
+
+            query: {
+                default: undefined
+            }
+            body: {
+                default: undefined
+            }
+        }
+        response: {
+            success: {
                 evmos: /** GetBlockByHeightResponse is the response type for the Query/GetBlockByHeight RPC method. */
                 {
                     /** BlockID */
@@ -15006,19 +10497,237 @@ Service.SimulateRPC method. */
                         }
                     }
                 }
+                axelar: /** GetBlockByHeightResponse is the response type for the Query/GetBlockByHeight RPC method. */
+                {
+                    /** BlockID */
+                    block_id: {
+                        hash: string
+                        /** PartsetHeader */
+                        part_set_header: {
+                            total: number
+                            hash: string
+                        }
+                    }
+                    block: {
+                        /** Header defines the structure of a Tendermint block header. */
+                        header: {
+                            /** basic block info */
+                            version: {
+                                block: string
+                                app: string
+                            }
+                            chain_id: string
+                            height: string
+                            time: string
+                            /** BlockID */
+                            last_block_id: {
+                                hash: string
+                                /** PartsetHeader */
+                                part_set_header: {
+                                    total: number
+                                    hash: string
+                                }
+                            }
+                            /** hashes of block data */
+                            last_commit_hash: string
+                            data_hash: string
+                            /** hashes from the app output from the prev block */
+                            validators_hash: string
+                            next_validators_hash: string
+                            consensus_hash: string
+                            app_hash: string
+                            last_results_hash: string
+                            /** consensus info */
+                            evidence_hash: string
+                            proposer_address: string
+                        }
+                        /** Data contains the set of transactions included in the block */
+                        data: {
+                            /** Txs that will be applied by state @ block.Height+1.
+                            NOTE: not all txs here are valid.  We're just agreeing on the order first.
+                            This means that block.AppHash does not include these txs. */
+                            txs: Array<string>
+                        }
+                        evidence: {
+                            evidence: Array<{
+                                /** DuplicateVoteEvidence contains evidence of a validator signed two conflicting votes. */
+                                duplicate_vote_evidence: {
+                                    /** Vote represents a prevote, precommit, or commit vote from validators for
+                                    consensus. */
+                                    vote_a: {
+                                        /** SignedMsgType is a type of signed message in the consensus.
+                                        
+                                         - SIGNED_MSG_TYPE_PREVOTE: Votes
+                                         - SIGNED_MSG_TYPE_PROPOSAL: Proposals */
+                                        type: string
+                                        height: string
+                                        round: number
+                                        /** BlockID */
+                                        block_id: {
+                                            hash: string
+                                            /** PartsetHeader */
+                                            part_set_header: {
+                                                total: number
+                                                hash: string
+                                            }
+                                        }
+                                        timestamp: string
+                                        validator_address: string
+                                        validator_index: number
+                                        signature: string
+                                    }
+                                    /** Vote represents a prevote, precommit, or commit vote from validators for
+                                    consensus. */
+                                    vote_b: {
+                                        /** SignedMsgType is a type of signed message in the consensus.
+                                        
+                                         - SIGNED_MSG_TYPE_PREVOTE: Votes
+                                         - SIGNED_MSG_TYPE_PROPOSAL: Proposals */
+                                        type: string
+                                        height: string
+                                        round: number
+                                        /** BlockID */
+                                        block_id: {
+                                            hash: string
+                                            /** PartsetHeader */
+                                            part_set_header: {
+                                                total: number
+                                                hash: string
+                                            }
+                                        }
+                                        timestamp: string
+                                        validator_address: string
+                                        validator_index: number
+                                        signature: string
+                                    }
+                                    total_voting_power: string
+                                    validator_power: string
+                                    timestamp: string
+                                }
+                                /** LightClientAttackEvidence contains evidence of a set of validators attempting to mislead a light client. */
+                                light_client_attack_evidence: {
+                                    conflicting_block: {
+                                        signed_header: {
+                                            /** Header defines the structure of a Tendermint block header. */
+                                            header: {
+                                                /** basic block info */
+                                                version: {
+                                                    block: string
+                                                    app: string
+                                                }
+                                                chain_id: string
+                                                height: string
+                                                time: string
+                                                /** BlockID */
+                                                last_block_id: {
+                                                    hash: string
+                                                    /** PartsetHeader */
+                                                    part_set_header: {
+                                                        total: number
+                                                        hash: string
+                                                    }
+                                                }
+                                                /** hashes of block data */
+                                                last_commit_hash: string
+                                                data_hash: string
+                                                /** hashes from the app output from the prev block */
+                                                validators_hash: string
+                                                next_validators_hash: string
+                                                consensus_hash: string
+                                                app_hash: string
+                                                last_results_hash: string
+                                                /** consensus info */
+                                                evidence_hash: string
+                                                proposer_address: string
+                                            }
+                                            /** Commit contains the evidence that a block was committed by a set of validators. */
+                                            commit: {
+                                                height: string
+                                                round: number
+                                                /** BlockID */
+                                                block_id: {
+                                                    hash: string
+                                                    /** PartsetHeader */
+                                                    part_set_header: {
+                                                        total: number
+                                                        hash: string
+                                                    }
+                                                }
+                                                signatures: Array<{
+                                                    /** BlockIdFlag indicates which BlcokID the signature is for */
+                                                    block_id_flag: string
+                                                    validator_address: string
+                                                    timestamp: string
+                                                    signature: string
+                                                }>
+                                            }
+                                        }
+                                        validator_set: {
+                                            validators: Array<{
+                                                address: string
+                                                /** PublicKey defines the keys available for use with Tendermint Validators */
+                                                pub_key: {
+                                                    ed25519: string
+                                                    secp256k1: string
+                                                }
+                                                voting_power: string
+                                                proposer_priority: string
+                                            }>
+                                            proposer: {
+                                                address: string
+                                                /** PublicKey defines the keys available for use with Tendermint Validators */
+                                                pub_key: {
+                                                    ed25519: string
+                                                    secp256k1: string
+                                                }
+                                                voting_power: string
+                                                proposer_priority: string
+                                            }
+                                            total_voting_power: string
+                                        }
+                                    }
+                                    common_height: string
+                                    byzantine_validators: Array<{
+                                        address: string
+                                        /** PublicKey defines the keys available for use with Tendermint Validators */
+                                        pub_key: {
+                                            ed25519: string
+                                            secp256k1: string
+                                        }
+                                        voting_power: string
+                                        proposer_priority: string
+                                    }>
+                                    total_voting_power: string
+                                    timestamp: string
+                                }
+                            }>
+                        }
+                        /** Commit contains the evidence that a block was committed by a set of validators. */
+                        last_commit: {
+                            height: string
+                            round: number
+                            /** BlockID */
+                            block_id: {
+                                hash: string
+                                /** PartsetHeader */
+                                part_set_header: {
+                                    total: number
+                                    hash: string
+                                }
+                            }
+                            signatures: Array<{
+                                /** BlockIdFlag indicates which BlcokID the signature is for */
+                                block_id_flag: string
+                                validator_address: string
+                                timestamp: string
+                                signature: string
+                            }>
+                        }
+                    }
+                }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -15037,67 +10746,23 @@ Service.SimulateRPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/base/tendermint/v1beta1/node_info' */
-            axelar: `/cosmos/base/tendermint/v1beta1/node_info`
-            /** '/cosmos/base/tendermint/v1beta1/node_info' */
-            evmos: `/cosmos/base/tendermint/v1beta1/node_info`
+            default: `/cosmos/base/tendermint/v1beta1/node_info`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** GetNodeInfoResponse is the request type for the Query/GetNodeInfo RPC method. */
-                {
-                    default_node_info: {
-                        protocol_version: {
-                            p2p: string
-                            block: string
-                            app: string
-                        }
-                        default_node_id: string
-                        listen_addr: string
-                        network: string
-                        version: string
-                        channels: string
-                        moniker: string
-                        other: {
-                            tx_index: string
-                            rpc_address: string
-                        }
-                    }
-                    /** VersionInfo is the type for the GetNodeInfoResponse message. */
-                    application_version: {
-                        name: string
-                        app_name: string
-                        version: string
-                        git_commit: string
-                        build_tags: string
-                        go_version: string
-                        build_deps: Array<{
-                            /** module path */
-                            path: string
-                            /** module version */
-                            version: string
-                            /** checksum */
-                            sum: string
-                        }>
-                        /** Since: cosmos-sdk 0.43 */
-                        cosmos_sdk_version: string
-                    }
-                }
-                evmos: /** GetNodeInfoResponse is the request type for the Query/GetNodeInfo RPC method. */
+                default: /** GetNodeInfoResponse is the request type for the Query/GetNodeInfo RPC method. */
                 {
                     default_node_info: {
                         protocol_version: {
@@ -15138,17 +10803,7 @@ Service.SimulateRPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -15167,48 +10822,29 @@ Service.SimulateRPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/base/tendermint/v1beta1/syncing' */
-            axelar: `/cosmos/base/tendermint/v1beta1/syncing`
-            /** '/cosmos/base/tendermint/v1beta1/syncing' */
-            evmos: `/cosmos/base/tendermint/v1beta1/syncing`
+            default: `/cosmos/base/tendermint/v1beta1/syncing`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** GetSyncingResponse is the response type for the Query/GetSyncing RPC method. */
-                {
-                    syncing: boolean
-                }
-                evmos: /** GetSyncingResponse is the response type for the Query/GetSyncing RPC method. */
+                default: /** GetSyncingResponse is the response type for the Query/GetSyncing RPC method. */
                 {
                     syncing: boolean
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -15227,40 +10863,15 @@ Service.SimulateRPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/base/tendermint/v1beta1/validatorsets/latest' */
-            axelar: `/cosmos/base/tendermint/v1beta1/validatorsets/latest`
-            /** '/cosmos/base/tendermint/v1beta1/validatorsets/latest' */
-            evmos: `/cosmos/base/tendermint/v1beta1/validatorsets/latest`
+            default: `/cosmos/base/tendermint/v1beta1/validatorsets/latest`
         }
         params: {
             path: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -15284,118 +10895,12 @@ Service.SimulateRPC method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** GetLatestValidatorSetResponse is the response type for the Query/GetValidatorSetByHeight RPC method. */
-                {
-                    block_height: string
-                    validators: Array<{
-                        address: string
-                        /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                        URL that describes the type of the serialized message.
-                        
-                        Protobuf library provides support to pack/unpack Any values in the form
-                        of utility functions or additional generated methods of the Any type.
-                        
-                        Example 1: Pack and unpack a message in C++.
-                        
-                            Foo foo = ...;
-                            Any any;
-                            any.PackFrom(foo);
-                            ...
-                            if (any.UnpackTo(&foo)) {
-                              ...
-                            }
-                        
-                        Example 2: Pack and unpack a message in Java.
-                        
-                            Foo foo = ...;
-                            Any any = Any.pack(foo);
-                            ...
-                            if (any.is(Foo.class)) {
-                              foo = any.unpack(Foo.class);
-                            }
-                        
-                         Example 3: Pack and unpack a message in Python.
-                        
-                            foo = Foo(...)
-                            any = Any()
-                            any.Pack(foo)
-                            ...
-                            if any.Is(Foo.DESCRIPTOR):
-                              any.Unpack(foo)
-                              ...
-                        
-                         Example 4: Pack and unpack a message in Go
-                        
-                             foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
-                             ...
-                             foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
-                               ...
-                             }
-                        
-                        The pack methods provided by protobuf library will by default use
-                        'type.googleapis.com/full.type.name' as the type URL and the unpack
-                        methods only use the fully qualified type name after the last '/'
-                        in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                        name "y.z".
-                        
-                        
-                        JSON
-                        ====
-                        The JSON representation of an `Any` value uses the regular
-                        representation of the deserialized, embedded message, with an
-                        additional field `@type` which contains the type URL. Example:
-                        
-                            package google.profile;
-                            message Person {
-                              string first_name = 1;
-                              string last_name = 2;
-                            }
-                        
-                            {
-                              "@type": "type.googleapis.com/google.profile.Person",
-                              "firstName": <string>,
-                              "lastName": <string>
-                            }
-                        
-                        If the embedded message type is well-known and has a custom JSON
-                        representation, that representation will be embedded adding a field
-                        `value` which holds the custom JSON in addition to the `@type`
-                        field. Example (for message [google.protobuf.Duration][]):
-                        
-                            {
-                              "@type": "type.googleapis.com/google.protobuf.Duration",
-                              "value": "1.212s"
-                            } */
-                        pub_key: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                        voting_power: string
-                        proposer_priority: string
-                    }>
-                    /** pagination defines an pagination for the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** GetLatestValidatorSetResponse is the response type for the Query/GetValidatorSetByHeight RPC method. */
+                default: /** GetLatestValidatorSetResponse is the response type for the Query/GetValidatorSetByHeight RPC method. */
                 {
                     block_height: string
                     validators: Array<{
@@ -15502,17 +11007,7 @@ Service.SimulateRPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -15531,44 +11026,17 @@ Service.SimulateRPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/base/tendermint/v1beta1/validatorsets/{height}' */
-            axelar: `/cosmos/base/tendermint/v1beta1/validatorsets/${number}`
-            /** '/cosmos/base/tendermint/v1beta1/validatorsets/{height}' */
-            evmos: `/cosmos/base/tendermint/v1beta1/validatorsets/${number}`
+            default: `/cosmos/base/tendermint/v1beta1/validatorsets/${number}`
         }
         params: {
             path: {
-                axelar: {
-                    height: number
-                }
-                evmos: {
+                default: {
                     height: number
                 }
             }
 
             query: {
-                axelar: {
-                    /** key is a value returned in PageResponse.next_key to begin
-                    querying the next page most efficiently. Only one of offset or key
-                    should be set. */
-                    'pagination.key': string
-                    /** offset is a numeric offset that can be used when key is unavailable.
-                    It is less efficient than using key. Only one of offset or key should
-                    be set. */
-                    'pagination.offset': number
-                    /** limit is the total number of results to be returned in the result page.
-                    If left empty it will default to a value to be set by each app. */
-                    'pagination.limit': number
-                    /** count_total is set to true  to indicate that the result set should include
-                    a count of the total number of items available for pagination in UIs.
-                    count_total is only respected when offset is used. It is ignored when key
-                    is set. */
-                    'pagination.count_total': string
-                    /** reverse is set to true if results are to be returned in the descending order.
-                    
-                    Since: cosmos-sdk 0.43 */
-                    'pagination.reverse': string
-                }
-                evmos: {
+                default: {
                     /** key is a value returned in PageResponse.next_key to begin
                     querying the next page most efficiently. Only one of offset or key
                     should be set. */
@@ -15592,118 +11060,12 @@ Service.SimulateRPC method. */
                 }
             }
             body: {
-                axelar: undefined
-                evmos: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** GetValidatorSetByHeightResponse is the response type for the Query/GetValidatorSetByHeight RPC method. */
-                {
-                    block_height: string
-                    validators: Array<{
-                        address: string
-                        /** `Any` contains an arbitrary serialized protocol buffer message along with a
-                        URL that describes the type of the serialized message.
-                        
-                        Protobuf library provides support to pack/unpack Any values in the form
-                        of utility functions or additional generated methods of the Any type.
-                        
-                        Example 1: Pack and unpack a message in C++.
-                        
-                            Foo foo = ...;
-                            Any any;
-                            any.PackFrom(foo);
-                            ...
-                            if (any.UnpackTo(&foo)) {
-                              ...
-                            }
-                        
-                        Example 2: Pack and unpack a message in Java.
-                        
-                            Foo foo = ...;
-                            Any any = Any.pack(foo);
-                            ...
-                            if (any.is(Foo.class)) {
-                              foo = any.unpack(Foo.class);
-                            }
-                        
-                         Example 3: Pack and unpack a message in Python.
-                        
-                            foo = Foo(...)
-                            any = Any()
-                            any.Pack(foo)
-                            ...
-                            if any.Is(Foo.DESCRIPTOR):
-                              any.Unpack(foo)
-                              ...
-                        
-                         Example 4: Pack and unpack a message in Go
-                        
-                             foo := &pb.Foo{...}
-                             any, err := anypb.New(foo)
-                             if err != nil {
-                               ...
-                             }
-                             ...
-                             foo := &pb.Foo{}
-                             if err := any.UnmarshalTo(foo); err != nil {
-                               ...
-                             }
-                        
-                        The pack methods provided by protobuf library will by default use
-                        'type.googleapis.com/full.type.name' as the type URL and the unpack
-                        methods only use the fully qualified type name after the last '/'
-                        in the type URL, for example "foo.bar.com/x/y.z" will yield type
-                        name "y.z".
-                        
-                        
-                        JSON
-                        ====
-                        The JSON representation of an `Any` value uses the regular
-                        representation of the deserialized, embedded message, with an
-                        additional field `@type` which contains the type URL. Example:
-                        
-                            package google.profile;
-                            message Person {
-                              string first_name = 1;
-                              string last_name = 2;
-                            }
-                        
-                            {
-                              "@type": "type.googleapis.com/google.profile.Person",
-                              "firstName": <string>,
-                              "lastName": <string>
-                            }
-                        
-                        If the embedded message type is well-known and has a custom JSON
-                        representation, that representation will be embedded adding a field
-                        `value` which holds the custom JSON in addition to the `@type`
-                        field. Example (for message [google.protobuf.Duration][]):
-                        
-                            {
-                              "@type": "type.googleapis.com/google.protobuf.Duration",
-                              "value": "1.212s"
-                            } */
-                        pub_key: {
-                            type_url: string
-                            /** Must be a valid serialized protocol buffer of the above specified type. */
-                            value: string
-                        }
-                        voting_power: string
-                        proposer_priority: string
-                    }>
-                    /** pagination defines an pagination for the response. */
-                    pagination: {
-                        /** next_key is the key to be passed to PageRequest.key to
-                        query the next page most efficiently */
-                        next_key: string
-                        /** total is total number of results available if PageRequest.count_total
-                        was set, its value is undefined otherwise */
-                        total: string
-                    }
-                }
-                evmos: /** GetValidatorSetByHeightResponse is the response type for the Query/GetValidatorSetByHeight RPC method. */
+                default: /** GetValidatorSetByHeightResponse is the response type for the Query/GetValidatorSetByHeight RPC method. */
                 {
                     block_height: string
                     validators: Array<{
@@ -15810,17 +11172,7 @@ Service.SimulateRPC method. */
                 }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        /** Must be a valid serialized protocol buffer of the above specified type. */
-                        value: string
-                    }>
-                }
-                evmos: {
+                default: {
                     error: string
                     code: number
                     message: string
@@ -17234,41 +12586,28 @@ Service.SimulateRPC method. */
         method: 'get'
         endpoint: {
             /** '/cosmos/params/v1beta1/params' */
-            axelar: `/cosmos/params/v1beta1/params`
-            /** '/kyve/query/v1beta1/params' */
-            kyve: `/kyve/query/v1beta1/params`
+            default: `/cosmos/params/v1beta1/params`
         }
         params: {
             path: {
-                axelar: undefined
-                kyve: undefined
+                default: undefined
             }
 
             query: {
+                kyve: undefined
                 axelar: {
                     /** subspace defines the module to query the parameter for. */
                     subspace: string
                     /** key defines the key of the parameter in the subspace. */
                     key: string
                 }
-                kyve: undefined
             }
             body: {
-                axelar: undefined
-                kyve: undefined
+                default: undefined
             }
         }
         response: {
             success: {
-                axelar: /** QueryParamsResponse is response type for the Query/Params RPC method. */
-                {
-                    /** param defines the queried parameter. */
-                    param: {
-                        subspace: string
-                        key: string
-                        value: string
-                    }
-                }
                 kyve: /** QueryParamsResponse ... */
                 {
                     /** bundles_params ... */
@@ -17388,17 +12727,17 @@ Service.SimulateRPC method. */
                         leave_pool_time: string
                     }
                 }
+                axelar: /** QueryParamsResponse is response type for the Query/Params RPC method. */
+                {
+                    /** param defines the queried parameter. */
+                    param: {
+                        subspace: string
+                        key: string
+                        value: string
+                    }
+                }
             }
             error: {
-                axelar: {
-                    error: string
-                    code: number
-                    message: string
-                    details: Array<{
-                        type_url: string
-                        value: string
-                    }>
-                }
                 kyve: {
                     error: string
                     code: number
@@ -17406,6 +12745,15 @@ Service.SimulateRPC method. */
                     details: Array<{
                         type_url: string
                         /** Must be a valid serialized protocol buffer of the above specified type. */
+                        value: string
+                    }>
+                }
+                axelar: {
+                    error: string
+                    code: number
+                    message: string
+                    details: Array<{
+                        type_url: string
                         value: string
                     }>
                 }
@@ -21846,7 +17194,7 @@ RPC method. */
 }
 
 /** Represent any of the available chain names. */
-export type ChainName = 'evmos' | 'axelar' | 'kyve'
+export type ChainName = 'evmos' | 'default' | 'kyve' | 'axelar'
 
 /** Represent any of the available operation IDs. */
 export type OperationId = keyof RestApi
