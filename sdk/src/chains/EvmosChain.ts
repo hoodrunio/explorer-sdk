@@ -1,5 +1,5 @@
 import { Cosmos44Chain } from './Cosmos44Chain'
-import { EvmosInfo } from '../chain-infos'
+import { EvmosInfo } from '../chain-info'
 import {
     EvmosRESTEndpoint,
     EvmosRESTMethod,

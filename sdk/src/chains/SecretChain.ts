@@ -1,5 +1,5 @@
 import { Cosmos44Chain } from './Cosmos44Chain'
-import { SecretInfo } from '../chain-infos'
+import { SecretInfo } from '../chain-info'
 
 /**
  * # Secret

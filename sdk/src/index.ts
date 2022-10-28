@@ -1,1 +1,1 @@
-export { getChain } from './cosmos/chains/index'
+export { getChain } from './chains/index'

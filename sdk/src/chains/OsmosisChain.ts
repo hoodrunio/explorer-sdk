@@ -1,5 +1,5 @@
 import { Cosmos44Chain } from './Cosmos44Chain'
-import { OsmosisInfo } from '../chain-infos'
+import { OsmosisInfo } from '../chain-info'
 
 /**
  * # Osmosis

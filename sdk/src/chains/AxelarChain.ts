@@ -1,5 +1,5 @@
 import { Cosmos44Chain } from './Cosmos44Chain'
-import { AxelarInfo } from '../chain-infos'
+import { AxelarInfo } from '../chain-info'
 
 /**
  * # Axelar

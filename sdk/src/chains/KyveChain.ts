@@ -1,5 +1,5 @@
 import { Cosmos44Chain } from './Cosmos44Chain'
-import { KyveInfo } from '../chain-infos'
+import { KyveInfo } from '../chain-info'
 
 /**
  * # Kyve

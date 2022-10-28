@@ -1,5 +1,5 @@
 import { Cosmos44Chain } from './Cosmos44Chain'
-import { CelestiaInfo } from '../chain-infos'
+import { CelestiaInfo } from '../chain-info'
 /**
  * # Celestia
  * The class that has methods to intereact with Celestia blockchain.
