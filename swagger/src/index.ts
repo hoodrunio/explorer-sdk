@@ -2,9 +2,10 @@ import { readdir, readFile, writeFile } from "fs/promises"
 import { Operations } from "./types/internal"
 import { Swagger } from "./types/swagger"
 import * as yaml from 'yaml'
-import { convertOperationsToTypeScriptTypes, generateOperations } from "./functions"
+import { convertOperationsToTypeScriptTypes, generateOperations, parseSchema, parseSchemaToTypeScript } from "./functions"
 import { exit } from "process"
 
+/** The entry of the application. */
 async function main() {
     // Define an object to store all the operations.
     let operations: Operations = {}

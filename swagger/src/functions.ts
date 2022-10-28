@@ -1,6 +1,19 @@
 import { Operations, Properties, Property } from "./types/internal";
 import { Schema, SchemaRef, Swagger, SwaggerParameter, SwaggerParameterPath, SwaggerPathMethodData } from "./types/swagger";
 
+/**
+ * Returns the schema representing the value of given reference inside given swagger.
+ * 
+ * # Usage
+ * ```ts
+ * const refObj = {
+ *     $ref: '#/definitions/cosmos.tx.v1beta1.SimulateRequest'
+ * }
+ * 
+ * // Returns swagger['definitions']['cosmos.tx.v1beta1.SimulateRequest'], if it exists.
+ * const schema = getRef(refObj.$ref, swagger)
+ * ```
+ */
 export function getRef(ref: string, swagger: Swagger): Schema | undefined {
     const refs = ref.split('/')
     const [refPath] = refs.slice(ref.length - 1);
@@ -10,6 +23,20 @@ export function getRef(ref: string, swagger: Swagger): Schema | undefined {
 
 
 
+/**
+ * Parses schema type and comment to a property.
+ * 
+ * # Usage
+ * ```ts
+ * const schema: Schema = {
+ *    type: 'string'
+ *    description: 'the comment about this object'
+ * }
+ * 
+ * const { type, comment }: Property = parseSchem(schema)
+ * 
+ * ```
+ */
 export function parseSchema(schema: Schema): Property {
     switch (schema.type) {
         case 'object': {
@@ -73,6 +100,10 @@ export function parseSchema(schema: Schema): Property {
     }
 }
 
+
+/** 
+ * Returns a new endpoint after replacing path parameters with their types.
+ */
 export function parseEndpoint(endpoint: string, params?: SwaggerParameter[]) {
     if (!params) return endpoint
 
@@ -82,27 +113,51 @@ export function parseEndpoint(endpoint: string, params?: SwaggerParameter[]) {
     }
 
     return endpoint
-
 }
 
 
+/** 
+ * Returns TypeScript type representation of given schema.
+ * 
+ * # Usage
+ * ```ts
+ * const schema: Schema = {
+ *    type: 'object'
+ *    description: 'the person itself',
+ *    properties: {
+ *         age: {
+ *             description: 'the age of the person',
+ *             type: 'number' 
+ *         },
+ *         name: {
+ *             description: 'the name of the person',
+ *             type: 'string' 
+ *         }
+ *    }
+ * }
+ * 
+ * // Returns string representation of the TS type.
+ * const tsType: string = parseSchema(schema)
+ * ```
+ */
 export function parseSchemaToTypeScript(schema: Schema | SchemaRef, swaggerObject: Swagger): string {
     if (typeof schema?.$ref === 'string') {
         const refSchema = getRef(schema.$ref, swaggerObject)
         if (refSchema !== undefined) {
-            const parsed = parseSchema(schema as Schema)
-            const comment = parsed?.comment ? `/** ${parsed?.comment} */\n` : ''
-            return `${comment}${parsed?.type}`
+            const property = parseSchema(schema as Schema)
+            const comment = property?.comment ? `/** ${property?.comment} */\n` : ''
+            return `${comment}${property?.type}`
         } else {
             return `unknown`
         }
     } else {
-        const parsed = parseSchema(schema as Schema)
-        const comment = parsed?.comment ? `/** ${parsed?.comment} */\n` : ''
-        return `${comment}${parsed.type}`
+        const property = parseSchema(schema as Schema)
+        const comment = property?.comment ? `/** ${property?.comment} */\n` : ''
+        return `${comment}${property.type}`
     }
 }
 
+/** Parses parameter type. */
 export function parseParameterType(param: SwaggerParameter): 'string' | 'number' {
     if (!param.format) return 'string'
     switch (param.format) {
@@ -114,6 +169,7 @@ export function parseParameterType(param: SwaggerParameter): 'string' | 'number'
     }
 }
 
+/** Parses parameters to Typescript types. Returns a tuple of path, query, and body params. */
 export function parseParametersToTypescript(swaggerObject: Swagger, params?: SwaggerParameter[]): [string, string, string] {
     if (!params) {
         return ['undefined', 'undefined', 'undefined']
@@ -127,11 +183,8 @@ export function parseParametersToTypescript(swaggerObject: Swagger, params?: Swa
         const paramName = param.name.includes('.') ? `'${param.name}'` : param.name
         const comment = param.description ? `/** ${param.description} */\n` : ''
 
-
-
         switch (param.in) {
             case 'path': {
-
                 pathParams += `${comment}${paramName}: ${parseParameterType(param)}\n`
                 break
             }
@@ -154,10 +207,11 @@ export function parseParametersToTypescript(swaggerObject: Swagger, params?: Swa
 }
 
 
-export function generateOperations(chainName: string, swaggerObject: Swagger): Operations {
+/** Generates a new `Operations` object by given chain name, and swagger. */
+export function generateOperations(chainName: string, swagger: Swagger): Operations {
     const operations: Operations = {}
 
-    for (const [endpoint, data] of Object.entries(swaggerObject.paths)) {
+    for (const [endpoint, data] of Object.entries(swagger.paths)) {
         const method = data?.get ? 'get' : 'post'
 
         const methodData = data[method]
@@ -165,7 +219,7 @@ export function generateOperations(chainName: string, swaggerObject: Swagger): O
 
 
 
-        const [pathParams, queryParams, bodyParams] = parseParametersToTypescript(swaggerObject, methodData.parameters,)
+        const [pathParams, queryParams, bodyParams] = parseParametersToTypescript(swagger, methodData.parameters,)
 
 
 
@@ -192,10 +246,10 @@ export function generateOperations(chainName: string, swaggerObject: Swagger): O
             },
             response: {
                 success: {
-                    [chainName]: parseSchemaToTypeScript(methodData.responses[200].schema, swaggerObject)
+                    [chainName]: parseSchemaToTypeScript(methodData.responses[200].schema, swagger)
                 },
                 error: {
-                    [chainName]: parseSchemaToTypeScript(methodData.responses.default.schema, swaggerObject)
+                    [chainName]: parseSchemaToTypeScript(methodData.responses.default.schema, swagger)
                 }
             },
             ...operations
@@ -206,6 +260,7 @@ export function generateOperations(chainName: string, swaggerObject: Swagger): O
 }
 
 
+/** Returns TypeScript representation of given `Operations`. */
 export function convertOperationsToTypeScriptTypes(operations: Operations): string {
     let content = '// DO NOT EDIT THIS FILE MANUALLY\n\n'
 
