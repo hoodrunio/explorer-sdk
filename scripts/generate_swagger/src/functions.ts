@@ -41,6 +41,11 @@ export function parseSchema(schema: Schema): Property {
     switch (schema.type) {
         case 'object': {
             const properties: Properties = {}
+            if (schema.properties === undefined) {
+                return {
+                    type: '{}',
+                }
+            }
             const schemaProps = Object.entries(schema.properties)
             for (const [prop, propSchema] of schemaProps) {
                 if (prop === 'type_url') {
