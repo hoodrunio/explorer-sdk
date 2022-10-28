@@ -44,6 +44,8 @@ async function main() {
         // Parse the file content.
         const swagger = yaml.parse(fileContent) as Swagger
 
+        console.log(chainName == 'evmos' ? JSON.stringify(Object.entries(swagger.paths).at(0)?.[1]?.get?.parameters) : 5)
+
         // Generate new `Operations` and add it to `operations`.
         const newOperations = generateOperations(chainName, swagger)
         for (const [operationId, operationData] of Object.entries(newOperations)) {
