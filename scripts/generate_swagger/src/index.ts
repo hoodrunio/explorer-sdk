@@ -1,5 +1,5 @@
 import { readdir, readFile, writeFile } from "fs/promises"
-import { Operations } from "./types/internal"
+import { OperationData, Operations } from "./types/internal"
 import { Swagger } from "./types/swagger"
 import * as yaml from 'yaml'
 import { convertOperationsToTypeScriptTypes, generateOperations, parseSchema, parseSchemaToTypeScript } from "./functions"
@@ -45,7 +45,27 @@ async function main() {
         const swagger = yaml.parse(fileContent) as Swagger
 
         // Generate new `Operations` and add it to `operations`.
-        operations = { ...generateOperations(chainName, swagger), ...operations }
+        const newOperations = generateOperations(chainName, swagger)
+        for (const [operationId, operationData] of Object.entries(newOperations)) {
+            const oldOperationData: OperationData | undefined = operations[operationId]
+            operations[operationId] = {
+                method: operationData.method,
+                comment: operationData.comment ?? oldOperationData?.comment,
+                endpoint: {
+                    ...operationData.endpoint,
+                    ...oldOperationData?.endpoint
+                },
+                params: {
+                    path: { ...operationData.params.path, ...oldOperationData?.params?.path },
+                    query: { ...operationData.params.query, ...oldOperationData?.params?.query },
+                    body: { ...operationData.params.body, ...oldOperationData?.params?.body },
+                },
+                response: {
+                    success: { ...operationData.response.success, ...oldOperationData?.response?.success, },
+                    error: { ...operationData.response.error, ...oldOperationData?.response?.error, },
+                }
+            }
+        }
     }
 
     // Convert `operations` to TypeScript type output.
