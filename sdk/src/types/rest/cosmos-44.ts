@@ -11,8 +11,8 @@ export type RESTCosmos44SuccessResponse<T extends RESTMethod> = RESTCosmos44Data
     response: infer R
 }
     ? Q extends PaginationQueryParams
-        ? R & PaginationResponse
-        : R
+    ? R & PaginationResponse
+    : R
     : never
 
 export type RESTCosmos44Response<T extends RESTMethod> =
@@ -43,6 +43,43 @@ type PathParam<
 > = RESTCosmos44Datas[T]['pathParams'][E]
 
 export interface RESTCosmos44Datas {
+
+    /** Node Info */
+    nodeInfo: {
+        endpoint: '/node_info'
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+            node_info: {
+                protocol_version: {
+                    p2p: string
+                    block: string
+                    app: string
+                }
+                id: string
+                listen_addr: string
+                network: string
+                version: string
+                channels: string
+                moniker: string
+                other: {
+                    tx_index: string
+                    rpc_address: string
+                }
+            }
+            application_version: {
+                name: string
+                server_name: string
+                version: string
+                commit: string
+                build_tags: string
+                go: string
+                build_deps: Array<string>
+                cosmos_sdk_version: string
+            }
+        }
+    }
+
     /** Queries all proposals based on given status. */
     proposals: {
         endpoint: `/cosmos/gov/v1beta1/proposals`
@@ -50,11 +87,11 @@ export interface RESTCosmos44Datas {
         queryParams: PaginationQueryParams & {
             /** The status of the proposals */
             proposal_status:
-                | 'PROPOSAL_STATUS_UNSPECIFIED'
-                | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
-                | 'PROPOSAL_STATUS_PASSED'
-                | 'PROPOSAL_STATUS_REJECTED'
-                | 'PROPOSAL_STATUS_FAILED'
+            | 'PROPOSAL_STATUS_UNSPECIFIED'
+            | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
+            | 'PROPOSAL_STATUS_PASSED'
+            | 'PROPOSAL_STATUS_REJECTED'
+            | 'PROPOSAL_STATUS_FAILED'
             /** The voter address for the proposals. */
             voter: string
             /** The deposit addresses from the proposals. */
@@ -98,7 +135,6 @@ export interface RESTCosmos44Datas {
             proposal: {
                 proposal_id: string
                 content: {
-                    '@type': string
                     title: string
                     description: string
                 }
@@ -303,7 +339,6 @@ export interface RESTCosmos44Datas {
         queryParams: PaginationQueryParams
         response: {
             evidence: Array<{
-                '@type': string
                 height: string
                 time: string
                 power: string
@@ -741,7 +776,6 @@ export interface RESTCosmos44Datas {
             validators: Array<{
                 operator_address: string
                 consensus_pubkey: {
-                    '@type': string
                     key: string
                 }
                 jailed: boolean
@@ -959,11 +993,9 @@ export interface RESTCosmos44Datas {
         queryParams: PaginationQueryParams
         response: {
             accounts: Array<{
-                '@type': string
                 base_account: {
                     address: string
                     pub_key?: {
-                        '@type': string
                         key: string
                     }
                     account_number: string
@@ -984,10 +1016,8 @@ export interface RESTCosmos44Datas {
         queryParams: undefined
         response: {
             account: {
-                '@type': string
                 address: string
                 pub_key: {
-                    '@type': string
                     key: string
                 }
                 account_number: string
@@ -1011,6 +1041,588 @@ export interface RESTCosmos44Datas {
         // Let's find a grantee and a granter address and test, to find the type of the server response.
         response: unknown // TODO!
     }
+
+    /** Fetches a TX by given hash */
+    txByHash: {
+        endpoint: `/cosmos/tx/v1beta1/txs/${PathParam<'txByHash', 'hash'>}`
+        pathParams: {
+            /** The tx hash to query, encoded as a hex string. */
+            hash: string
+        }
+        queryParams: undefined
+        response: {
+            tx: {
+                body: {
+                    messages: Array<{
+                        client_id?: string
+                        header?: {
+                            signed_header: {
+                                header: {
+                                    version: {
+                                        block: string
+                                        app: string
+                                    }
+                                    chain_id: string
+                                    height: string
+                                    time: string
+                                    last_block_id: {
+                                        hash: string
+                                        part_set_header: {
+                                            total: number
+                                            hash: string
+                                        }
+                                    }
+                                    last_commit_hash: string
+                                    data_hash: string
+                                    validators_hash: string
+                                    next_validators_hash: string
+                                    consensus_hash: string
+                                    app_hash: string
+                                    last_results_hash: string
+                                    evidence_hash: string
+                                    proposer_address: string
+                                }
+                                commit: {
+                                    height: string
+                                    round: number
+                                    block_id: {
+                                        hash: string
+                                        part_set_header: {
+                                            total: number
+                                            hash: string
+                                        }
+                                    }
+                                    signatures: Array<{
+                                        block_id_flag: string
+                                        validator_address?: string
+                                        timestamp: string
+                                        signature?: string
+                                    }>
+                                }
+                            }
+                            validator_set: {
+                                validators: Array<{
+                                    address: string
+                                    pub_key: {
+                                        ed25519: string
+                                    }
+                                    voting_power: string
+                                    proposer_priority: string
+                                }>
+                                proposer: {
+                                    address: string
+                                    pub_key: {
+                                        ed25519: string
+                                    }
+                                    voting_power: string
+                                    proposer_priority: string
+                                }
+                                total_voting_power: string
+                            }
+                            trusted_height: {
+                                revision_number: string
+                                revision_height: string
+                            }
+                            trusted_validators: {
+                                validators: Array<{
+                                    address: string
+                                    pub_key: {
+                                        ed25519: string
+                                    }
+                                    voting_power: string
+                                    proposer_priority: string
+                                }>
+                                proposer: {
+                                    address: string
+                                    pub_key: {
+                                        ed25519: string
+                                    }
+                                    voting_power: string
+                                    proposer_priority: string
+                                }
+                                total_voting_power: string
+                            }
+                        }
+                        signer: string
+                        packet?: {
+                            sequence: string
+                            source_port: string
+                            source_channel: string
+                            destination_port: string
+                            destination_channel: string
+                            data: string
+                            timeout_height: {
+                                revision_number: string
+                                revision_height: string
+                            }
+                            timeout_timestamp: string
+                        }
+                        acknowledgement?: string
+                        proof_acked?: string
+                        proof_height?: {
+                            revision_number: string
+                            revision_height: string
+                        }
+                    }>
+                    memo: string
+                    timeout_height: string
+                    extension_options: Array<any>
+                    non_critical_extension_options: Array<any>
+                }
+                auth_info: {
+                    signer_infos: Array<{
+                        public_key: {
+                            key: string
+                        }
+                        mode_info: {
+                            single: {
+                                mode: string
+                            }
+                        }
+                        sequence: string
+                    }>
+                    fee: {
+                        amount: Array<{
+                            denom: string
+                            amount: string
+                        }>
+                        gas_limit: string
+                        payer: string
+                        granter: string
+                    }
+                }
+                signatures: Array<string>
+            }
+            tx_response: {
+                height: string
+                txhash: string
+                codespace: string
+                code: number
+                data: string
+                raw_log: string
+                logs: Array<{
+                    msg_index: number
+                    log: string
+                    events: Array<{
+                        type: string
+                        attributes: Array<{
+                            key: string
+                            value: string
+                        }>
+                    }>
+                }>
+                info: string
+                gas_wanted: string
+                gas_used: string
+                tx: {
+                    body: {
+                        messages: Array<{
+                            client_id?: string
+                            header?: {
+                                signed_header: {
+                                    header: {
+                                        version: {
+                                            block: string
+                                            app: string
+                                        }
+                                        chain_id: string
+                                        height: string
+                                        time: string
+                                        last_block_id: {
+                                            hash: string
+                                            part_set_header: {
+                                                total: number
+                                                hash: string
+                                            }
+                                        }
+                                        last_commit_hash: string
+                                        data_hash: string
+                                        validators_hash: string
+                                        next_validators_hash: string
+                                        consensus_hash: string
+                                        app_hash: string
+                                        last_results_hash: string
+                                        evidence_hash: string
+                                        proposer_address: string
+                                    }
+                                    commit: {
+                                        height: string
+                                        round: number
+                                        block_id: {
+                                            hash: string
+                                            part_set_header: {
+                                                total: number
+                                                hash: string
+                                            }
+                                        }
+                                        signatures: Array<{
+                                            block_id_flag: string
+                                            validator_address?: string
+                                            timestamp: string
+                                            signature?: string
+                                        }>
+                                    }
+                                }
+                                validator_set: {
+                                    validators: Array<{
+                                        address: string
+                                        pub_key: {
+                                            ed25519: string
+                                        }
+                                        voting_power: string
+                                        proposer_priority: string
+                                    }>
+                                    proposer: {
+                                        address: string
+                                        pub_key: {
+                                            ed25519: string
+                                        }
+                                        voting_power: string
+                                        proposer_priority: string
+                                    }
+                                    total_voting_power: string
+                                }
+                                trusted_height: {
+                                    revision_number: string
+                                    revision_height: string
+                                }
+                                trusted_validators: {
+                                    validators: Array<{
+                                        address: string
+                                        pub_key: {
+                                            ed25519: string
+                                        }
+                                        voting_power: string
+                                        proposer_priority: string
+                                    }>
+                                    proposer: {
+                                        address: string
+                                        pub_key: {
+                                            ed25519: string
+                                        }
+                                        voting_power: string
+                                        proposer_priority: string
+                                    }
+                                    total_voting_power: string
+                                }
+                            }
+                            signer: string
+                            packet?: {
+                                sequence: string
+                                source_port: string
+                                source_channel: string
+                                destination_port: string
+                                destination_channel: string
+                                data: string
+                                timeout_height: {
+                                    revision_number: string
+                                    revision_height: string
+                                }
+                                timeout_timestamp: string
+                            }
+                            acknowledgement?: string
+                            proof_acked?: string
+                            proof_height?: {
+                                revision_number: string
+                                revision_height: string
+                            }
+                        }>
+                        memo: string
+                        timeout_height: string
+                        extension_options: Array<any>
+                        non_critical_extension_options: Array<any>
+                    }
+                    auth_info: {
+                        signer_infos: Array<{
+                            public_key: {
+                                key: string
+                            }
+                            mode_info: {
+                                single: {
+                                    mode: string
+                                }
+                            }
+                            sequence: string
+                        }>
+                        fee: {
+                            amount: Array<{
+                                denom: string
+                                amount: string
+                            }>
+                            gas_limit: string
+                            payer: string
+                            granter: string
+                        }
+                    }
+                    signatures: Array<string>
+                }
+                timestamp: string
+                events: Array<{
+                    type: string
+                    attributes: Array<{
+                        key: string
+                        value: string
+                        index: boolean
+                    }>
+                }>
+            }
+        }
+
+    }
+
+    /** Fetches txs by event. */
+    txsByEvents: {
+        endpoint: `/cosmos/tx/v1beta1/txs`
+        pathParams: undefined
+        queryParams: PaginationQueryParams & {
+            /** The list of transaction event type. */
+            events: string
+            order_by: 'ORDER_BY_UNSPECIFIED' | 'ORDER_BY_ASC' | 'ORDER_BY_DESC'
+        }
+        response: {
+            txs: Array<{
+                body: {
+                    messages: Array<{
+                        delegator_address?: string
+                        validator_address?: string
+                        amount: any
+                        proposal_id?: string
+                        voter?: string
+                        option?: string
+                        from_address?: string
+                        to_address?: string
+                    }>
+                    memo: string
+                    timeout_height: string
+                    extension_options: Array<any>
+                    non_critical_extension_options: Array<any>
+                }
+                auth_info: {
+                    signer_infos: Array<{
+                        public_key: {
+                            key: string
+                        }
+                        mode_info: {
+                            single: {
+                                mode: string
+                            }
+                        }
+                        sequence: string
+                    }>
+                    fee: {
+                        amount: Array<{
+                            denom: string
+                            amount: string
+                        }>
+                        gas_limit: string
+                        payer: string
+                        granter: string
+                    }
+                }
+                signatures: Array<string>
+            }>
+            tx_responses: Array<{
+                height: string
+                txhash: string
+                codespace: string
+                code: number
+                data: string
+                raw_log: string
+                logs: Array<{
+                    msg_index: number
+                    log: string
+                    events: Array<{
+                        type: string
+                        attributes: Array<{
+                            key: string
+                            value: string
+                        }>
+                    }>
+                }>
+                info: string
+                gas_wanted: string
+                gas_used: string
+                tx: {
+                    body: {
+                        messages: Array<{
+                            delegator_address?: string
+                            validator_address?: string
+                            amount: any
+                            proposal_id?: string
+                            voter?: string
+                            option?: string
+                            from_address?: string
+                            to_address?: string
+                        }>
+                        memo: string
+                        timeout_height: string
+                        extension_options: Array<any>
+                        non_critical_extension_options: Array<any>
+                    }
+                    auth_info: {
+                        signer_infos: Array<{
+                            public_key: {
+                                key: string
+                            }
+                            mode_info: {
+                                single: {
+                                    mode: string
+                                }
+                            }
+                            sequence: string
+                        }>
+                        fee: {
+                            amount: Array<{
+                                denom: string
+                                amount: string
+                            }>
+                            gas_limit: string
+                            payer: string
+                            granter: string
+                        }
+                    }
+                    signatures: Array<string>
+                }
+                timestamp: string
+                events: Array<{
+                    type: string
+                    attributes: Array<{
+                        key: string
+                        value: string
+                        index: boolean
+                    }>
+                }>
+            }>
+        }
+
+    }
+
+    // HERE!
+
+    /** Queries the total rewards accrued by a each validator. */
+    rewardsByDelegator: {
+        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<'rewardsByDelegator', 'delegator_address'>}/rewards`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegator_address: string
+        }
+        queryParams: undefined
+        response: {
+            rewards: Array<{
+                validator_address: string
+                reward: Array<{
+                    denom: string
+                    amount: string
+                }>
+            }>
+            total: Array<{
+                denom: string
+                amount: string
+            }>
+        }
+    }
+
+    /** Queries the total rewards accrued by a delegation. */
+    rewardsByDelegatorValidatorPair: {
+        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<'rewardsByDelegatorValidatorPair', 'delegator_address'>}/rewards/${PathParam<'rewardsByDelegatorValidatorPair', 'validator_address'>}`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegator_address: string
+            /** The validator address to query for. */
+            validator_address: string
+        }
+        queryParams: undefined
+        response: {
+            rewards: Array<{
+                denom: string
+                amount: string
+            }>
+        }
+    }
+
+    /** Queries the validators of a delegator. */
+    validatorsByDelegator: {
+        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<'validatorsByDelegator', 'delegator_address'>}/validators`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegator_address: string
+        }
+        queryParams: undefined
+        response: {
+            validators: Array<string>
+        }
+    }
+
+    /** Queries withdraw address of a delegator. */
+    withdrawAddressByDelegator: {
+        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<'withdrawAddressByDelegator', 'delegator_address'>}/withdraw_address`
+        pathParams: {
+            /** The delegator address to query for. */
+            delegator_address: string
+        }
+        queryParams: undefined
+        response: {
+            withdraw_address: string
+        }
+    }
+
+    /** Queries accumulated commission for a validator. */
+    commissionByValidator: {
+        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<'commissionByValidator', 'validator_address'>}/commission`
+        pathParams: {
+            /** The validator address to query for. */
+            validator_address: string
+        }
+        queryParams: undefined
+        response: {
+            commission: {
+                commission: Array<{
+                    denom: string
+                    amount: string
+                }>
+            }
+        }
+    }
+
+    /** Queries accumulated rewards for a validator. */
+    outstandingRewardsByValidator: {
+        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<'outstandingRewardsByValidator', 'validator_address'>}/outstanding_rewards`
+        pathParams: {
+            /** The validator address to query for. */
+            validator_address: string
+        }
+        queryParams: undefined
+        response: {
+            rewards: {
+                rewards: Array<{
+                    denom: string
+                    amount: string
+                }>
+            }
+        }
+    }
+
+    /** Queries slash events for a validator. */
+    slashesByValidator: {
+        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<'outstandingRewardsByValidator', 'validator_address'>}/slashes`
+        pathParams: {
+            /** The validator address to query for. */
+            validator_address: string
+        }
+        queryParams: PaginationQueryParams & {
+            /** The optional starting height to query the slashes. */
+            starting_height?: number
+            /** The optional ending height to query the slashes. */
+            ending_height?: number
+        }
+        response: {
+            slashes: Array<{
+                validator_period: string
+                fraction: string
+            }>
+        }
+
+    }
 }
 
 /**
@@ -1025,15 +1637,15 @@ export interface RESTCosmos44Datas {
 
 export interface PaginationQueryParams {
     /** `key` is a value returned in PageResponse.next_key to begin querying the next page most efficiently. Only one of offset or key should be set. */
-    'pagination.key': unknown
+    'pagination.key'?: unknown
     /** `offset` is a numeric offset that can be used when key is unavailable. It is less efficient than using key. Only one of offset or key should be set. */
-    'pagination.offset': number
+    'pagination.offset'?: number
     /** `limit` is the total number of results to be returned in the result page. If left empty it will default to a value to be set by each app. */
-    'pagination.limit': number
+    'pagination.limit'?: number
     /** `count_total` is set to true to indicate that the result set should include a count of the total number of items available for pagination in UIs. count_total is only respected when offset is used. It is ignored when key is set. */
-    'pagination.count_total': boolean
+    'pagination.count_total'?: boolean
     /** `reverse` is set to true if results are to be returned in the descending order. */
-    'pagination.reverse': boolean
+    'pagination.reverse'?: boolean
 }
 
 export interface PaginationResponse {
