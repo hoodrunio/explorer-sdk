@@ -12,29 +12,30 @@ To run:
 bun run index.ts
 ```
 
-This project was created using `bun init` in bun v0.2.2. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
+This project was created using [Bun](https://bun.sh) which is a fast all-in-one JavaScript runtime.
 
 
 
-# REST API Files
+# Requested Chains
+Please add requested chains below. So we can find their swagger files.
+
+
+# REST API
+
+## Swagger Files
 The swagger files for each chain:
 - [Cosmos](https://raw.githubusercontent.com/cosmos/cosmos-sdk/main/client/docs/swagger-ui/swagger.yaml)
 - [Evmos](https://raw.githubusercontent.com/evmos/evmos/main/client/docs/swagger-ui/swagger.yaml)
 - [Kyve(not found in GitHub)](https://api.alpha.kyve.network/swagger/swagger.yml)
 - [Axelar](https://raw.githubusercontent.com/axelarnetwork/axelar-core/main/client/docs/static/swagger/swagger.yaml)
 - [Canto](https://raw.githubusercontent.com/Canto-Network/ethermint-test/main/client/docs/swagger-ui/swagger.yaml)
+- [Osmosis](https://raw.githubusercontent.com/osmosis-labs/osmosis/main/client/docs/static/swagger/swagger.yaml)
+- [Kava](https://raw.githubusercontent.com/Kava-Labs/kava/master/client/docs/swagger-ui/swagger.yaml)
+- [Akash](https://raw.githubusercontent.com/ovrclk/akash/master/client/docs/swagger-ui/swagger.yaml)
+- [Secret](https://raw.githubusercontent.com/scrtlabs/SecretNetwork/master/client/docs/static/swagger/swagger.yaml)
+- [Umee](https://raw.githubusercontent.com/umee-network/umee/main/swagger/swagger.yaml)
+- [Haqq](https://raw.githubusercontent.com/haqq-network/haqq/master/client/docs/swagger-ui/swagger.yaml)
 
 
-# RPC Files
-The swagger files for each chain:
-- [Osmosis]()
-
-
-
-To find new swagger files replace the repo name and visit:
-
-- `https://github.com/search?q=org%3A__RepoName__++filename%3Aswagger.yaml&type=Code`
-
-or
-
-- `https://github.com/search?q=org%3A__RepoName__++filename%3Aswagger.yml&type=Code`
+## Open API Files
+- We should also find `openapi.yaml` files.
