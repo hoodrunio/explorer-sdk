@@ -11,8 +11,8 @@ export type RESTCosmos44SuccessResponse<T extends RESTMethod> = RESTCosmos44Data
     response: infer R
 }
     ? Q extends PaginationQueryParams
-        ? R & PaginationResponse
-        : R
+    ? R & PaginationResponse
+    : R
     : never
 
 export type RESTCosmos44Response<T extends RESTMethod> =
@@ -86,11 +86,11 @@ export interface RESTCosmos44Datas {
         queryParams: PaginationQueryParams & {
             /** The status of the proposals */
             proposal_status:
-                | 'PROPOSAL_STATUS_UNSPECIFIED'
-                | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
-                | 'PROPOSAL_STATUS_PASSED'
-                | 'PROPOSAL_STATUS_REJECTED'
-                | 'PROPOSAL_STATUS_FAILED'
+            | 'PROPOSAL_STATUS_UNSPECIFIED'
+            | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
+            | 'PROPOSAL_STATUS_PASSED'
+            | 'PROPOSAL_STATUS_REJECTED'
+            | 'PROPOSAL_STATUS_FAILED'
             /** The voter address for the proposals. */
             voter: string
             /** The deposit addresses from the proposals. */
@@ -1638,6 +1638,39 @@ export interface RESTCosmos44Datas {
                 validator_period: string
                 fraction: string
             }>
+        }
+    }
+
+
+    /** Queries the balance of a single coin for a single account. */
+    evmosBalance: {
+        endpoint: `/cosmos/bank/v1beta1/balances/${PathParam<'balance', 'address'>}/by_denom`
+        pathParams: {
+            /** The address to query balances for. */
+            address: string
+        }
+        queryParams: {
+            /** The coin denom to query balances for. */
+            denom: string
+        }
+        response: RESTCosmos44Datas['balance']
+    }
+
+    /** Returns the current minting inflation value. */
+    evmosInflation: {
+        endpoint: `/evmos/inflation/v1/inflation_rate`
+        pathParams: undefined
+        queryParams: undefined
+        response: RESTCosmos44Datas['inflation']
+    }
+
+    /** Returns the total number of tokens that are in circulation (i.e. excluding unvested tokens). */
+    evmosCirculatingSupply: {
+        endpoint: `/evmos/inflation/v1/circulating_supply`
+        pathParams: undefined
+        queryParams: undefined
+        response: {
+
         }
     }
 }
