@@ -30,9 +30,6 @@ export class Cosmos44Chain {
     /** Decimals of the native token of the chain. */
     readonly decimals: number
 
-    /** The Cosmos SDK version. */
-    readonly sdkVersion: number
-
     /**
      * Makes an RPC request to the RPC server at `endpoint`, with `queryParams`. \
      * Returns the result of the server response. \
