@@ -1,5 +1,5 @@
 {
-  "name": "swagger_app",
+  "name": "api_generator_app",
   "module": "index.ts",
   "type": "module",
   "devDependencies": {
