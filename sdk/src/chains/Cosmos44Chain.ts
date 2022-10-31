@@ -16,7 +16,6 @@ export class Cosmos44Chain {
         this.urls = info.urls
         this.prefixes = info.prefixes
         this.decimals = info.decimals
-        this.sdkVersion = info.sdkVersion
     }
 
     /** The name of the chain. */
