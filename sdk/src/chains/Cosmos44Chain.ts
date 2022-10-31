@@ -16,6 +16,7 @@ export class Cosmos44Chain {
         this.urls = info.urls
         this.prefixes = info.prefixes
         this.decimals = info.decimals
+        this.sdkVersion = info.sdkVersion
     }
 
     /** The name of the chain. */
@@ -29,6 +30,9 @@ export class Cosmos44Chain {
 
     /** Decimals of the native token of the chain. */
     readonly decimals: number
+
+    /** The Cosmos SDK version. */
+    readonly sdkVersion: number
 
     /**
      * Makes an RPC request to the RPC server at `endpoint`, with `queryParams`. \
@@ -265,15 +269,6 @@ export class Cosmos44Chain {
         return this.rpcRequest<'blockSearch'>('/block_searchs', params)
     }
 
-    /**
-     * Returns the transaction associated with `hash`. \
-     * Return value includes prove, if `prove` is true. \
-     * Return value doesn't include prove, if `prove` is false. \
-     * (default false)
-     */
-    async getTX(params: RPCParams<'consensusParams'>) {
-        return this.rpcRequest<'consensusParams'>('/consensus_params', params)
-    }
 
     /** Broadcasts `evidence` of the misbehavior. */
     async broadcastEvidence(params: RPCParams<'broadcastEvidence'>) {
@@ -646,4 +641,70 @@ export class Cosmos44Chain {
             undefined
         )
     }
+
+    /** Returns the properties of connected node. */
+    async getNodeInfo() {
+        return this.restGetRequest<'nodeInfo'>('/node_info', undefined)
+    }
+
+
+    /** Returns a TX by given hash.  */
+    async getTxByHash({ hash }: RESTCosmos44PathParams<'txByHash'>) {
+        return this.restGetRequest<'txByHash'>(`/cosmos/tx/v1beta1/txs/${hash}`, undefined)
+    }
+
+    /** Returns TXs by given sender. */
+    async getTxsBySender({ sender, ...query }: { sender: string } & Omit<RESTCosmos44Params<'txsByEvents'>, 'events'>) {
+        return this.restGetRequest<'txsByEvents'>(`/cosmos/tx/v1beta1/txs`, { ...query, events: `message.sender='${sender}'` })
+    }
+
+    /** Returns TXs by given recipient. */
+    async getTxsByRecipient({ recipient, ...query }: { recipient: string } & Omit<RESTCosmos44Params<'txsByEvents'>, 'events'>) {
+        return this.restGetRequest<'txsByEvents'>(`/cosmos/tx/v1beta1/txs`, { ...query, events: `message.recipient='${recipient}'` })
+    }
+
+    /** Returns TXs by given sender. */
+    async getTxsByHeigth({ height, ...query }: { height: string } & Omit<RESTCosmos44Params<'txsByEvents'>, 'events'>) {
+        return this.restGetRequest<'txsByEvents'>(`/cosmos/tx/v1beta1/txs`, { ...query, events: `tx.height=${height}` })
+    }
+
+
+    /** Returns the total rewards accrued by a each validator.  */
+    async getRewardsByDelegator({ delegator_address }: RESTCosmos44PathParams<'rewardsByDelegator'>) {
+        return this.restGetRequest<'rewardsByDelegator'>(`/cosmos/distribution/v1beta1/delegators/${delegator_address}/rewards`, undefined)
+    }
+
+    /** Returns the total rewards accrued by a delegation.  */
+    async getRewardsByDelegatorValidatorPair({ delegator_address, validator_address }: RESTCosmos44PathParams<'rewardsByDelegatorValidatorPair'>) {
+        return this.restGetRequest<'rewardsByDelegatorValidatorPair'>(`/cosmos/distribution/v1beta1/delegators/${delegator_address}/rewards/${validator_address}`, undefined)
+    }
+
+    /** Returns the validators of a delegator.  */
+    async getValidatorsByDelegator({ delegator_address }: RESTCosmos44PathParams<'validatorsByDelegator'>) {
+        return this.restGetRequest<'validatorsByDelegator'>(`/cosmos/distribution/v1beta1/delegators/${delegator_address}/validators`, undefined)
+    }
+
+    /** Returns the withdraw address of a delegator.  */
+    async getWithdrawAddressByDelegator({ delegator_address }: RESTCosmos44PathParams<'withdrawAddressByDelegator'>) {
+        return this.restGetRequest<'withdrawAddressByDelegator'>(`/cosmos/distribution/v1beta1/delegators/${delegator_address}/withdraw_address`, undefined)
+    }
+
+    /** Returns accumulated commission for a validator.  */
+    async getCommissionByValidator({ validator_address }: RESTCosmos44PathParams<'commissionByValidator'>) {
+        return this.restGetRequest<'commissionByValidator'>(`/cosmos/distribution/v1beta1/validators/${validator_address}/commission`, undefined)
+    }
+
+    /** Returns accumulated rewards for a validator.  */
+    async getRewardsByValidator({ validator_address }: RESTCosmos44PathParams<'outstandingRewardsByValidator'>) {
+        return this.restGetRequest<'outstandingRewardsByValidator'>(`/cosmos/distribution/v1beta1/validators/${validator_address}/outstanding_rewards`, undefined)
+    }
+
+
+    /** Returns slash events for a validator. */
+    async getSlashesByValidator({ validator_address, ...query }: RESTCosmos44PathParams<'slashesByValidator'> & RESTCosmos44Params<'slashesByValidator'>) {
+        return this.restGetRequest<'slashesByValidator'>(`/cosmos/distribution/v1beta1/validators/${validator_address}/slashes`, query)
+    }
+
+
+
 }
