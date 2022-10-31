@@ -11,8 +11,8 @@ export type RESTCosmos44SuccessResponse<T extends RESTMethod> = RESTCosmos44Data
     response: infer R
 }
     ? Q extends PaginationQueryParams
-    ? R & PaginationResponse
-    : R
+        ? R & PaginationResponse
+        : R
     : never
 
 export type RESTCosmos44Response<T extends RESTMethod> =
@@ -43,10 +43,9 @@ type PathParam<
 > = RESTCosmos44Datas[T]['pathParams'][E]
 
 export interface RESTCosmos44Datas {
-
     /** Node Info */
     nodeInfo: {
-        endpoint: '/node_info'
+        endpoint: '/cosmos/base/tendermint/v1beta1/node_info'
         pathParams: undefined
         queryParams: undefined
         response: {
@@ -87,11 +86,11 @@ export interface RESTCosmos44Datas {
         queryParams: PaginationQueryParams & {
             /** The status of the proposals */
             proposal_status:
-            | 'PROPOSAL_STATUS_UNSPECIFIED'
-            | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
-            | 'PROPOSAL_STATUS_PASSED'
-            | 'PROPOSAL_STATUS_REJECTED'
-            | 'PROPOSAL_STATUS_FAILED'
+                | 'PROPOSAL_STATUS_UNSPECIFIED'
+                | 'PROPOSAL_STATUS_DEPOSIT_PERIOD'
+                | 'PROPOSAL_STATUS_PASSED'
+                | 'PROPOSAL_STATUS_REJECTED'
+                | 'PROPOSAL_STATUS_FAILED'
             /** The voter address for the proposals. */
             voter: string
             /** The deposit addresses from the proposals. */
@@ -1367,7 +1366,6 @@ export interface RESTCosmos44Datas {
                 }>
             }
         }
-
     }
 
     /** Fetches txs by event. */
@@ -1494,14 +1492,16 @@ export interface RESTCosmos44Datas {
                 }>
             }>
         }
-
     }
 
     // HERE!
 
     /** Queries the total rewards accrued by a each validator. */
     rewardsByDelegator: {
-        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<'rewardsByDelegator', 'delegator_address'>}/rewards`
+        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<
+            'rewardsByDelegator',
+            'delegator_address'
+        >}/rewards`
         pathParams: {
             /** The delegator address to query for. */
             delegator_address: string
@@ -1524,7 +1524,10 @@ export interface RESTCosmos44Datas {
 
     /** Queries the total rewards accrued by a delegation. */
     rewardsByDelegatorValidatorPair: {
-        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<'rewardsByDelegatorValidatorPair', 'delegator_address'>}/rewards/${PathParam<'rewardsByDelegatorValidatorPair', 'validator_address'>}`
+        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<
+            'rewardsByDelegatorValidatorPair',
+            'delegator_address'
+        >}/rewards/${PathParam<'rewardsByDelegatorValidatorPair', 'validator_address'>}`
         pathParams: {
             /** The delegator address to query for. */
             delegator_address: string
@@ -1542,7 +1545,10 @@ export interface RESTCosmos44Datas {
 
     /** Queries the validators of a delegator. */
     validatorsByDelegator: {
-        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<'validatorsByDelegator', 'delegator_address'>}/validators`
+        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<
+            'validatorsByDelegator',
+            'delegator_address'
+        >}/validators`
         pathParams: {
             /** The delegator address to query for. */
             delegator_address: string
@@ -1555,7 +1561,10 @@ export interface RESTCosmos44Datas {
 
     /** Queries withdraw address of a delegator. */
     withdrawAddressByDelegator: {
-        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<'withdrawAddressByDelegator', 'delegator_address'>}/withdraw_address`
+        endpoint: `/cosmos/distribution/v1beta1/delegators/${PathParam<
+            'withdrawAddressByDelegator',
+            'delegator_address'
+        >}/withdraw_address`
         pathParams: {
             /** The delegator address to query for. */
             delegator_address: string
@@ -1568,7 +1577,10 @@ export interface RESTCosmos44Datas {
 
     /** Queries accumulated commission for a validator. */
     commissionByValidator: {
-        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<'commissionByValidator', 'validator_address'>}/commission`
+        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<
+            'commissionByValidator',
+            'validator_address'
+        >}/commission`
         pathParams: {
             /** The validator address to query for. */
             validator_address: string
@@ -1586,7 +1598,10 @@ export interface RESTCosmos44Datas {
 
     /** Queries accumulated rewards for a validator. */
     outstandingRewardsByValidator: {
-        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<'outstandingRewardsByValidator', 'validator_address'>}/outstanding_rewards`
+        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<
+            'outstandingRewardsByValidator',
+            'validator_address'
+        >}/outstanding_rewards`
         pathParams: {
             /** The validator address to query for. */
             validator_address: string
@@ -1604,7 +1619,10 @@ export interface RESTCosmos44Datas {
 
     /** Queries slash events for a validator. */
     slashesByValidator: {
-        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<'outstandingRewardsByValidator', 'validator_address'>}/slashes`
+        endpoint: `/cosmos/distribution/v1beta1/validators/${PathParam<
+            'outstandingRewardsByValidator',
+            'validator_address'
+        >}/slashes`
         pathParams: {
             /** The validator address to query for. */
             validator_address: string
@@ -1621,7 +1639,6 @@ export interface RESTCosmos44Datas {
                 fraction: string
             }>
         }
-
     }
 }
 
