@@ -1,0 +1,12 @@
+{
+    "cosmos": "https://raw.githubusercontent.com/cosmos/cosmos-sdk/main/client/docs/swagger-ui/swagger.yaml",
+    "evmos": "https://raw.githubusercontent.com/evmos/evmos/main/client/docs/swagger-ui/swagger.yaml",
+    "axelar": "https://raw.githubusercontent.com/axelarnetwork/axelar-core/main/client/docs/static/swagger/swagger.yaml",
+    "canto": "https://raw.githubusercontent.com/Canto-Network/ethermint-test/main/client/docs/swagger-ui/swagger.yaml",
+    "osmosis": "https://raw.githubusercontent.com/osmosis-labs/osmosis/main/client/docs/static/swagger/swagger.yaml",
+    "kava": "https://raw.githubusercontent.com/Kava-Labs/kava/master/client/docs/swagger-ui/swagger.yaml",
+    "akash": "https://raw.githubusercontent.com/ovrclk/akash/master/client/docs/swagger-ui/swagger.yaml",
+    "secret": "https://raw.githubusercontent.com/scrtlabs/SecretNetwork/master/client/docs/static/swagger/swagger.yaml",
+    "umee": "https://raw.githubusercontent.com/umee-network/umee/main/swagger/swagger.yaml",
+    "haqq": "https://raw.githubusercontent.com/haqq-network/haqq/master/client/docs/swagger-ui/swagger.yaml"
+}
