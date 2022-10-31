@@ -11,6 +11,7 @@ export class EvmosChain extends Cosmos44Chain {
     }
 
 
+    /** Returns the balance of a single coin for a single account. */
     async getBalanceEvmos({
         address,
         ...query
@@ -21,7 +22,13 @@ export class EvmosChain extends Cosmos44Chain {
         )
     }
 
+    /** Returns the inflation rate of the current period. */
     async getInflationEvmos() {
         return this.restGetRequest<'evmosInflation'>(`/evmos/inflation/v1/inflation_rate`, undefined)
+    }
+
+    /** Returns the total number of tokens that are in circulation (i.e. excluding unvested tokens). */
+    async getCirculatingSupplyEvmos() {
+        return this.restGetRequest<'evmosCirculatingSupply'>('/evmos/inflation/v1/circulating_supply', undefined)
     }
 }
