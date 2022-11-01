@@ -1,8 +1,11 @@
 {
   "name": "api_generator_app",
   "module": "index.ts",
-  "type": "module",
   "devDependencies": {
     "bun-types": "^0.2.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "yaml": "^2.1.3"
   }
 }
