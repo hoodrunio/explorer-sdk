@@ -42,4 +42,3 @@ The swagger files for each chain:
 - We should also find `openapi.yaml` files.
 - [Juno](https://raw.githubusercontent.com/CosmosContracts/juno/main/docs/static/openapi.yml)
 - [Stride](https://raw.githubusercontent.com/Stride-Labs/stride/main/docs/static/openapi.yml)
-- [Celestia](https://raw.githubusercontent.com/celestiaorg/celestia-core/master/rpc/openapi/openapi.yaml)
