@@ -35,7 +35,10 @@ The swagger files for each chain:
 - [Secret](https://raw.githubusercontent.com/scrtlabs/SecretNetwork/master/client/docs/static/swagger/swagger.yaml)
 - [Umee](https://raw.githubusercontent.com/umee-network/umee/main/swagger/swagger.yaml)
 - [Haqq](https://raw.githubusercontent.com/haqq-network/haqq/master/client/docs/swagger-ui/swagger.yaml)
+- [Iris (Last updated in 2021)](https://raw.githubusercontent.com/irisnet/irishub/master/lite/swagger-ui/swagger.yaml)
 
 
 ## Open API Files
 - We should also find `openapi.yaml` files.
+- [Juno](https://raw.githubusercontent.com/CosmosContracts/juno/main/docs/static/openapi.yml)
+- [Stride](https://raw.githubusercontent.com/Stride-Labs/stride/main/docs/static/openapi.yml)
