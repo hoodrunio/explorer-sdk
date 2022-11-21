@@ -1,4 +1,4 @@
-# Explorer Monorepo
+# Explorer Monorepo (Deprecated)
 
 This repo contains (will contain) everything for the upcoming explorer.
 
